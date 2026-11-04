@@ -9,8 +9,8 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const XUMM_API_KEY = process.env.XUMM_API_KEY;
-const XUMM_API_SECRET = process.env.XUMM_API_SECRET;
+const XUMM_API_KEY = process.env.XUMM_API_KEY || process.env.XUMM_APIKEY;
+const XUMM_API_SECRET = process.env.XUMM_API_SECRET || process.env.XUMM_APISECRET;
 
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS;
 const MINTING_ADDRESS = process.env.MINTING_ADDRESS;

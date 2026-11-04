@@ -1,0 +1,237 @@
+const express = require('express');
+const cors = require('cors');
+const { XummSdk } = require('xumm-sdk');
+const xrpl = require('xrpl');
+require('dotenv').config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
+const XUMM_API_KEY = process.env.XUMM_API_KEY;
+const XUMM_API_SECRET = process.env.XUMM_API_SECRET;
+
+const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS;
+const MINTING_ADDRESS = process.env.MINTING_ADDRESS;
+const MINTING_SECRET = process.env.MINTING_SECRET;
+
+// Inicializar SDK de Xaman
+const Sdk = new XummSdk(XUMM_API_KEY, XUMM_API_SECRET);
+
+// Almacén temporal de estados de payloads en memoria
+const activePayloads = {};
+
+// 1. Endpoint para conectar billetera genérica con Xaman
+app.post('/api/connect-wallet', async (req, res) => {
+    try {
+        const payload = {
+            txjson: {
+                TransactionType: "SignIn"
+            }
+        };
+
+        const created = await Sdk.payload.create(payload);
+        if (!created) {
+            return res.status(500).json({ error: 'No se pudo crear el payload en Xaman' });
+        }
+
+        activePayloads[created.uuid] = { signed: false, account: null };
+
+        res.json({
+            uuid: created.uuid,
+            qr_code: created.refs.qr_png,
+            deep_link: created.next.always
+        });
+    } catch (error) {
+        console.error('Error en /api/connect-wallet:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 2. Endpoint de Compra / Pago dirigido a la Tesorería (Opción B)
+app.post('/api/buy-nft', async (req, res) => {
+    try {
+        const { priceXRP } = req.body;
+        const drops = Math.floor(parseFloat(priceXRP) * 1000000).toString();
+
+        // El pago va DIRECTO a la dirección de Tesorería
+        const payload = {
+            txjson: {
+                TransactionType: "Payment",
+                Destination: TREASURY_ADDRESS,
+                Amount: drops
+            }
+        };
+
+        const created = await Sdk.payload.create(payload);
+        if (!created) {
+            return res.status(500).json({ error: 'Error al generar la orden de pago en Xaman' });
+        }
+
+        activePayloads[created.uuid] = { signed: false, type: 'buy', price: priceXRP };
+
+        res.json({
+            uuid: created.uuid,
+            qr_code: created.refs.qr_png,
+            deep_link: created.next.always
+        });
+    } catch (error) {
+        console.error('Error en /api/buy-nft:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 3. Endpoint para verificar el estado de la firma en Xaman
+app.get('/api/check-status/:uuid', async (req, res) => {
+    try {
+        const uuid = req.params.uuid;
+        const payloadInfo = await Sdk.payload.get(uuid);
+
+        if (!payloadInfo) {
+            return res.status(404).json({ error: 'Payload no encontrado' });
+        }
+
+        const signed = payloadInfo.meta.signed;
+        const expired = payloadInfo.meta.expired;
+        const account = payloadInfo.response.account;
+
+        if (signed) {
+            activePayloads[uuid] = {
+                signed: true,
+                account: account,
+                expired: false
+            };
+
+            // Validar si la cuenta conectada es la tesorería (Admin)
+            const isAdmin = (account === TREASURY_ADDRESS);
+
+            return res.json({
+                signed: true,
+                expired: false,
+                account: account,
+                isAdmin: isAdmin
+            });
+        }
+
+        if (expired) {
+            return res.json({ signed: false, expired: true });
+        }
+
+        res.json({ signed: false, expired: false });
+    } catch (error) {
+        console.error('Error verificando estado:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 4. Endpoint para consultar balances en XRP de cualquier cuenta
+app.get('/api/balances/:address', async (req, res) => {
+    const address = req.params.address;
+    const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233'); // Cambiar a Mainnet cuando esté en producción
+
+    try {
+        await client.connect();
+        const response = await client.request({
+            command: 'account_info',
+            account: address,
+            ledger_index: 'validated'
+        });
+
+        const drops = response.result.account_data.Balance;
+        const xrp = xrpl.dropsToXrp(drops);
+
+        await client.disconnect();
+        res.json({ success: true, xrp: xrp });
+    } catch (error) {
+        await client.disconnect();
+        console.error('Error obteniendo balance:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 5. Función de Minteo Automático XLS-20 (Ejecutada por la cuenta de minteo)
+async function executeAutomaticMint(nftMetadataURI) {
+    const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
+    try {
+        await client.connect();
+
+        const mintingWallet = xrpl.Wallet.fromSeed(MINTING_SECRET);
+
+        const mintTx = {
+            TransactionType: "NFTokenMint",
+            Account: mintingWallet.classicAddress,
+            NFTokenTaxon: 1,
+            Flags: 8, // tfTransferable
+            URI: xrpl.convertStringToHex(nftMetadataURI),
+            TransferFee: 250 // 2.5% regalía de reventa
+        };
+
+        const result = await client.submitAndWait(mintTx, { wallet: mintingWallet });
+        console.log("¡NFT minteado exitosamente por la cuenta de minteo!", result.result.hash);
+
+        await client.disconnect();
+        return result.result.hash;
+    } catch (error) {
+        await client.disconnect();
+        console.error('Error en minteo automático XLS-20:', error);
+        throw error;
+    }
+}
+// Endpoint para procesar el minteo automático XLS-20 desde la web
+// Endpoint para procesar el minteo automático XLS-20 desde la web
+app.post('/api/mint-nft', async (req, res) => {
+    try {
+        const { title, price, category, image, video, license, description, royalty } = req.body;
+        
+        const metadata = {
+            name: title,
+            description: description,
+            image: image,
+            animation_url: video || null,
+            attributes: [
+                { trait_type: "Category", value: category },
+                { trait_type: "License", value: license }
+            ]
+        };
+
+        const metadataURI = "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf4dfuyljbad43rk2q5i4chkuai/" + encodeURIComponent(title);
+
+        const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
+        await client.connect();
+
+        const mintingWallet = xrpl.Wallet.fromSeed(MINTING_SECRET);
+        const transferFeeVal = Math.round(parseFloat(royalty) * 100);
+
+        let taxon = 1;
+        if (category.includes('Zodiac')) taxon = 2;
+        else if (category.includes('Botanical')) taxon = 3;
+        else if (category.includes('Universal')) taxon = 4;
+
+        const mintTx = {
+            TransactionType: "NFTokenMint",
+            Account: mintingWallet.classicAddress,
+            NFTokenTaxon: taxon,
+            Flags: 8, // tfTransferable
+            URI: xrpl.convertStringToHex(metadataURI),
+            TransferFee: transferFeeVal
+        };
+
+        const result = await client.submitAndWait(mintTx, { wallet: mintingWallet });
+        await client.disconnect();
+
+        res.json({ 
+            success: true, 
+            message: 'NFT minted successfully on XRPL',
+            txHash: result.result.hash,
+            issuer: mintingWallet.classicAddress
+        });
+
+    } catch (error) {
+        console.error('Error during automatic minting:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+app.listen(PORT, () => {
+    console.log(`Servidor de Aeterna Ledger corriendo en http://localhost:${PORT}`);
+});

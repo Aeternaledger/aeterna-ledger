@@ -1,7 +1,1126 @@
 <!DOCTYPE html>
-<html>
-<body style="background:#070A0F; color:#D4AF37; text-align:center; padding-top:20%; font-family:sans-serif;">
-    <h1>AETERNA LEDGER</h1>
-    <p style="color:#888;"> Launching Soon</p>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETERNA LEDGER | Universal Asset Tokenization</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: {
+                            dark: '#070A0F',
+                            card: '#0D131F',
+                            border: '#1E293B',
+                            gold: '#D4AF37'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #070A0F; color: #F1F5F9; font-family: system-ui, -apple-system, sans-serif; }
+        .btn-xaman { background-color: #087bff; color: #ffffff; transition: all 0.2s ease; }
+        .btn-xaman:hover { background-color: #3395ff; box-shadow: 0 0 20px rgba(8, 123, 255, 0.35); }
+        .btn-buy { background-color: #D4AF37; color: #000000; font-weight: 600; transition: all 0.2s ease; }
+        .btn-buy:hover { background-color: #e6c547; box-shadow: 0 0 20px rgba(212, 175, 55, 0.35); }
+        .wallet-connected-badge { background-color: #043875; border-color: #087bff; color: #60a5fa; transition: all 0.2s ease; }
+        .wallet-connected-badge:hover { background-color: #052c5c; border-color: #ef4444; color: #fca5a5; }
+        .nav-active { background-color: #1E293B; color: #D4AF37; font-weight: 700; border-bottom: 2px solid #D4AF37; }
+        
+        /* ORGANIC TAXONOMY BANNER STYLES */
+        .pillar-card {
+            background: linear-gradient(180deg, rgba(13, 19, 31, 0.9) 0%, rgba(7, 10, 15, 0.95) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pillar-card:hover {
+            border-color: rgba(212, 175, 55, 0.8);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+            transform: translateY(-2px);
+        }
+        .sub-node {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .sub-node:hover {
+            border-color: #D4AF37;
+            color: #D4AF37;
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateX(4px);
+        }
+        .organic-line {
+            background: linear-gradient(180deg, #D4AF37 0%, rgba(212, 175, 55, 0.1) 100%);
+        }
+        /* DUAL RANGE SLIDER */
+        .range-slider-container {
+            position: relative;
+            height: 8px;
+            background: #1E293B;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .range-slider-wrapper {
+            position: relative;
+            padding: 10px 0;
+        }
+        .range-slider-track {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(90deg, #D4AF37, #F59E0B);
+            border-radius: 999px;
+            top: 0;
+            bottom: 0;
+        }
+        .range-input {
+            position: absolute;
+            width: 100%;
+            height: 8px;
+            top: 10px;
+            left: 0;
+            background: none;
+            pointer-events: none;
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+            z-index: 20;
+        }
+        .range-input::-webkit-slider-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #D4AF37;
+            border: 2px solid #070A0F;
+            pointer-events: auto;
+            -webkit-appearance: none;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+        .range-input::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #F59E0B;
+        }
+        .chip-btn {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #94A3B8;
+            transition: all 0.2s ease;
+        }
+        .chip-btn:hover, .chip-btn.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: #D4AF37;
+            color: #D4AF37;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-obsidian-gold selection:text-black">
+    <!-- HEADER / NAVIGATION -->
+    <header class="border-b border-obsidian-border bg-obsidian-dark/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full border border-obsidian-gold/60 bg-obsidian-card flex items-center justify-center text-obsidian-gold font-bold text-lg shadow-md">
+                    Ɐ
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-widest text-white flex items-center gap-2">
+                        AETERNA LEDGER <span class="text-[10px] bg-obsidian-gold/10 text-obsidian-gold px-2 py-0.5 rounded border border-obsidian-gold/30 font-mono">XRPL XLS-20</span>
+                    </h1>
+                    <p id="t-subtitle" class="text-[11px] text-slate-400">Universal Unclaimed Asset Ledger</p>
+                </div>
+            </div>
+            <!-- NAVIGATION MENU -->
+            <div class="flex flex-wrap items-center gap-3">
+                <nav class="flex space-x-1 text-xs font-mono">
+                    <button onclick="switchTab('about')" id="tab-about" class="px-3 py-2 rounded text-slate-300 hover:text-white transition nav-active">About</button>
+                    <button onclick="switchTab('store')" id="tab-store" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Store</button>
+                    <button onclick="switchTab('mint')" id="tab-mint" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Mint Studio</button>
+                    <button onclick="switchTab('market')" id="tab-market" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Marketplace</button>
+                    <button onclick="switchTab('mynfts')" id="tab-mynfts" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Holdings</button>
+                    <button onclick="switchTab('admin')" id="tab-admin" class="hidden px-3 py-2 rounded text-slate-400 hover:text-white border border-obsidian-gold/30">Admin</button>
+                </nav>
+                <!-- SELECTOR DE IDIOMA CON BANDERAS -->
+                <div class="relative inline-block text-left font-mono text-xs">
+                    <select id="language-select" onchange="changeLanguage(this.value)" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-2.5 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/50 transition">
+                        <option value="en">🇬🇧 EN</option>
+                        <option value="es">sp ES</option>
+                        <option value="ja">🇯🇵 JA</option>
+                        <option value="ko">🇰🇷 KO</option>
+                        <option value="zh">🇨🇳 ZH</option>
+                        <option value="ru">🇷🇺 RU</option>
+                    </select>
+                </div>
+                <!-- WALLET STATUS -->
+                <div id="wallet-balances" class="hidden items-center gap-2 font-mono text-[11px] bg-obsidian-card border border-obsidian-border px-3 py-1.5 rounded-lg">
+                    <span class="text-slate-400">XRP:</span>
+                    <span id="balance-xrp" class="text-obsidian-gold font-bold">0.00</span>
+                </div>
+                <div id="wallet-status" onclick="disconnectWallet()" title="Click to disconnect" class="hidden text-xs px-3 py-2 rounded-lg font-mono cursor-pointer border wallet-connected-badge flex items-center gap-1.5">
+                    <span>🟢</span> <span id="wallet-address-text">Connected</span>
+                </div>
+                <button onclick="connectXaman()" id="connect-btn" class="btn-xaman font-semibold px-4 py-2 rounded-lg text-xs tracking-wide shadow-md">
+                    Connect Xaman
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
+        
+        <!-- VIEW 0: ABOUT / WHAT IS AETERNA LEDGER -->
+        <section id="view-about" class="space-y-8 max-w-4xl mx-auto">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8 md:p-12 space-y-8 shadow-2xl">
+                <div class="space-y-3 text-center md:text-left">
+                    <span id="t-about-badge" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Manifesto & Vision</span>
+                    <h2 id="t-about-title" class="text-3xl md:text-4xl font-light text-white tracking-tight">What is Aeterna Ledger?</h2>
+                    <p id="t-about-desc" class="text-slate-400 text-sm leading-relaxed max-w-2xl">
+                        A digital registry dedicated to unclaimed elements associated with nature and the cosmos, represented strictly as NFTs on the XRP Ledger.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                    <div class="bg-obsidian-dark/70 border border-obsidian-border p-6 rounded-xl space-y-3">
+                        <div id="t-about-box1-sub" class="text-obsidian-gold font-mono text-xs uppercase tracking-wider">01. Digital Asset Ledger</div>
+                        <h3 id="t-about-box1-title" class="text-lg font-medium text-white">Tokenizing Unowned Elements</h3>
+                        <p id="t-about-box1-desc" class="text-xs text-slate-400 leading-relaxed">
+                            We created this platform so that anyone can mint digital representations of natural elements, plants, ideas, or concepts as NFTs strictly within the XRPL network.
+                        </p>
+                    </div>
+                    <div class="bg-obsidian-dark/70 border border-obsidian-border p-6 rounded-xl space-y-3">
+                        <div id="t-about-box2-sub" class="text-obsidian-gold font-mono text-xs uppercase tracking-wider">02. Powered by XRPL</div>
+                        <h3 id="t-about-box2-title" class="text-lg font-medium text-white">Speed, Security & Global Scale</h3>
+                        <p id="t-about-box2-desc" class="text-xs text-slate-400 leading-relaxed">
+                            We selected the XRP Ledger (XRPL) for its speed and security. Collectible NFTs of planets, stars, or concepts exist exclusively within the XRPL blockchain ecosystem.
+                        </p>
+                    </div>
+                </div>
+                <div class="border-t border-obsidian-border pt-6 text-center">
+                    <p id="t-about-quote" class="text-xs text-slate-400 italic font-mono mb-6">"Digital elements on the XRP Ledger without real-world ownership claims."</p>
+                    <button onclick="switchTab('store')" id="t-about-btn" class="btn-buy px-6 py-3 rounded-xl text-xs font-bold tracking-widest uppercase shadow-lg">
+                        Explore Genesis Store &rarr;
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- VIEW 1: REGISTRY STORE -->
+        <section id="view-store" class="hidden space-y-8">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8 relative overflow-hidden">
+                <div class="max-w-3xl space-y-3 relative z-10">
+                    <span id="t-tag" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Official Genesis Registry</span>
+                    <h2 id="t-hero-title" class="text-3xl font-light text-white tracking-tight">Tokenization of Unclaimed Universal Elements</h2>
+                    <p id="t-hero-desc" class="text-slate-400 text-sm leading-relaxed">
+                        Acquire digital NFTs for natural elements, celestial bodies, flora, and archetypes. Valid strictly within the XRPL ecosystem with direct settlement in <strong class="text-obsidian-gold">XRP</strong>.
+                    </p>
+                </div>
+            </div>
+            <!-- TAXONOMY BANNER STORE -->
+            <div class="space-y-6">
+                <div class="text-center space-y-1">
+                    <h3 id="t-taxo-title" class="text-xs font-mono tracking-widest uppercase text-obsidian-gold">Universal Taxonomy Network</h3>
+                    <p id="t-taxo-subtitle" class="text-xs text-slate-400">Select a category branch to filter registered assets</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                    <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
+                        <div class="w-12 h-12 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-xl font-mono shadow-inner mb-4">🌌</div>
+                        <h4 id="t-p1-title" class="text-base font-medium text-white tracking-wide">Cosmos & Deep Space</h4>
+                        <span id="t-p1-desc" class="text-[10px] text-slate-500 font-mono mb-6 uppercase tracking-wider">Digital Cosmic Assets</span>
+                        <div class="w-px h-6 organic-line mb-4"></div>
+                        <div class="w-full space-y-2.5 font-mono text-xs">
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Planets', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p1-s1" class="text-slate-300">Planets & Moons</span>
+                            </div>
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Stars', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p1-s2" class="text-slate-300">Stars & Stellar Systems</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
+                        <div class="w-12 h-12 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-xl font-mono shadow-inner mb-4">🌍</div>
+                        <h4 id="t-p2-title" class="text-base font-medium text-white tracking-wide">Biosphere & Terrestrial Gea</h4>
+                        <span id="t-p2-desc" class="text-[10px] text-slate-500 font-mono mb-6 uppercase tracking-wider">Digital Terrestrial Collectibles</span>
+                        <div class="w-px h-6 organic-line mb-4"></div>
+                        <div class="w-full space-y-2.5 font-mono text-xs">
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Fauna', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p2-s1" class="text-slate-300">Fauna & Wild Species</span>
+                            </div>
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Botanical', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p2-s2" class="text-slate-300">Botany & Master Flora</span>
+                            </div>
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Minerals', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p2-s3" class="text-slate-300">Minerals & Pure Elements</span>
+                            </div>
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Geography', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p2-s4" class="text-slate-300">Global Geography & Waters</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
+                        <div class="w-12 h-12 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-xl font-mono shadow-inner mb-4">💡</div>
+                        <h4 id="t-p3-title" class="text-base font-medium text-white tracking-wide">Intangible, Concepts & Culture</h4>
+                        <span id="t-p3-desc" class="text-[10px] text-slate-500 font-mono mb-6 uppercase tracking-wider">Public Domain Abstraciton (CC0)</span>
+                        <div class="w-px h-6 organic-line mb-4"></div>
+                        <div class="w-full space-y-2.5 font-mono text-xs">
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Concepts', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p3-s1" class="text-slate-300">Concepts, Ideas & Knowledge</span>
+                            </div>
+                            <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Symbols', 'store')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span id="t-p3-s2" class="text-slate-300">Symbols, Archetypes & Culture</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- TOOLBAR STORE -->
+            <div class="bg-obsidian-card border border-obsidian-border p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
+                <div class="flex items-center gap-2">
+                    <span id="t-cat-label" class="text-slate-400">Category:</span>
+                    <span id="active-category-tag" class="text-obsidian-gold font-bold bg-obsidian-gold/10 px-2.5 py-1 rounded border border-obsidian-gold/30">ALL</span>
+                    <button id="reset-filter-btn" onclick="resetFilter('store')" class="hidden text-slate-400 hover:text-white underline text-[11px] ml-2">Reset Filter</button>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <select id="sort-select" onchange="applyFiltersAndSort()" class="bg-obsidian-dark border border-obsidian-border text-slate-300 py-2 px-3 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/50 transition">
+                        <option value="newest" id="opt-newest">Sort: Newest First</option>
+                        <option value="oldest" id="opt-oldest">Sort: Oldest First</option>
+                        <option value="price-asc" id="opt-price-asc">Price: Low to High</option>
+                        <option value="price-desc" id="opt-price-desc">Price: High to Low</option>
+                        <option value="name-asc" id="opt-name-asc">Name: A to Z</option>
+                        <option value="name-desc" id="opt-name-desc">Name: Z to A</option>
+                    </select>
+                </div>
+            </div>
+            <div id="nft-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2"></div>
+        </section>
+        <!-- VIEW 2: XLS-20 MINT STUDIO -->
+        <section id="view-mint" class="hidden space-y-8 max-w-4xl mx-auto">
+            <div class="bg-obsidian-card border border-obsidian-border rounded-2xl p-8 space-y-6 shadow-2xl">
+                <div class="border-b border-obsidian-border pb-4">
+                    <span id="t-mint-badge" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Protocol Engine</span>
+                    <h2 id="t-mint-title" class="text-2xl font-light text-white mt-2">Digital XLS-20 NFT Mint Studio</h2>
+                    <p id="t-mint-desc" class="text-xs text-slate-400 mt-1">Register and mint your digital NFT on XRPL Ledger under CC0 License metadata.</p>
+                </div>
+                <form id="user-mint-form" onsubmit="handleUserMint(event)" class="space-y-5 text-xs font-mono">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label id="t-lbl-title" class="text-slate-300 block">Element Title *</label>
+                            <input type="text" id="mint-title" required placeholder="e.g. Constellation Andromeda Core" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label id="t-lbl-cat" class="text-slate-300 block">Registry Category *</label>
+                            <select id="mint-category" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
+                                <option value="Planets & Moons">Planets & Moons</option>
+                                <option value="Stars & Stellar Systems">Stars & Stellar Systems</option>
+                                <option value="Fauna & Wild Species">Fauna & Wild Species</option>
+                                <option value="Botany & Master Flora">Botany & Master Flora</option>
+                                <option value="Minerals & Pure Elements">Minerals & Pure Elements</option>
+                                <option value="Global Geography & Waters">Global Geography & Waters</option>
+                                <option value="Concepts, Ideas & Knowledge">Concepts, Ideas & Knowledge</option>
+                                <option value="Symbols, Archetypes & Culture">Symbols, Archetypes & Culture</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label id="t-lbl-price" class="text-slate-300 block">Initial Price in XRP *</label>
+                            <input type="number" id="mint-price" required placeholder="15" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label id="t-lbl-royalty" class="text-slate-300 block">Creator Royalty Fee (%)</label>
+                            <input type="number" id="mint-royalty" min="0" max="50" value="2.5" step="0.5" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label id="t-lbl-img" class="text-slate-300 block">Cover Image URL (Thumbnail / Poster) *</label>
+                            <input type="url" id="mint-image" required placeholder="https://images.unsplash.com/... (JPG/PNG)" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label id="t-lbl-video" class="text-slate-300 block">Video Asset URL (Optional Animation / MP4)</label>
+                            <input type="url" id="mint-video" placeholder="https://.../animation.mp4 (Optional)" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label id="t-lbl-lic" class="text-slate-300 block">Legal License Standard *</label>
+                        <select id="mint-license" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
+                            <option value="CC0 (Public Domain)">CC0 (Public Domain - Universal Digital Asset)</option>
+                            <option value="CC BY 4.0">CC BY 4.0 (Attribution Required)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label id="t-lbl-hist" class="text-slate-300 block">Description / History *</label>
+                        <textarea id="mint-desc-text" rows="3" required placeholder="Detailed specifications of the digital asset..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none"></textarea>
+                    </div>
+                    <div class="legal-disclaimer-box" style="background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; padding: 15px; margin: 20px 0; text-align: left;">
+                        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: #E0E0E0; font-size: 0.85rem; line-height: 1.4;">
+                            <input type="checkbox" id="mint-legal-agree" required style="margin-top: 3px; accent-color: #D4AF37; cursor: pointer;">
+                            <span id="t-legal-text">
+                                I have read and agree to the Terms & Legal Disclaimer (I understand these NFTs are digital assets valid exclusively within the XRPL network with no real-world asset ownership or financial promises). *
+                            </span>
+                        </label>
+                    </div>
+                    <button type="submit" id="t-mint-submit" class="w-full btn-buy py-3.5 rounded-xl text-sm font-bold tracking-wider uppercase">
+                        Mint & Register XLS-20 Asset
+                    </button>
+                </form>
+            </div>
+        </section>
+        <!-- VIEW 3: SECONDARY MARKETPLACE -->
+        <section id="view-market" class="hidden space-y-8">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="text-[11px] uppercase tracking-widest text-emerald-400 font-mono bg-emerald-950/40 px-3 py-1 rounded border border-emerald-500/30 flex items-center gap-1.5 w-fit">
+                        <span>🛡️</span> Verified Issuer Protection
+                    </span>
+                    <h2 id="t-market-title" class="text-2xl font-light text-white mt-2">Verified Secondary Marketplace</h2>
+                    <p id="t-market-desc" class="text-slate-400 text-xs mt-1">Secondary listings strictly filtered by Aeterna Ledger Issuer signature. No external spam.</p>
+                </div>
+            </div>
+            <!-- TAXONOMY MARKETPLACE -->
+            <div class="space-y-6">
+                <div class="text-center space-y-1">
+                    <h3 id="t-market-taxo-title" class="text-xs font-mono tracking-widest uppercase text-obsidian-gold">Marketplace Taxonomy</h3>
+                    <p id="t-market-taxo-sub" class="text-xs text-slate-400">Filter secondary verified listings by branch</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                    <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
+                        <div class="w-10 h-10 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-lg font-mono shadow-inner mb-3">🌌</div>
+                        <h4 class="text-sm font-medium text-white tracking-wide">Cosmos & Deep Space</h4>
+                        <div class="w-full space-y-2 font-mono text-xs mt-4">
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Planets', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Planets & Moons</span>
+                            </div>
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Stars', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Stars & Stellar Systems</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
+                        <div class="w-10 h-10 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-lg font-mono shadow-inner mb-3">🌍</div>
+                        <h4 class="text-sm font-medium text-white tracking-wide">Biosphere & Terrestrial Gea</h4>
+                        <div class="w-full space-y-2 font-mono text-xs mt-4">
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Fauna', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Fauna & Wild Species</span>
+                            </div>
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Botanical', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Botany & Master Flora</span>
+                            </div>
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Minerals', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Minerals & Pure Elements</span>
+                            </div>
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Geography', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Global Geography & Waters</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
+                        <div class="w-10 h-10 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-lg font-mono shadow-inner mb-3">💡</div>
+                        <h4 class="text-sm font-medium text-white tracking-wide">Intangible & Concepts</h4>
+                        <div class="w-full space-y-2 font-mono text-xs mt-4">
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Concepts', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Concepts, Ideas & Knowledge</span>
+                            </div>
+                            <div class="sub-node p-2.5 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Symbols', 'market')">
+                                <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
+                                <span class="text-slate-300">Symbols, Archetypes & Culture</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- TOOLBAR MARKETPLACE -->
+            <div class="bg-gradient-to-r from-obsidian-card via-obsidian-dark to-obsidian-card border border-obsidian-gold/30 p-6 rounded-2xl shadow-xl space-y-6 font-mono text-xs">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-obsidian-border pb-4">
+                    <div class="flex items-center gap-2">
+                        <span id="t-market-cat-label" class="text-slate-400">Market Category:</span>
+                        <span id="market-active-category-tag" class="text-obsidian-gold font-bold bg-obsidian-gold/10 px-2.5 py-1 rounded border border-obsidian-gold/30">ALL</span>
+                        <button id="market-reset-filter-btn" onclick="resetFilter('market')" class="hidden text-slate-400 hover:text-white underline text-[11px] ml-2">Reset Category</button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="setMarketPricePreset(1, 1000, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px] active">All (1 - +1000 XRP)</button>
+                        <button onclick="setMarketPricePreset(1, 100, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">1 - 100 XRP</button>
+                        <button onclick="setMarketPricePreset(100, 250, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">100 - 250 XRP</button>
+                        <button onclick="setMarketPricePreset(250, 500, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">250 - 500 XRP</button>
+                        <button onclick="setMarketPricePreset(500, 1000, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">+1000 XRP</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2">
+                    <div class="lg:col-span-8 space-y-3 bg-obsidian-dark/80 p-4 rounded-xl border border-obsidian-border">
+                        <div class="flex justify-between items-center text-xs">
+                            <span id="t-range-label" class="text-slate-400">Selected Price Range:</span>
+                            <div class="text-obsidian-gold font-bold bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/30">
+                                <span id="m-range-min-val">1</span> XRP — <span id="m-range-max-val">+1000</span> XRP
+                            </div>
+                        </div>
+                        <div class="range-slider-wrapper">
+                            <div class="range-slider-container">
+                                <div id="m-slider-track" class="range-slider-track" style="left: 0%; right: 0%;"></div>
+                            </div>
+                            <input type="range" id="m-slider-min" min="1" max="1000" value="1" step="1" oninput="updateMarketSlider()" class="range-input">
+                            <input type="range" id="m-slider-max" min="1" max="1000" value="1000" step="1" oninput="updateMarketSlider()" class="range-input">
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
+                            <span>1 XRP</span>
+                            <span>100 XRP</span>
+                            <span>250 XRP</span>
+                            <span>500 XRP</span>
+                            <span>+1000 XRP</span>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-4 space-y-2">
+                        <label id="t-sort-label" class="text-slate-400 text-xs block">Sort Asset Sequence</label>
+                        <select id="market-sort-select" onchange="applyMarketplaceFilters()" class="w-full bg-obsidian-dark border border-obsidian-gold/40 text-slate-200 py-3 px-4 rounded-xl outline-none cursor-pointer hover:border-obsidian-gold transition shadow-md">
+                            <option value="newest" id="m-opt-newest">⚡ Sort: Newest First</option>
+                            <option value="oldest" id="m-opt-oldest">⌛ Sort: Oldest First</option>
+                            <option value="price-asc" id="m-opt-price-asc">📉 Price: Low to High</option>
+                            <option value="price-desc" id="m-opt-price-desc">📈 Price: High to Low</option>
+                            <option value="name-asc" id="m-opt-name-asc">🔤 Name: A to Z</option>
+                            <option value="name-desc" id="m-opt-name-desc">🔤 Name: Z to A</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="market-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </section>
+        <!-- VIEW 4: MY HOLDINGS -->
+        <section id="view-mynfts" class="hidden space-y-8">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8">
+                <h2 id="t-my-title" class="text-2xl font-light text-white tracking-tight">Personal Digital Holdings</h2>
+                <p id="t-my-desc" class="text-slate-400 text-xs mt-1">Digital NFT assets on the XRP Ledger linked to your connected wallet.</p>
+            </div>
+            <div id="my-nfts-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
+                    <p id="t-my-empty" class="text-slate-400 text-sm font-mono">Connect your wallet to synchronize your acquired digital NFTs.</p>
+                </div>
+            </div>
+        </section>
+        <!-- VIEW 5: ADMIN STUDIO -->
+        <section id="view-admin" class="hidden space-y-8 max-w-3xl mx-auto">
+            <div class="bg-obsidian-card border border-obsidian-border rounded-2xl p-8 space-y-6 shadow-xl">
+                <div class="border-b border-obsidian-border pb-4">
+                    <h3 class="text-xl font-medium text-white flex items-center gap-2">🛡️ Admin Treasury Studio</h3>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- FOOTER -->
+    <footer class="border-t border-obsidian-border bg-obsidian-dark py-6 text-center text-xs text-slate-500 font-mono">
+        <p>Aeterna Ledger Ecosystem &bull; XRPL XLS-20 Standard & Xaman &bull; NFTs represent digital assets exclusively valid within the XRPL network.</p>
+    </footer>
+    <!-- NFT DETAILS MODAL -->
+    <div id="details-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
+        <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row">
+            <div class="md:w-1/2 h-72 md:h-auto bg-black relative">
+                <img id="detail-img" src="" alt="Asset Art" class="w-full h-full object-cover">
+                <span id="detail-rarity" class="absolute top-3 left-3 bg-obsidian-dark/80 text-obsidian-gold text-[10px] font-mono px-2.5 py-1 rounded border border-obsidian-gold/30"></span>
+            </div>
+            <div class="md:w-1/2 p-6 flex flex-col justify-between space-y-4">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-start">
+                        <h3 id="detail-title" class="text-xl font-bold text-white"></h3>
+                        <button onclick="closeDetails()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+                    </div>
+                    <p id="detail-desc" class="text-xs text-slate-300 leading-relaxed"></p>
+                </div>
+                <div class="space-y-3 pt-4 border-t border-obsidian-border">
+                    <div class="flex justify-between items-center font-mono">
+                        <span id="t-modal-price-label" class="text-xs text-slate-400">Price:</span>
+                        <span id="detail-price" class="text-obsidian-gold font-bold text-base"></span>
+                    </div>
+                    <button id="detail-buy-btn" onclick="" class="btn-buy-modal w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">
+                        Buy NFT
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- XAMAN QR MODAL -->
+    <div id="xaman-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl p-6 max-w-sm w-full space-y-6 text-center shadow-2xl">
+            <h3 id="t-modal-title" class="text-base font-medium text-white">Scan with Xaman Wallet</h3>
+            <div class="bg-white p-3 rounded-xl inline-block mx-auto border-2 border-obsidian-gold">
+                <img id="qr-code-img" src="" alt="Xaman QR" class="w-48 h-48 mx-auto">
+            </div>
+            <p id="modal-desc" class="text-xs text-slate-300">Approve on your mobile device.</p>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeModal()" id="t-btn-cancel" class="flex-1 bg-obsidian-border hover:bg-slate-800 text-slate-300 font-medium py-2.5 rounded-lg text-xs transition">Cancel</button>
+                <a id="deep-link-btn" href="#" target="_blank" class="flex-1 btn-xaman py-2.5 rounded-lg text-xs transition flex items-center justify-center font-semibold">Open App</a>
+            </div>
+        </div>
+    </div>
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentUserIsAdmin = false;
+        let activeInterval = null;
+        let activeCategoryFilterStore = 'ALL';
+        let activeCategoryFilterMarket = 'ALL';
+        const coreStoreNFTs = [
+            { id: 1, titleKey: 'nft_1_title', descKey: 'nft_1_desc', price: '25', rarity: 'Planets & Moons', img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80' },
+            { id: 2, titleKey: 'nft_2_title', descKey: 'nft_2_desc', price: '10', rarity: 'Botany & Master Flora', img: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80' },
+            { id: 3, titleKey: 'nft_3_title', descKey: 'nft_3_desc', price: '15', rarity: 'Concepts, Ideas & Knowledge', img: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80' },
+            { id: 4, titleKey: 'nft_4_title', descKey: 'nft_4_desc', price: '30', rarity: 'Stars & Stellar Systems', img: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80' }
+        ];
+        const secondaryMarketNFTs = [
+            { id: 101, titleKey: 'nft_5_title', descKey: 'nft_5_desc', price: '40', rarity: 'Stars & Stellar Systems', img: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80' },
+            { id: 102, titleKey: 'nft_6_title', descKey: 'nft_6_desc', price: '180', rarity: 'Global Geography & Waters', img: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=800&q=80' },
+            { id: 103, titleKey: 'nft_7_title', descKey: 'nft_7_desc', price: '650', rarity: 'Minerals & Pure Elements', img: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=800&q=80' }
+        ];
+        // DICCIONARIO MULTILINGÜE COMPLETO Y CORREGIDO SIN REFERENCIAS A SOBERANÍA O DERECHOS REALES
+        const translations = {
+            en: {
+                subtitle: "Universal Unclaimed Asset Ledger",
+                tabAbout: "About", tabStore: "Store", tabMint: "Mint Studio", tabMarket: "Marketplace", tabMyNfts: "Holdings",
+                connectBtn: "Connect Xaman", tag: "Official Genesis Registry",
+                heroTitle: "Tokenization of Unclaimed Universal Elements",
+                heroDesc: "Acquire digital NFTs for natural elements, celestial bodies, flora, and archetypes. Valid strictly within the XRPL ecosystem with direct settlement in XRP.",
+                mintBadge: "Protocol Engine", mintTitle: "Digital XLS-20 NFT Mint Studio", mintDesc: "Register and mint your digital NFT on XRPL Ledger under CC0 License metadata.",
+                lblTitle: "Element Title *", lblCat: "Registry Category *", lblPrice: "Initial Price in XRP *", lblRoyalty: "Creator Royalty Fee (%)",
+                lblImg: "Cover Image URL (Thumbnail / Poster) *", lblVideo: "Video Asset URL (Optional Animation / MP4)", lblLic: "Legal License Standard *", lblHist: "Description / History *",
+                legalText: "I have read and agree to the Terms & Legal Disclaimer (I understand these NFTs are digital assets valid exclusively within the XRPL network with no real-world asset ownership or financial promises). *",
+                mintSubmit: "Mint & Register XLS-20 Asset",
+                marketTitle: "Verified Secondary Marketplace",
+                marketDesc: "Secondary listings strictly filtered by Aeterna Ledger Issuer signature. No external spam.",
+                myTitle: "Personal Digital Holdings", myDesc: "Digital NFT assets on the XRP Ledger linked to your connected wallet.",
+                myEmpty: "Connect your wallet to synchronize your acquired digital NFTs.",
+                taxoTitle: "Universal Taxonomy Network", taxoSubtitle: "Select a category branch to filter registered assets",
+                marketTaxoTitle: "Marketplace Taxonomy", marketTaxoSub: "Filter secondary verified listings by branch",
+                catLabel: "Category:", marketCatLabel: "Market Category:", rangeLabel: "Selected Price Range:", sortLabel: "Sort Asset Sequence",
+                optNewest: "⚡ Sort: Newest First", optOldest: "⌛ Sort: Oldest First", optPriceAsc: "📉 Price: Low to High", optPriceDesc: "📈 Price: High to Low", optNameAsc: "🔤 Name: A to Z", optNameDesc: "🔤 Name: Z to A",
+                detailsBtn: "Details", acquireBtn: "Buy NFT", priceLabel: "Price", btnBuy: "Buy NFT",
+                aboutBadge: "Manifesto & Vision", aboutTitle: "What is Aeterna Ledger?",
+                aboutDesc: "A digital registry dedicated to unclaimed elements associated with nature and the cosmos, represented strictly as NFTs on the XRP Ledger.",
+                aboutBox1Sub: "01. Digital Asset Ledger", aboutBox1Title: "Tokenizing Unowned Elements",
+                aboutBox1Desc: "We created this platform so that anyone can mint digital representations of natural elements, plants, ideas, or concepts as NFTs strictly within the XRPL network.",
+                aboutBox2Sub: "02. Powered by XRPL", aboutBox2Title: "Speed, Security & Global Scale",
+                aboutBox2Desc: "We selected the XRP Ledger (XRPL) for its speed and security. Collectible NFTs of planets, stars, or concepts exist exclusively within the XRPL blockchain ecosystem.",
+                aboutQuote: "\"Digital elements on the XRP Ledger without real-world ownership claims.\"",
+                aboutBtn: "Explore Genesis Store →",
+                nft_1_title: "Exoplanet Kepler-442b", nft_1_desc: "Digital NFT representation of rocky exoplanet Kepler-442b on XRPL.",
+                nft_2_title: "Nicotiana Tabacum Genus", nft_2_desc: "Digital botanical NFT asset linked to ancestral plant strains on XRPL.",
+                nft_3_title: "Universal Harmony Principle", nft_3_desc: "Philosophical concept NFT representing equilibrium in collective systems.",
+                nft_4_title: "Alpha Centauri System", nft_4_desc: "Triple star system digital NFT asset registered under CC0 on XRPL.",
+                nft_5_title: "Constellation Lyra Star Alpha", nft_5_desc: "Resale listing verified from Aeterna Ledger Core Mint.",
+                nft_6_title: "Pacific Trench Water Zone", nft_6_desc: "Digital geographic NFT asset linked to ocean abyss coordinates.",
+                nft_7_title: "Gold Element Synthesis Model", nft_7_desc: "Atomic structure & physical properties dataset NFT on XRPL."
+            },
+            es: {
+                subtitle: "Registro Universal de Elementos Sin Dueño",
+                tabAbout: "Acerca de", tabStore: "Tienda", tabMint: "Estudio Mint", tabMarket: "Mercado", tabMyNfts: "Mis Activos",
+                connectBtn: "Conectar Xaman", tag: "Registro Génesis Oficial",
+                heroTitle: "Tokenización de Elementos Universales Libres",
+                heroDesc: "Adquiere NFT digitales para elementos naturales, cuerpos celestes, flora y arquetipos sin dueño. Válidos estrictamente dentro del ecosistema XRPL con liquidación en XRP.",
+                mintBadge: "Motor de Protocolo", mintTitle: "Estudio de Minteo Digital XLS-20 NFT", mintDesc: "Registra y mintea tu NFT digital en XRPL Ledger bajo metadatos de licencia CC0.",
+                lblTitle: "Título del Elemento *", lblCat: "Categoría de Registro *", lblPrice: "Precio Inicial en XRP *", lblRoyalty: "Tarifa de Regalía del Creador (%)",
+                lblImg: "URL de Imagen de Portada (Miniatura / Póster) *", lblVideo: "URL de Video (Animación / MP4 Opcional)", lblLic: "Estándar de Licencia Legal *", lblHist: "Descripción / Historia *",
+                legalText: "He leído y acepto los Términos y Aviso Legal (Comprendo que estos NFT son activos digitales válidos exclusivamente dentro de la red XRPL sin propiedad en el mundo real ni promesas financieras). *",
+                mintSubmit: "Mintear y Registrar Activo XLS-20",
+                marketTitle: "Mercado Secundario Verificado",
+                marketDesc: "Listados secundarios filtrados estrictamente por la firma del emisor Aeterna Ledger.",
+                myTitle: "Mis Activos Digitales", myDesc: "Activos NFT digitales en XRP Ledger vinculados a tu billetera conectada.",
+                myEmpty: "Conecta tu billetera para sincronizar tus NFT adquiridos.",
+                taxoTitle: "Red Taxonómica Universal", taxoSubtitle: "Selecciona una categoría para filtrar activos registrados",
+                marketTaxoTitle: "Taxonomía del Mercado", marketTaxoSub: "Filtra listados secundarios verificados por rama",
+                catLabel: "Categoría:", marketCatLabel: "Categoría de Mercado:", rangeLabel: "Rango de Precio Seleccionado:", sortLabel: "Orden de Activos",
+                optNewest: "⚡ Orden: Más Recientes", optOldest: "⌛ Orden: Más Antiguos", optPriceAsc: "📉 Precio: Menor a Mayor", optPriceDesc: "📈 Precio: Mayor a Menor", optNameAsc: "🔤 Nombre: A a Z", optNameDesc: "🔤 Nombre: Z a A",
+                detailsBtn: "Detalles", acquireBtn: "Comprar NFT", priceLabel: "Precio", btnBuy: "Comprar NFT",
+                aboutBadge: "Manifiesto y Visión", aboutTitle: "¿Qué es Aeterna Ledger?",
+                aboutDesc: "Un registro digital dedicado a elementos de la naturaleza y el cosmos sin dueño, representados estrictamente como NFTs en la red XRP Ledger.",
+                aboutBox1Sub: "01. Registro Digital de Activos", aboutBox1Title: "Tokenizar Elementos Libres",
+                aboutBox1Desc: "Creamos esta plataforma para que cualquiera pueda mintear representaciones digitales de elementos naturales, plantas o ideas como NFTs exclusivamente dentro de la red XRPL.",
+                aboutBox2Sub: "02. Impulsado por XRPL", aboutBox2Title: "Velocidad, Seguridad y Escala Global",
+                aboutBox2Desc: "Seleccionamos XRP Ledger (XRPL) por su velocidad y seguridad. Los NFTs coleccionables existen únicamente dentro del ecosistema blockchain de XRPL.",
+                aboutQuote: "\"Elementos digitales en el XRP Ledger sin derechos o propiedad sobre el mundo real.\"",
+                aboutBtn: "Explorar Tienda Génesis →",
+                nft_1_title: "Exoplaneta Kepler-442b", nft_1_desc: "Representación digital NFT del exoplaneta Kepler-442b en XRPL.",
+                nft_2_title: "Género Nicotiana Tabacum", nft_2_desc: "Activo NFT botánico digital vinculado a plantas ancestrales en XRPL.",
+                nft_3_title: "Principio de Armonía Universal", nft_3_desc: "NFT de concepto filosófico que representa el equilibrio en sistemas colectivos.",
+                nft_4_title: "Sistema Alfa Centauri", nft_4_desc: "NFT digital del sistema estelar triple registrado bajo dominio público CC0 en XRPL.",
+                nft_5_title: "Estrella Alfa de la Constelación Lira", nft_5_desc: "Listado de reventa verificado del Minteo Central de Aeterna Ledger.",
+                nft_6_title: "Zona de Fosa del Pacífico", nft_6_desc: "NFT geográfico digital vinculado a coordenadas del abismo oceánico.",
+                nft_7_title: "Modelo de Síntesis del Elemento Oro", nft_7_desc: "NFT de datos de estructura atómica y propiedades físicas en XRPL."
+            },
+            ja: {
+                subtitle: "所有者なき万物資産のユニバーサル台帳",
+                tabAbout: "概要", tabStore: "ストア", tabMint: "ミントスタジオ", tabMarket: "市場", tabMyNfts: "所有資産",
+                connectBtn: "Xaman接続", tag: "公式ジェネシスレジストリ",
+                heroTitle: "未所有の万物エレメントのトークン化",
+                heroDesc: "自然、天体、植物群のデジタルNFTを取得。決済はXRPで直接行われ、XRPLエコシステム内のみで有効です。",
+                mintBadge: "プロトコルエンジン", mintTitle: "デジタル XLS-20 NFT ミントスタジオ", mintDesc: "CC0ライセンスのメタデータの下で、デジタルNFTをXRPL上で登録・ミントします。",
+                lblTitle: "エレメント名 *", lblCat: "登録カテゴリ *", lblPrice: "初期価格 (XRP) *", lblRoyalty: "クリエーターロイヤルティ (%)",
+                lblImg: "カバー画像 URL (サムネイル / ポスター) *", lblVideo: "動画アセット URL (オプション アニメーション / MP4)", lblLic: "法的使用許諾基準 *", lblHist: "説明 / 歴史 *",
+                legalText: "利用規約および法的免責事項を読み、これに同意します（これらのNFTはXRPLネットワーク内のみで有効なデジタル資産であり、実世界の所有権を約束するものではないことを理解しています）。*",
+                mintSubmit: "XLS-20資産をミントして登録",
+                marketTitle: "検証済み二次市場",
+                marketDesc: "Aeterna Ledgerの発行者署名によって厳密にフィルタリングされた二次出品。",
+                myTitle: "個人のデジタル所有資産", myDesc: "接続されたウォレットに関連付けられたXRPL上のデジタルNFT資産。",
+                myEmpty: "取得したデジタルNFTを同期するにはウォレットを接続してください。",
+                taxoTitle: "ユニバーサル分類ネットワーク", taxoSubtitle: "カテゴリを選択して登録資産を絞り込みます",
+                marketTaxoTitle: "マーケット分類", marketTaxoSub: "部門別に検証済みの二次出品を絞り込む",
+                catLabel: "カテゴリ:", marketCatLabel: "市場カテゴリ:", rangeLabel: "選択された価格帯:", sortLabel: "アセットの並び順",
+                optNewest: "⚡ 順序: 新着順", optOldest: "⌛ 順序: 古い順", optPriceAsc: "📉 価格: 安い順", optPriceDesc: "📈 価格: 高い順", optNameAsc: "🔤 名前: A から Z", optNameDesc: "🔤 名前: Z から A",
+                detailsBtn: "詳細", acquireBtn: "NFTを購入", priceLabel: "価格", btnBuy: "NFTを購入",
+                aboutBadge: "マニフェストとビジョン", aboutTitle: "Aeterna Ledgerとは？",
+                aboutDesc: "自然や宇宙に関連する未所有の要素を対象としたデジタルレジストリであり、XRP Ledger上のNFTとしてのみ存在します。",
+                aboutBox1Sub: "01. デジタル資産レジストリ", aboutBox1Title: "未所有要素のトークン化",
+                aboutBox1Desc: "誰でも自然の要素やアイデアをXRPLネットワーク内のNFTとしてミントできるようにこのプラットフォームを作成しました。",
+                aboutBox2Sub: "02. XRPLによる駆動", aboutBox2Title: "速度、セキュリティ、グローバルスケール",
+                aboutBox2Desc: "速度とセキュリティのためにXRP Ledger（XRPL）を選択しました。惑星や星のNFTはXRPLブロックチェーン内にのみ存在します。",
+                aboutQuote: "「現実世界の所有権主張を伴わないXRP Ledger上のデジタルエレメント。」",
+                aboutBtn: "ジェネシスストアを探索 →",
+                nft_1_title: "系外惑星 ケプラー442b", nft_1_desc: "XRPL上の岩石系外惑星ケプラー442bのデジタルNFT表現。",
+                nft_2_title: "タバコ属植物", nft_2_desc: "XRPL上の古代植物に関連付けられたデジタルボタニカルNFT。",
+                nft_3_title: "普遍的調和の原理", nft_3_desc: "集合システムの均衡を表す哲学的概念NFT。",
+                nft_4_title: "アルファ・ケンタウリ系", nft_4_desc: "XRPL上のCC0ライセンスに基づく三重星系のデジタルNFT。",
+                nft_5_title: "こと座ベガ（アルファ星）", nft_5_desc: "Aeterna Ledgerコアミントから検証された再販リスティング。",
+                nft_6_title: "太平洋海溝ゾーン", nft_6_desc: "海洋深淵の座標に関連付けられたデジタル地理NFT。",
+                nft_7_title: "金元素合成モデル", nft_7_desc: "XRPL上の原子構造と物理的特性のデータセットNFT。"
+            },
+            ko: {
+                subtitle: "소유자 없는 보편적 자산의 원장",
+                tabAbout: "소개", tabStore: "상점", tabMint: "민트 스튜디오", tabMarket: "마켓플레이스", tabMyNfts: "보유 자산",
+                connectBtn: "Xaman 연결", tag: "공식 제네시스 등록소",
+                heroTitle: "소유권 없는 보편적 요소의 토큰화",
+                heroDesc: "자연 요소, 천체, 식물군에 대한 디지털 NFT를 인수하세요. XRPL 생태계 내에서만 유효하며 XRP로 직접 정산됩니다.",
+                mintBadge: "프로토콜 엔진", mintTitle: "디지털 XLS-20 NFT 민트 스튜디오", mintDesc: "CC0 라이선스 메타데이터에 따라 XRPL에서 디지털 NFT를 등록하고 민팅하세요.",
+                lblTitle: "요소 이름 *", lblCat: "등록 카테고리 *", lblPrice: "초기 가격 (XRP) *", lblRoyalty: "크리에이터 로열티 (%)",
+                lblImg: "커버 이미지 URL (썸네일 / 포스터) *", lblVideo: "비디오 에셋 URL (선택 사항 애니메이션 / MP4)", lblLic: "법적 라이선스 표준 *", lblHist: "설명 / 역사 *",
+                legalText: "이용 약관 및 법적 면책 조항을 읽고 이에 동의합니다(이 NFT는 XRPL 네트워크 내에서만 유효한 디지털 자산이며 실제 소유권이나 재정적 보장을 제공하지 않음을 이해합니다). *",
+                mintSubmit: "XLS-20 자산 민팅 및 등록",
+                marketTitle: "검증된 2차 마켓플레이스",
+                marketDesc: "Aeterna Ledger 서명에 의해 엄격하게 필터링된 2차 매물.",
+                myTitle: "개인 디지털 보유 자산", myDesc: "연결된 지갑에 연결된 XRP Ledger의 디지털 NFT 자산.",
+                myEmpty: "획득한 디지털 NFT를 동기화하려면 지갑을 연결하세요.",
+                taxoTitle: "보편적 분류 네트워크", taxoSubtitle: "등록된 자산을 필터링할 카테고리를 선택하세요",
+                marketTaxoTitle: "마켓플레이스 분류", marketTaxoSub: "분과별로 검증된 2차 매물 필터링",
+                catLabel: "카테고리:", marketCatLabel: "마켓 카테고리:", rangeLabel: "선택된 가격대:", sortLabel: "자산 정렬 순서",
+                optNewest: "⚡ 정렬: 최신순", optOldest: "⌛ 정렬: 오래된순", optPriceAsc: "📉 가격: 낮은순", optPriceDesc: "📈 가격: 높은순", optNameAsc: "🔤 이름: A to Z", optNameDesc: "🔤 이름: Z to A",
+                detailsBtn: "상세 정보", acquireBtn: "NFT 구매", priceLabel: "가격", btnBuy: "NFT 구매",
+                aboutBadge: "선언문 및 비전", aboutTitle: "Aeterna Ledger란 무엇인가요?",
+                aboutDesc: "자연 및 우주와 관련된 소유자 없는 요소를 XRP Ledger 상의 NFT로 엄격하게 관리하는 디지털 등록소입니다.",
+                aboutBox1Sub: "01. 디지털 자산 등록소", aboutBox1Title: "소유자 없는 요소의 토큰화",
+                aboutBox1Desc: "누구나 자연 요소나 아이디어를 XRPL 네트워크 내의 NFT로 민팅할 수 있도록 이 플랫폼을 만들었습니다.",
+                aboutBox2Sub: "02. XRPL 구동", aboutBox2Title: "속도, 보안 및 글로벌 확장",
+                aboutBox2Desc: "속도와 보안을 위해 XRP Ledger(XRPL)를 선택했습니다. 행성이나 별의 NFT는 XRPL 블록체인 생태계 내에만 존재합니다.",
+                aboutQuote: "\"실제 세계의 소유권 주장 없이 XRP Ledger에서 유효한 디지털 요소.\"",
+                aboutBtn: "제네시스 상점 탐색 →",
+                nft_1_title: "외행성 케플러-442b", nft_1_desc: "XRPL 상의 암석 외행성 케플러-442b에 대한 디지털 NFT 표현.",
+                nft_2_title: "니코티아나 타바쿰 속", nft_2_desc: "XRPL 상의 고대 식물과 연결된 디지털 식물 NFT 자산.",
+                nft_3_title: "보편적 조화 원리", nft_3_desc: "집단 시스템의 균형을 나타내는 철학적 개념 NFT.",
+                nft_4_title: "알파 센타우리 시스템", nft_4_desc: "XRPL 상에서 CC0 라이선스로 등록된 삼중성계 디지털 NFT 자산.",
+                nft_5_title: "거문고자리 알파성", nft_5_desc: "Aeterna Ledger 코어 민트에서 검증된 재판매 목록.",
+                nft_6_title: "태평양 해구 구역", nft_6_desc: "심해 해양 좌표에 연결된 디지털 지리 NFT 자산.",
+                nft_7_title: "금 원소 합성 모델", nft_7_desc: "XRPL 상의 원자 구조 및 물리적 특성 데이터셋 NFT."
+            },
+            zh: {
+                subtitle: "无主普遍资产的全球账本",
+                tabAbout: "关于", tabStore: "商店", tabMint: "铸造工作室", tabMarket: "市场", tabMyNfts: "我的资产",
+                connectBtn: "连接 Xaman", tag: "官方创世登记处",
+                heroTitle: "无主普遍元素的代币化",
+                heroDesc: "收购自然元素、天体、植物群的数字 NFT。仅在 XRPL 生态系统内有效，使用 XRP 直接结算。",
+                mintBadge: "协议引擎", mintTitle: "数字 XLS-20 NFT 铸造工作室", mintDesc: "在 CC0 许可元数据下，在 XRPL 账本上注册并铸造您的数字 NFT。",
+                lblTitle: "元素名称 *", lblCat: "登记类别 *", lblPrice: "初始价格 (XRP) *", lblRoyalty: "创作者版税 (%)",
+                lblImg: "封面图片 URL (缩略图 / 海报) *", lblVideo: "视频资产 URL (可选动画 / MP4)", lblLic: "法律许可标准 *", lblHist: "描述 / 历史 *",
+                legalText: "我已阅读并同意条款与法律免责声明（我理解这些 NFT 是仅在 XRPL 网络内有效的数字资产，不包含现实世界的资产所有权或财务承诺）。*",
+                mintSubmit: "铸造并注册 XLS-20 资产",
+                marketTitle: "经过验证的二级市场",
+                marketDesc: "严格通过 Aeterna Ledger 签名的二级挂牌，拒绝外部垃圾信息。",
+                myTitle: "个人数字资产", myDesc: "链接到您已连接钱包的 XRP Ledger 数字 NFT 资产。",
+                myEmpty: "请连接您的钱包以同步您获得的数字 NFT。",
+                taxoTitle: "全球分类网络", taxoSubtitle: "选择类别分支以筛选已登记资产",
+                marketTaxoTitle: "市场分类", marketTaxoSub: "按分支筛选经过验证的二级挂牌",
+                catLabel: "类别:", marketCatLabel: "市场类别:", rangeLabel: "选定价格范围:", sortLabel: "资产排列顺序",
+                optNewest: "⚡ 排序: 最新优先", optOldest: "⌛ 排序: 最早优先", optPriceAsc: "📉 价格: 从低到高", optPriceDesc: "📈 价格: 从高到低", optNameAsc: "🔤 名称: A 到 Z", optNameDesc: "🔤 名称: Z 到 A",
+                detailsBtn: "详情", acquireBtn: "购买 NFT", priceLabel: "价格", btnBuy: "购买 NFT",
+                aboutBadge: "宣言与愿景", aboutTitle: "什么是 Aeterna Ledger？",
+                aboutDesc: "一个专门针对与自然和宇宙相关的无主元素的数字登记册，严格作为 XRP Ledger 上的 NFT 存在。",
+                aboutBox1Sub: "01. 数字资产登记册", aboutBox1Title: "代币化无主元素",
+                aboutBox1Desc: "我们创建这个平台是为了让任何人都可以将自然元素或想法铸造为 XRPL 网络内的 NFT。",
+                aboutBox2Sub: "02. 由 XRPL 驱动", aboutBox2Title: "速度、安全与全球规模",
+                aboutBox2Desc: "我们选择 XRP Ledger (XRPL) 是因为它卓越的速度和安全性。行星或恒星的 NFT 仅存在于 XRPL 区块链生态系统中。",
+                aboutQuote: "“XRP Ledger 上的数字元素，不包含现实世界的合法所有权主张。”",
+                aboutBtn: "探索创世商店 →",
+                nft_1_title: "系外行星 开普勒-442b", nft_1_desc: "XRPL 上系外行星 Kepler-442b 的数字 NFT 表现形式。",
+                nft_2_title: "烟草属植物群", nft_2_desc: "XRPL 上与古老植物相关的数字植物 NFT 资产。",
+                nft_3_title: "宇宙和谐原则", nft_3_desc: "代表集体系统平衡的哲学概念 NFT。",
+                nft_4_title: "半人马座阿尔法系统", nft_4_desc: "在 XRPL 上根据 CC0 注册的三星系统数字 NFT 资产。",
+                nft_5_title: "织女星（天琴座α）", nft_5_desc: "来自 Aeterna Ledger 核心铸造的经验证转售挂牌。",
+                nft_6_title: "太平洋海沟区", nft_6_desc: "与深海坐标相关的数字地理 NFT 资产。",
+                nft_7_title: "黄金元素合成模型", nft_7_desc: "XRPL 上的原子结构与物理特性数据集 NFT。"
+            },
+            ru: {
+                subtitle: "Универсальный реестр бесхозяйных активов",
+                tabAbout: "О проекте", tabStore: "Магазин", tabMint: "Минт Студия", tabMarket: "Рынок", tabMyNfts: "Активы",
+                connectBtn: "Подключить Xaman", tag: "Официальный реестр Genesis",
+                heroTitle: "Токенизация ничейных универсальных элементов",
+                heroDesc: "Приобретайте цифровые NFT для природных элементов, небесных тел и флоры. Действительны строго в экосистеме XRPL с прямым расчетом в XRP.",
+                mintBadge: "Протокольный движок", mintTitle: "Цифровая студия минтинга XLS-20 NFT", mintDesc: "Регистрируйте и минтите свой цифровой NFT в XRPL Ledger под метаданными лицензии CC0.",
+                lblTitle: "Название элемента *", lblCat: "Категория реестра *", lblPrice: "Начальная цена в XRP *", lblRoyalty: "Комиссия автора (%)",
+                lblImg: "URL обложки (Миниатюра / Постер) *", lblVideo: "URL видео (Опционально Анимация / MP4)", lblLic: "Стандарт правовой лицензии *", lblHist: "Описание / История *",
+                legalText: "Я прочитал и согласен с Условиями и правовым отказом от ответственности (Я понимаю, что эти NFT являются цифровыми активами, действительными исключительно в сети XRPL, без реальных прав собственности или финансовых обещаний). *",
+                mintSubmit: "Минтить и зарегистрировать актив XLS-20",
+                marketTitle: "Проверенный вторичный рынок",
+                marketDesc: "Вторичные листинги строго отфильтрованы по подписи эмитента Aeterna Ledger.",
+                myTitle: "Личные цифровые активы", myDesc: "Цифровые активы NFT в XRP Ledger, привязанные к вашему кошельку.",
+                myEmpty: "Подключите кошелек для синхронизации ваших acquired цифровых NFT.",
+                taxoTitle: "Универсальная таксономическая сеть", taxoSubtitle: "Выберите категорию для фильтрации активов",
+                marketTaxoTitle: "Таксономия рынка", marketTaxoSub: "Фильтрация проверенных вторичных листингов по ветвям",
+                catLabel: "Категория:", marketCatLabel: "Категория рынка:", rangeLabel: "Выбранный диапазон цен:", sortLabel: "Порядок активов",
+                optNewest: "⚡ Сортировка: Сначала новые", optOldest: "⌛ Сортировка: Сначала старые", optPriceAsc: "📉 Цена: По возрастанию", optPriceDesc: "📈 Цена: По убыванию", optNameAsc: "🔤 Имя: от A до Z", optNameDesc: "🔤 Имя: от Z до A",
+                detailsBtn: "Детали", acquireBtn: "Купить NFT", priceLabel: "Цена", btnBuy: "Купить NFT",
+                aboutBadge: "Манифест и видение", aboutTitle: "Что такое Aeterna Ledger?",
+                aboutDesc: "Цифровой реестр, посвященный бесхозяйным элементам природы и космоса, представленным строго в виде NFT в XRP Ledger.",
+                aboutBox1Sub: "01. Реестр цифровых активов", aboutBox1Title: "Токенизация свободных элементов",
+                aboutBox1Desc: "Мы создали эту платформу, чтобы каждый мог минтить цифровые репрезентации элементов или идей исключительно в сети XRPL.",
+                aboutBox2Sub: "02. На базе XRPL", aboutBox2Title: "Скорость, безопасность и глобальный масштаб",
+                aboutBox2Desc: "Мы выбрали XRP Ledger (XRPL) за его скорость и безопасность. Коллекционные NFT существуют исключительно в блокчейн-экосистеме XRPL.",
+                aboutQuote: "«Цифровые элементы в XRP Ledger без претензий на владение в реальном мире».",
+                aboutBtn: "Исследовать магазин Genesis →",
+                nft_1_title: "Экзопланета Кеплер-442b", nft_1_desc: "Цифровое NFT-представление экзопланеты Кеплер-442b в XRPL.",
+                nft_2_title: "Род Никотиана Табакум", nft_2_desc: "Цифровой ботанический NFT-актив, связанный с растениями в XRPL.",
+                nft_3_title: "Принцип универсальной гармонии", nft_3_desc: "NFT философской концепции, представляющий баланс в системах.",
+                nft_4_title: "Система Альфа Центавра", nft_4_desc: "Цифровой NFT-актив тройной звездной системы в XRPL под CC0.",
+                nft_5_title: "Звезда Альфа Лиры", nft_5_desc: "Проверенный листинг перепродажи из базового минта Aeterna Ledger.",
+                nft_6_title: "Зона Тихоокеанского желоба", nft_6_desc: "Цифровой географический NFT, привязанный к координатам океана.",
+                nft_7_title: "Модель синтеза элемента золота", nft_7_desc: "NFT набора данных атомной структуры в XRPL."
+            }
+        };
+        function changeLanguage(lang) {
+            localStorage.setItem('aeterna_lang', lang);
+            const t = translations[lang] || translations.en;
+            
+            const sub = document.getElementById('t-subtitle');
+            if (sub) sub.innerText = t.subtitle;
+            const btnConnect = document.getElementById('connect-btn');
+            if (btnConnect) btnConnect.innerText = t.connectBtn;
+            document.getElementById('tab-about').innerText = t.tabAbout;
+            document.getElementById('tab-store').innerText = t.tabStore;
+            document.getElementById('tab-mint').innerText = t.tabMint;
+            document.getElementById('tab-market').innerText = t.tabMarket;
+            document.getElementById('tab-mynfts').innerText = t.tabMyNfts;
+            // About Us Texts
+            document.getElementById('t-about-badge').innerText = t.aboutBadge;
+            document.getElementById('t-about-title').innerText = t.aboutTitle;
+            document.getElementById('t-about-desc').innerText = t.aboutDesc;
+            document.getElementById('t-about-box1-sub').innerText = t.aboutBox1Sub;
+            document.getElementById('t-about-box1-title').innerText = t.aboutBox1Title;
+            document.getElementById('t-about-box1-desc').innerText = t.aboutBox1Desc;
+            document.getElementById('t-about-box2-sub').innerText = t.aboutBox2Sub;
+            document.getElementById('t-about-box2-title').innerText = t.aboutBox2Title;
+            document.getElementById('t-about-box2-desc').innerText = t.aboutBox2Desc;
+            document.getElementById('t-about-quote').innerText = t.aboutQuote;
+            document.getElementById('t-about-btn').innerText = t.aboutBtn;
+            // Mint Studio Texts
+            document.getElementById('t-mint-badge').innerText = t.mintBadge;
+            document.getElementById('t-mint-title').innerText = t.mintTitle;
+            document.getElementById('t-mint-desc').innerText = t.mintDesc;
+            document.getElementById('t-lbl-title').innerText = t.lblTitle;
+            document.getElementById('t-lbl-cat').innerText = t.lblCat;
+            document.getElementById('t-lbl-price').innerText = t.lblPrice;
+            document.getElementById('t-lbl-royalty').innerText = t.lblRoyalty;
+            document.getElementById('t-lbl-img').innerText = t.lblImg;
+            document.getElementById('t-lbl-video').innerText = t.lblVideo;
+            document.getElementById('t-lbl-lic').innerText = t.lblLic;
+            document.getElementById('t-lbl-hist').innerText = t.lblHist;
+            document.getElementById('t-legal-text').innerText = t.legalText;
+            document.getElementById('t-mint-submit').innerText = t.mintSubmit;
+            // Store & Market general labels
+            document.getElementById('t-tag').innerText = t.tag;
+            document.getElementById('t-hero-title').innerText = t.heroTitle;
+            document.getElementById('t-hero-desc').innerHTML = `${t.heroDesc.replace('XRP', '<strong class="text-obsidian-gold">XRP</strong>')}`;
+            document.getElementById('t-market-title').innerText = t.marketTitle;
+            document.getElementById('t-market-desc').innerText = t.marketDesc;
+            document.getElementById('t-my-title').innerText = t.myTitle;
+            document.getElementById('t-my-desc').innerText = t.myDesc;
+            document.getElementById('t-my-empty').innerText = t.myEmpty;
+            
+            document.getElementById('t-cat-label').innerText = t.catLabel;
+            document.getElementById('t-market-cat-label').innerText = t.marketCatLabel;
+            document.getElementById('t-range-label').innerText = t.rangeLabel;
+            document.getElementById('t-sort-label').innerText = t.sortLabel;
+            document.getElementById('opt-newest').innerText = t.optNewest;
+            document.getElementById('opt-oldest').innerText = t.optOldest;
+            document.getElementById('opt-price-asc').innerText = t.optPriceAsc;
+            document.getElementById('opt-price-desc').innerText = t.optPriceDesc;
+            document.getElementById('opt-name-asc').innerText = t.optNameAsc;
+            document.getElementById('opt-name-desc').innerText = t.optNameDesc;
+            document.getElementById('m-opt-newest').innerText = t.optNewest;
+            document.getElementById('m-opt-oldest').innerText = t.optOldest;
+            document.getElementById('m-opt-price-asc').innerText = t.optPriceAsc;
+            document.getElementById('m-opt-price-desc').innerText = t.optPriceDesc;
+            document.getElementById('m-opt-name-asc').innerText = t.optNameAsc;
+            document.getElementById('m-opt-name-desc').innerText = t.optNameDesc;
+            const modalPriceLbl = document.getElementById('t-modal-price-label');
+            if (modalPriceLbl) modalPriceLbl.innerText = t.priceLabel + ':';
+            
+            const detailBuyBtn = document.getElementById('detail-buy-btn');
+            if (detailBuyBtn) detailBuyBtn.innerText = t.btnBuy;
+
+            applyFiltersAndSort();
+            applyMarketplaceFilters();
+        }
+        function filterCategory(catKey, targetSection) {
+            const categoryMap = {
+                'Planets': 'Planets & Moons',
+                'Stars': 'Stars & Stellar Systems',
+                'Fauna': 'Fauna & Wild Species',
+                'Botanical': 'Botany & Master Flora',
+                'Minerals': 'Minerals & Pure Elements',
+                'Geography': 'Global Geography & Waters',
+                'Concepts': 'Concepts, Ideas & Knowledge',
+                'Symbols': 'Symbols, Archetypes & Culture'
+            };
+            const targetCategory = categoryMap[catKey] || catKey;
+            if (targetSection === 'store') {
+                activeCategoryFilterStore = catKey;
+                document.getElementById('active-category-tag').innerText = targetCategory;
+                document.getElementById('reset-filter-btn').classList.remove('hidden');
+                applyFiltersAndSort();
+            } else if (targetSection === 'market') {
+                activeCategoryFilterMarket = catKey;
+                document.getElementById('market-active-category-tag').innerText = targetCategory;
+                document.getElementById('market-reset-filter-btn').classList.remove('hidden');
+                applyMarketplaceFilters();
+            }
+        }
+        function resetFilter(targetSection) {
+            if (targetSection === 'store') {
+                activeCategoryFilterStore = 'ALL';
+                document.getElementById('active-category-tag').innerText = 'ALL';
+                document.getElementById('reset-filter-btn').classList.add('hidden');
+                applyFiltersAndSort();
+            } else if (targetSection === 'market') {
+                activeCategoryFilterMarket = 'ALL';
+                document.getElementById('market-active-category-tag').innerText = 'ALL';
+                document.getElementById('market-reset-filter-btn').classList.add('hidden');
+                applyMarketplaceFilters();
+            }
+        }
+        function applyFiltersAndSort() {
+            let items = [...coreStoreNFTs];
+            if (activeCategoryFilterStore !== 'ALL') {
+                const categoryMap = {
+                    'Planets': 'Planets & Moons',
+                    'Stars': 'Stars & Stellar Systems',
+                    'Fauna': 'Fauna & Wild Species',
+                    'Botanical': 'Botany & Master Flora',
+                    'Minerals': 'Minerals & Pure Elements',
+                    'Geography': 'Global Geography & Waters',
+                    'Concepts': 'Concepts, Ideas & Knowledge',
+                    'Symbols': 'Symbols, Archetypes & Culture'
+                };
+                const targetCategory = categoryMap[activeCategoryFilterStore] || activeCategoryFilterStore;
+                items = items.filter(nft => nft.rarity === targetCategory);
+            }
+            const sortVal = document.getElementById('sort-select').value;
+            if (sortVal === 'newest') items.sort((a, b) => b.id - a.id);
+            else if (sortVal === 'oldest') items.sort((a, b) => a.id - b.id);
+            else if (sortVal === 'price-asc') items.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+            else if (sortVal === 'price-desc') items.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+            else if (sortVal === 'name-asc') items.sort((a, b) => a.titleKey.localeCompare(b.titleKey));
+            else if (sortVal === 'name-desc') items.sort((a, b) => b.titleKey.localeCompare(a.titleKey));
+            renderCards('nft-grid', items);
+        }
+        function updateMarketSlider() {
+            const minInput = document.getElementById('m-slider-min');
+            const maxInput = document.getElementById('m-slider-max');
+            const track = document.getElementById('m-slider-track');
+            
+            let minVal = parseInt(minInput.value);
+            let maxVal = parseInt(maxInput.value);
+            if (minVal > maxVal - 10) {
+                minInput.value = maxVal - 10;
+                minVal = maxVal - 10;
+            }
+            document.getElementById('m-range-min-val').innerText = minVal;
+            document.getElementById('m-range-max-val').innerText = maxVal === 1000 ? '+1000' : maxVal;
+            const percentMin = ((minVal - 1) / 999) * 100;
+            const percentMax = 100 - (((maxVal - 1) / 999) * 100);
+            track.style.left = percentMin + '%';
+            track.style.right = percentMax + '%';
+            applyMarketplaceFilters();
+        }
+        function setMarketPricePreset(min, max, btnEl) {
+            document.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            document.getElementById('m-slider-min').value = min;
+            document.getElementById('m-slider-max').value = max;
+            updateMarketSlider();
+        }
+        function applyMarketplaceFilters() {
+            let items = [...secondaryMarketNFTs];
+            if (activeCategoryFilterMarket !== 'ALL') {
+                const categoryMap = {
+                    'Planets': 'Planets & Moons',
+                    'Stars': 'Stars & Stellar Systems',
+                    'Fauna': 'Fauna & Wild Species',
+                    'Botanical': 'Botany & Master Flora',
+                    'Minerals': 'Minerals & Pure Elements',
+                    'Geography': 'Global Geography & Waters',
+                    'Concepts': 'Concepts, Ideas & Knowledge',
+                    'Symbols': 'Symbols, Archetypes & Culture'
+                };
+                const targetCategory = categoryMap[activeCategoryFilterMarket] || activeCategoryFilterMarket;
+                items = items.filter(nft => nft.rarity === targetCategory);
+            }
+            const minVal = parseFloat(document.getElementById('m-slider-min').value);
+            const maxVal = parseFloat(document.getElementById('m-slider-max').value);
+            items = items.filter(nft => {
+                const price = parseFloat(nft.price);
+                if (maxVal === 1000) return price >= minVal;
+                return price >= minVal && price <= maxVal;
+            });
+            const sortVal = document.getElementById('market-sort-select').value;
+            if (sortVal === 'newest') items.sort((a, b) => b.id - a.id);
+            else if (sortVal === 'oldest') items.sort((a, b) => a.id - b.id);
+            else if (sortVal === 'price-asc') items.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+            else if (sortVal === 'price-desc') items.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+            else if (sortVal === 'name-asc') items.sort((a, b) => a.titleKey.localeCompare(b.titleKey));
+            else if (sortVal === 'name-desc') items.sort((a, b) => b.titleKey.localeCompare(a.titleKey));
+            renderCards('market-grid', items);
+        }
+        function renderCards(containerId, items) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const lang = localStorage.getItem('aeterna_lang') || 'en';
+            const t = translations[lang] || translations.en;
+            container.innerHTML = '';
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
+                        <p class="text-slate-400 text-sm font-mono">No registered assets match your current filters.</p>
+                    </div>
+                `;
+                return;
+            }
+            items.forEach(item => {
+                const translatedTitle = t[item.titleKey] || item.titleKey;
+                const translatedDesc = t[item.descKey] || item.descKey;
+                const card = document.createElement('div');
+                card.className = "bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden hover:border-obsidian-gold/50 transition duration-300 group flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="h-60 bg-slate-900 relative overflow-hidden cursor-pointer" onclick="openDetails('${item.titleKey}', '${item.price}', '${item.descKey}', '${item.rarity}', '${item.img}')">
+                            <img src="${item.img}" alt="${translatedTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 right-3 bg-obsidian-dark/80 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2.5 py-1 rounded border border-obsidian-gold/30">${item.rarity}</span>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <h4 class="text-base font-medium text-white">${translatedTitle}</h4>
+                            <p class="text-xs text-slate-400 line-clamp-2">${translatedDesc}</p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0 flex justify-between items-center border-t border-obsidian-border/60 mt-4">
+                        <div>
+                            <span class="text-[10px] text-slate-500 uppercase tracking-wider block">${t.priceLabel}</span>
+                            <span class="text-obsidian-gold font-mono font-bold text-sm">${item.price} XRP</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openDetails('${item.titleKey}', '${item.price}', '${item.descKey}', '${item.rarity}', '${item.img}')" class="bg-obsidian-border hover:bg-slate-800 text-slate-300 font-medium px-3 py-2 rounded-lg text-xs transition">
+                                ${t.detailsBtn}
+                            </button>
+                            <button onclick="buyNFT('${translatedTitle}', '${item.price}')" class="btn-buy px-4 py-2 rounded-lg text-xs">
+                                ${t.btnBuy}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        function switchTab(tab) {
+            const views = ['about', 'store', 'mint', 'market', 'mynfts', 'admin'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                const tabEl = document.getElementById(`tab-${v}`);
+                if (el) el.classList.add('hidden');
+                if (tabEl) tabEl.classList.remove('nav-active');
+            });
+            const activeView = document.getElementById(`view-${tab}`);
+            const activeTab = document.getElementById(`tab-${tab}`);
+            if (activeView) activeView.classList.remove('hidden');
+            if (activeTab) activeTab.classList.add('nav-active');
+        }
+        async function handleUserMint(event) {
+            event.preventDefault();
+            const legalAgreed = document.getElementById('mint-legal-agree').checked;
+            if (!legalAgreed) {
+                alert("You must accept the Legal Disclaimer & Terms of Minting before proceeding.");
+                return;
+            }
+            const title = document.getElementById('mint-title').value;
+            const price = document.getElementById('mint-price').value;
+            const category = document.getElementById('mint-category').value;
+            const image = document.getElementById('mint-image').value;
+            const description = document.getElementById('mint-desc-text').value;
+            
+            alert('Connecting to XRPL Mainnet... Minting NFT asset via Aeterna Ledger protocol.');
+            coreStoreNFTs.unshift({
+                id: Date.now(),
+                titleKey: title,
+                descKey: description,
+                price: price,
+                rarity: category,
+                img: image
+            });
+            applyFiltersAndSort();
+            document.getElementById('user-mint-form').reset();
+            switchTab('store');
+        }
+        function openDetails(titleKey, price, descKey, rarity, image) {
+            const lang = localStorage.getItem('aeterna_lang') || 'en';
+            const t = translations[lang] || translations.en;
+            
+            document.getElementById('detail-title').innerText = t[titleKey] || titleKey;
+            document.getElementById('detail-price').innerText = price + ' XRP';
+            document.getElementById('detail-desc').innerText = t[descKey] || descKey;
+            document.getElementById('detail-rarity').innerText = rarity;
+            document.getElementById('detail-img').src = image;
+            document.getElementById('detail-buy-btn').setAttribute('onclick', `buyNFT('${t[titleKey] || titleKey}', '${price}')`);
+            
+            const modal = document.getElementById('details-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeDetails() {
+            const modal = document.getElementById('details-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        function closeModal() {
+            const modal = document.getElementById('xaman-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        async function connectXaman() {
+            alert('Connecting to Xaman Wallet...');
+        }
+        async function buyNFT(itemName, price) {
+            closeDetails();
+            alert(`Initiating purchase for ${itemName} at ${price} XRP.`);
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('aeterna_lang') || 'en';
+            const langSelect = document.getElementById('language-select');
+            if (langSelect) langSelect.value = savedLang;
+            changeLanguage(savedLang);
+            updateMarketSlider();
+        });
+    </script>
 </body>
 </html>

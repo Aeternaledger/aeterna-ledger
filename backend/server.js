@@ -117,44 +117,47 @@ app.post('/api/buy-nft', async (req, res) => {
 
 app.post('/api/mint-payload', async (req, res) => {
     try {
-        const { account, title, category, image, royalty } = req.body;
+        const { account, title, category, image, royalty, description } = req.body;
 
+        // Construir la URI de metadatos (compatible con IPFS o estándar URI de XRPL)
         const metadataURI = "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf4dfuyljbad43rk2q5i4chkuai/" + encodeURIComponent(title);
-        
-        // Convertir string de metadatos a Hexadecimal para XRPL
         const uriHex = Buffer.from(metadataURI).toString('hex').toUpperCase();
 
         let taxon = 1;
-        if (category && category.includes('Zodiac')) taxon = 2;
+        if (category && category.includes('Stars')) taxon = 2;
         else if (category && category.includes('Botanical')) taxon = 3;
-        else if (category && category.includes('Universal')) taxon = 4;
+        else if (category && category.includes('Concepts')) taxon = 4;
 
         const transferFeeVal = Math.round(parseFloat(royalty || 2.5) * 100);
 
-        // Payload de transacción NFTokenMint para Xaman
+        // Estructura oficial del payload para Xaman (Xumm SDK)
         const payload = {
             txjson: {
                 TransactionType: "NFTokenMint",
-                Account: account,
+                Account: account,             // Cuenta del usuario conectado en Xaman
                 NFTokenTaxon: taxon,
-                Flags: 8, // tfTransferable
+                Flags: 8,                     // tfTransferable (Permite reventa en el marketplace)
                 URI: uriHex,
                 TransferFee: transferFeeVal
             }
         };
 
-        // Solicitar a la API de Xumm la creación del código QR
+        // Crear el payload oficial en la API de Xaman
         const xummResponse = await xumm.payload.create(payload);
+
+        if (!xummResponse || !xummResponse.uuid) {
+            return res.status(500).json({ success: false, error: 'No se pudo generar el payload en Xaman' });
+        }
 
         res.json({
             success: true,
             uuid: xummResponse.uuid,
-            qr_code: xummResponse.preds.qr_png,
-            deep_link: xummResponse.next.always
+            qr_code: xummResponse.refs.qr_png,         // Referencia oficial del QR de Xaman
+            deep_link: xummResponse.next.always       // Enlace profundo para abrir la app móvil
         });
 
     } catch (error) {
-        console.error('Error al crear payload de NFTokenMint:', error);
+        console.error('Error al crear payload NFTokenMint:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

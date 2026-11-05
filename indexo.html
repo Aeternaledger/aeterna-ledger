@@ -1139,69 +1139,47 @@
         async function handleUserMint(event) {
     event.preventDefault();
 
-    const legalAgreed = document.getElementById('mint-legal-agree').checked;
-    if (!legalAgreed) {
-        alert("Debe aceptar los Términos y Descargo de Responsabilidad Legal antes de continuar.");
-        return;
-    }
-
     if (!connectedAccount) {
-        alert("Por favor, conecta tu billetera Xaman antes de mintear un NFT.");
+        alert("Por favor, conecta tu billetera Xaman antes de mintear.");
         return;
     }
 
-    const title = document.getElementById('mint-title').value;
-    const price = document.getElementById('mint-price').value;
-    const category = document.getElementById('mint-category').value;
-    const image = document.getElementById('mint-image').value;
-    const royalty = document.getElementById('mint-royalty').value;
-    const description = document.getElementById('mint-desc-text').value;
+    const mintData = {
+        account: connectedAccount,
+        title: document.getElementById('mint-title').value,
+        price: document.getElementById('mint-price').value,
+        category: document.getElementById('mint-category').value,
+        image: document.getElementById('mint-image').value,
+        royalty: document.getElementById('mint-royalty').value,
+        description: document.getElementById('mint-desc-text').value
+    };
 
     try {
-        // Enviar solicitud de payload de minteo a Xaman
         const response = await fetch(`${BACKEND_URL}/api/mint-payload`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                account: connectedAccount,
-                title: title,
-                category: category,
-                image: image,
-                royalty: royalty,
-                description: description
-            })
+            body: JSON.stringify(mintData)
         });
 
         const data = await response.json();
 
         if (response.ok && data.uuid && data.qr_code) {
-            // Mostrar modal de código QR para la app Xaman
-            showXamanModal(data.qr_code, data.deep_link, `Firma en Xaman para mintear "${title}" en XRPL`);
+            // Muestra el QR oficial de Xaman al usuario
+            showXamanModal(data.qr_code, data.deep_link, `Firma en Xaman para mintear "${mintData.title}"`);
             
-            // Esperar a que el usuario apruebe y firme en su celular
+            // Monitorear el estado de firma del usuario
             pollPayloadStatus(data.uuid, (account, isAdmin, txHash) => {
                 closeModal();
-                alert(`¡NFT minteado exitosamente en XRPL por tu cuenta! Hash de transacción: ${txHash || data.uuid}`);
-                
-                // Agregar el NFT localmente a la tienda y limpiar formulario
-                coreStoreNFTs.unshift({
-                    id: Date.now(),
-                    titleKey: title,
-                    descKey: description,
-                    price: price,
-                    rarity: category,
-                    img: image
-                });
-                applyFiltersAndSort();
+                alert(`¡NFT minteado exitosamente desde tu cuenta de Xaman!`);
                 document.getElementById('user-mint-form').reset();
                 switchTab('store');
             });
         } else {
-            alert('Error al generar la solicitud para Xaman: ' + (data.error || 'Error desconocido'));
+            alert('Error al iniciar el minteo: ' + (data.error || 'Desconocido'));
         }
-    } catch (error) {
-        console.error('Error durante el minteo:', error);
-        alert('No se pudo conectar con el servidor para iniciar el minteo.');
+    } catch (err) {
+        console.error('Error de red:', err);
+        alert('Error de conexión al procesar el minteo.');
     }
 }
 

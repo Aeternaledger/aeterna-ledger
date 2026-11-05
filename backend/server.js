@@ -115,6 +115,50 @@ app.post('/api/buy-nft', async (req, res) => {
     }
 });
 
+app.post('/api/mint-payload', async (req, res) => {
+    try {
+        const { account, title, category, image, royalty } = req.body;
+
+        const metadataURI = "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf4dfuyljbad43rk2q5i4chkuai/" + encodeURIComponent(title);
+        
+        // Convertir string de metadatos a Hexadecimal para XRPL
+        const uriHex = Buffer.from(metadataURI).toString('hex').toUpperCase();
+
+        let taxon = 1;
+        if (category && category.includes('Zodiac')) taxon = 2;
+        else if (category && category.includes('Botanical')) taxon = 3;
+        else if (category && category.includes('Universal')) taxon = 4;
+
+        const transferFeeVal = Math.round(parseFloat(royalty || 2.5) * 100);
+
+        // Payload de transacción NFTokenMint para Xaman
+        const payload = {
+            txjson: {
+                TransactionType: "NFTokenMint",
+                Account: account,
+                NFTokenTaxon: taxon,
+                Flags: 8, // tfTransferable
+                URI: uriHex,
+                TransferFee: transferFeeVal
+            }
+        };
+
+        // Solicitar a la API de Xumm la creación del código QR
+        const xummResponse = await xumm.payload.create(payload);
+
+        res.json({
+            success: true,
+            uuid: xummResponse.uuid,
+            qr_code: xummResponse.preds.qr_png,
+            deep_link: xummResponse.next.always
+        });
+
+    } catch (error) {
+        console.error('Error al crear payload de NFTokenMint:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // 4. Endpoint para verificar el estado de la firma en Xaman
 app.get('/api/check-status/:uuid', async (req, res) => {
     try {

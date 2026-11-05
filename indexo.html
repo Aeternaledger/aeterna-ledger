@@ -121,34 +121,36 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-obsidian-gold selection:text-black">
     <!-- HEADER / NAVIGATION -->
-    <header class="border-b border-obsidian-border bg-obsidian-dark/90 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full border border-obsidian-gold/60 bg-obsidian-card flex items-center justify-center text-obsidian-gold font-bold text-lg shadow-md">
-                    Ɐ
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-widest text-white flex items-center gap-2">
-                        AETERNA LEDGER <span class="text-[10px] bg-obsidian-gold/10 text-obsidian-gold px-2 py-0.5 rounded border border-obsidian-gold/30 font-mono">XRPL XLS-20</span>
-                    </h1>
-                    <p id="t-subtitle" class="text-[11px] text-slate-400">Universal Unclaimed Asset Ledger</p>
+    <header class="border-b border-obsidian-border bg-obsidian-dark/95 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full border border-obsidian-gold/60 bg-obsidian-card flex items-center justify-center text-obsidian-gold font-bold text-lg shadow-md flex-shrink-0">
+                        Ɐ
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-lg font-bold tracking-widest text-white flex items-center gap-2 flex-wrap">
+                            AETERNA LEDGER <span class="text-[10px] bg-obsidian-gold/10 text-obsidian-gold px-2 py-0.5 rounded border border-obsidian-gold/30 font-mono">XRPL XLS-20</span>
+                        </h1>
+                        <p id="t-subtitle" class="text-[11px] text-slate-400">Universal Unclaimed Asset Ledger</p>
+                    </div>
                 </div>
             </div>
-            <!-- NAVIGATION MENU -->
-            <div class="flex flex-wrap items-center gap-3">
-                <nav class="flex space-x-1 text-xs font-mono">
-                    <button onclick="switchTab('about')" id="tab-about" class="px-3 py-2 rounded text-slate-300 hover:text-white transition nav-active">About</button>
-                    <button onclick="switchTab('store')" id="tab-store" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Store</button>
-                    <button onclick="switchTab('mint')" id="tab-mint" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Mint Studio</button>
-                    <button onclick="switchTab('market')" id="tab-market" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Marketplace</button>
-                    <button onclick="switchTab('mynfts')" id="tab-mynfts" class="px-3 py-2 rounded text-slate-300 hover:text-white transition">Holdings</button>
-                    <button onclick="switchTab('admin')" id="tab-admin" class="hidden px-3 py-2 rounded text-slate-400 hover:text-white border border-obsidian-gold/30">Admin</button>
+            <!-- NAVIGATION MENU & CONTROLS -->
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-2.5 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                <nav class="flex space-x-1 text-xs font-mono overflow-x-auto max-w-full">
+                    <button onclick="switchTab('about')" id="tab-about" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition nav-active whitespace-nowrap">About</button>
+                    <button onclick="switchTab('store')" id="tab-store" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Store</button>
+                    <button onclick="switchTab('mint')" id="tab-mint" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Mint Studio</button>
+                    <button onclick="switchTab('market')" id="tab-market" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Marketplace</button>
+                    <button onclick="switchTab('mynfts')" id="tab-mynfts" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Holdings</button>
+                    <button onclick="switchTab('admin')" id="tab-admin" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-400 hover:text-white border border-obsidian-gold/30 whitespace-nowrap">Admin</button>
                 </nav>
-                <!-- SELECTOR DE IDIOMA CON BANDERAS -->
+                <!-- SELECTOR DE IDIOMA -->
                 <div class="relative inline-block text-left font-mono text-xs">
-                    <select id="language-select" onchange="changeLanguage(this.value)" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-2.5 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/50 transition">
+                    <select id="language-select" onchange="changeLanguage(this.value)" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-2 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/50 transition">
                         <option value="en">🇬🇧 EN</option>
-                        <option value="es">sp ES</option>
+                        <option value="es">🇪🇸 ES</option>
                         <option value="ja">🇯🇵 JA</option>
                         <option value="ko">🇰🇷 KO</option>
                         <option value="zh">🇨🇳 ZH</option>
@@ -156,28 +158,29 @@
                     </select>
                 </div>
                 <!-- WALLET STATUS -->
-                <div id="wallet-balances" class="hidden items-center gap-2 font-mono text-[11px] bg-obsidian-card border border-obsidian-border px-3 py-1.5 rounded-lg">
+                <div id="wallet-balances" class="hidden items-center gap-1.5 font-mono text-[11px] bg-obsidian-card border border-obsidian-border px-2.5 py-1.5 rounded-lg">
                     <span class="text-slate-400">XRP:</span>
                     <span id="balance-xrp" class="text-obsidian-gold font-bold">0.00</span>
                 </div>
-                <div id="wallet-status" onclick="disconnectWallet()" title="Click to disconnect" class="hidden text-xs px-3 py-2 rounded-lg font-mono cursor-pointer border wallet-connected-badge flex items-center gap-1.5">
+                <div id="wallet-status" onclick="disconnectWallet()" title="Click to disconnect" class="hidden text-xs px-3 py-2 rounded-lg font-mono cursor-pointer border wallet-connected-badge items-center gap-1.5">
                     <span>🟢</span> <span id="wallet-address-text">Connected</span>
                 </div>
-                <button onclick="connectXaman()" id="connect-btn" class="btn-xaman font-semibold px-4 py-2 rounded-lg text-xs tracking-wide shadow-md">
+                <button onclick="connectXaman()" id="connect-btn" class="btn-xaman font-semibold px-4 py-2 rounded-lg text-xs tracking-wide shadow-md whitespace-nowrap">
                     Connect Xaman
                 </button>
             </div>
         </div>
     </header>
+
     <!-- MAIN CONTAINER -->
-    <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-grow space-y-12">
         
         <!-- VIEW 0: ABOUT / WHAT IS AETERNA LEDGER -->
         <section id="view-about" class="space-y-8 max-w-4xl mx-auto">
-            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8 md:p-12 space-y-8 shadow-2xl">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-12 space-y-8 shadow-2xl">
                 <div class="space-y-3 text-center md:text-left">
                     <span id="t-about-badge" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Manifesto & Vision</span>
-                    <h2 id="t-about-title" class="text-3xl md:text-4xl font-light text-white tracking-tight">What is Aeterna Ledger?</h2>
+                    <h2 id="t-about-title" class="text-2xl sm:text-4xl font-light text-white tracking-tight">What is Aeterna Ledger?</h2>
                     <p id="t-about-desc" class="text-slate-400 text-sm leading-relaxed max-w-2xl">
                         A digital registry dedicated to unclaimed elements associated with nature and the cosmos, represented strictly as NFTs on the XRP Ledger.
                     </p>
@@ -206,12 +209,13 @@
                 </div>
             </div>
         </section>
+
         <!-- VIEW 1: REGISTRY STORE -->
         <section id="view-store" class="hidden space-y-8">
-            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8 relative overflow-hidden">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8 relative overflow-hidden">
                 <div class="max-w-3xl space-y-3 relative z-10">
                     <span id="t-tag" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Official Genesis Registry</span>
-                    <h2 id="t-hero-title" class="text-3xl font-light text-white tracking-tight">Tokenization of Unclaimed Universal Elements</h2>
+                    <h2 id="t-hero-title" class="text-2xl sm:text-3xl font-light text-white tracking-tight">Tokenization of Unclaimed Universal Elements</h2>
                     <p id="t-hero-desc" class="text-slate-400 text-sm leading-relaxed">
                         Acquire digital NFTs for natural elements, celestial bodies, flora, and archetypes. Valid strictly within the XRPL ecosystem with direct settlement in <strong class="text-obsidian-gold">XRP</strong>.
                     </p>
@@ -223,7 +227,7 @@
                     <h3 id="t-taxo-title" class="text-xs font-mono tracking-widest uppercase text-obsidian-gold">Universal Taxonomy Network</h3>
                     <p id="t-taxo-subtitle" class="text-xs text-slate-400">Select a category branch to filter registered assets</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 relative">
                     <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
                         <div class="w-12 h-12 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-xl font-mono shadow-inner mb-4">🌌</div>
                         <h4 id="t-p1-title" class="text-base font-medium text-white tracking-wide">Cosmos & Deep Space</h4>
@@ -232,11 +236,11 @@
                         <div class="w-full space-y-2.5 font-mono text-xs">
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Planets', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p1-s1" class="text-slate-300">Planets & Moons</span>
+                                <span class="text-slate-300">Planets & Moons</span>
                             </div>
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Stars', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p1-s2" class="text-slate-300">Stars & Stellar Systems</span>
+                                <span class="text-slate-300">Stars & Stellar Systems</span>
                             </div>
                         </div>
                     </div>
@@ -248,35 +252,35 @@
                         <div class="w-full space-y-2.5 font-mono text-xs">
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Fauna', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p2-s1" class="text-slate-300">Fauna & Wild Species</span>
+                                <span class="text-slate-300">Fauna & Wild Species</span>
                             </div>
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Botanical', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p2-s2" class="text-slate-300">Botany & Master Flora</span>
+                                <span class="text-slate-300">Botany & Master Flora</span>
                             </div>
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Minerals', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p2-s3" class="text-slate-300">Minerals & Pure Elements</span>
+                                <span class="text-slate-300">Minerals & Pure Elements</span>
                             </div>
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Geography', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p2-s4" class="text-slate-300">Global Geography & Waters</span>
+                                <span class="text-slate-300">Global Geography & Waters</span>
                             </div>
                         </div>
                     </div>
                     <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
                         <div class="w-12 h-12 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-xl font-mono shadow-inner mb-4">💡</div>
                         <h4 id="t-p3-title" class="text-base font-medium text-white tracking-wide">Intangible, Concepts & Culture</h4>
-                        <span id="t-p3-desc" class="text-[10px] text-slate-500 font-mono mb-6 uppercase tracking-wider">Public Domain Abstraciton (CC0)</span>
+                        <span id="t-p3-desc" class="text-[10px] text-slate-500 font-mono mb-6 uppercase tracking-wider">Public Domain Abstraction (CC0)</span>
                         <div class="w-px h-6 organic-line mb-4"></div>
                         <div class="w-full space-y-2.5 font-mono text-xs">
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Concepts', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p3-s1" class="text-slate-300">Concepts, Ideas & Knowledge</span>
+                                <span class="text-slate-300">Concepts, Ideas & Knowledge</span>
                             </div>
                             <div class="sub-node p-3 rounded-lg flex items-center gap-2 cursor-pointer" onclick="filterCategory('Symbols', 'store')">
                                 <span class="w-1.5 h-1.5 rounded-full bg-obsidian-gold"></span>
-                                <span id="t-p3-s2" class="text-slate-300">Symbols, Archetypes & Culture</span>
+                                <span class="text-slate-300">Symbols, Archetypes & Culture</span>
                             </div>
                         </div>
                     </div>
@@ -284,13 +288,13 @@
             </div>
             <!-- TOOLBAR STORE -->
             <div class="bg-obsidian-card border border-obsidian-border p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span id="t-cat-label" class="text-slate-400">Category:</span>
                     <span id="active-category-tag" class="text-obsidian-gold font-bold bg-obsidian-gold/10 px-2.5 py-1 rounded border border-obsidian-gold/30">ALL</span>
                     <button id="reset-filter-btn" onclick="resetFilter('store')" class="hidden text-slate-400 hover:text-white underline text-[11px] ml-2">Reset Filter</button>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                    <select id="sort-select" onchange="applyFiltersAndSort()" class="bg-obsidian-dark border border-obsidian-border text-slate-300 py-2 px-3 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/50 transition">
+                    <select id="sort-select" onchange="applyFiltersAndSort()" class="bg-obsidian-dark border border-obsidian-border text-slate-300 py-2 px-3 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/50 transition w-full md:w-auto">
                         <option value="newest" id="opt-newest">Sort: Newest First</option>
                         <option value="oldest" id="opt-oldest">Sort: Oldest First</option>
                         <option value="price-asc" id="opt-price-asc">Price: Low to High</option>
@@ -300,14 +304,15 @@
                     </select>
                 </div>
             </div>
-            <div id="nft-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2"></div>
+            <div id="nft-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-2"></div>
         </section>
+
         <!-- VIEW 2: XLS-20 MINT STUDIO -->
         <section id="view-mint" class="hidden space-y-8 max-w-4xl mx-auto">
-            <div class="bg-obsidian-card border border-obsidian-border rounded-2xl p-8 space-y-6 shadow-2xl">
+            <div class="bg-obsidian-card border border-obsidian-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
                 <div class="border-b border-obsidian-border pb-4">
                     <span id="t-mint-badge" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Protocol Engine</span>
-                    <h2 id="t-mint-title" class="text-2xl font-light text-white mt-2">Digital XLS-20 NFT Mint Studio</h2>
+                    <h2 id="t-mint-title" class="text-xl sm:text-2xl font-light text-white mt-2">Digital XLS-20 NFT Mint Studio</h2>
                     <p id="t-mint-desc" class="text-xs text-slate-400 mt-1">Register and mint your digital NFT on XRPL Ledger under CC0 License metadata.</p>
                 </div>
                 <form id="user-mint-form" onsubmit="handleUserMint(event)" class="space-y-5 text-xs font-mono">
@@ -361,9 +366,9 @@
                         <label id="t-lbl-hist" class="text-slate-300 block">Description / History *</label>
                         <textarea id="mint-desc-text" rows="3" required placeholder="Detailed specifications of the digital asset..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none"></textarea>
                     </div>
-                    <div class="legal-disclaimer-box" style="background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; padding: 15px; margin: 20px 0; text-align: left;">
-                        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; color: #E0E0E0; font-size: 0.85rem; line-height: 1.4;">
-                            <input type="checkbox" id="mint-legal-agree" required style="margin-top: 3px; accent-color: #D4AF37; cursor: pointer;">
+                    <div class="bg-[rgba(212,175,55,0.05)] border border-[rgba(212,175,55,0.2)] rounded-lg p-4 my-4 text-left">
+                        <label class="flex items-start gap-3 cursor-pointer text-[#E0E0E0] text-[0.85rem] leading-relaxed">
+                            <input type="checkbox" id="mint-legal-agree" required class="mt-1 accent-[#D4AF37] cursor-pointer flex-shrink-0">
                             <span id="t-legal-text">
                                 I have read and agree to the Terms & Legal Disclaimer (I understand these NFTs are digital assets valid exclusively within the XRPL network with no real-world asset ownership or financial promises). *
                             </span>
@@ -375,14 +380,15 @@
                 </form>
             </div>
         </section>
+
         <!-- VIEW 3: SECONDARY MARKETPLACE -->
         <section id="view-market" class="hidden space-y-8">
-            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <span class="text-[11px] uppercase tracking-widest text-emerald-400 font-mono bg-emerald-950/40 px-3 py-1 rounded border border-emerald-500/30 flex items-center gap-1.5 w-fit">
+                    <span class="text-[11px] uppercase tracking-widest text-emerald-400 font-mono bg-emerald-950/40 px-3 py-1 rounded border border-emerald-500/30 inline-flex items-center gap-1.5">
                         <span>🛡️</span> Verified Issuer Protection
                     </span>
-                    <h2 id="t-market-title" class="text-2xl font-light text-white mt-2">Verified Secondary Marketplace</h2>
+                    <h2 id="t-market-title" class="text-xl sm:text-2xl font-light text-white mt-2">Verified Secondary Marketplace</h2>
                     <p id="t-market-desc" class="text-slate-400 text-xs mt-1">Secondary listings strictly filtered by Aeterna Ledger Issuer signature. No external spam.</p>
                 </div>
             </div>
@@ -392,7 +398,7 @@
                     <h3 id="t-market-taxo-title" class="text-xs font-mono tracking-widest uppercase text-obsidian-gold">Marketplace Taxonomy</h3>
                     <p id="t-market-taxo-sub" class="text-xs text-slate-400">Filter secondary verified listings by branch</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 relative">
                     <div class="pillar-card p-6 rounded-2xl flex flex-col items-center relative">
                         <div class="w-10 h-10 rounded-full bg-obsidian-gold/10 border border-obsidian-gold/40 flex items-center justify-center text-obsidian-gold text-lg font-mono shadow-inner mb-3">🌌</div>
                         <h4 class="text-sm font-medium text-white tracking-wide">Cosmos & Deep Space</h4>
@@ -446,24 +452,24 @@
                 </div>
             </div>
             <!-- TOOLBAR MARKETPLACE -->
-            <div class="bg-gradient-to-r from-obsidian-card via-obsidian-dark to-obsidian-card border border-obsidian-gold/30 p-6 rounded-2xl shadow-xl space-y-6 font-mono text-xs">
+            <div class="bg-gradient-to-r from-obsidian-card via-obsidian-dark to-obsidian-card border border-obsidian-gold/30 p-4 sm:p-6 rounded-2xl shadow-xl space-y-6 font-mono text-xs">
                 <div class="flex flex-wrap items-center justify-between gap-4 border-b border-obsidian-border pb-4">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span id="t-market-cat-label" class="text-slate-400">Market Category:</span>
                         <span id="market-active-category-tag" class="text-obsidian-gold font-bold bg-obsidian-gold/10 px-2.5 py-1 rounded border border-obsidian-gold/30">ALL</span>
                         <button id="market-reset-filter-btn" onclick="resetFilter('market')" class="hidden text-slate-400 hover:text-white underline text-[11px] ml-2">Reset Category</button>
                     </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="setMarketPricePreset(1, 1000, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px] active">All (1 - +1000 XRP)</button>
-                        <button onclick="setMarketPricePreset(1, 100, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">1 - 100 XRP</button>
-                        <button onclick="setMarketPricePreset(100, 250, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">100 - 250 XRP</button>
-                        <button onclick="setMarketPricePreset(250, 500, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">250 - 500 XRP</button>
-                        <button onclick="setMarketPricePreset(500, 1000, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px]">+1000 XRP</button>
+                    <div class="flex flex-wrap items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
+                        <button onclick="setMarketPricePreset(1, 1000, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px] active whitespace-nowrap">All (1 - +1000 XRP)</button>
+                        <button onclick="setMarketPricePreset(1, 100, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">1 - 100 XRP</button>
+                        <button onclick="setMarketPricePreset(100, 250, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">100 - 250 XRP</button>
+                        <button onclick="setMarketPricePreset(250, 500, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">250 - 500 XRP</button>
+                        <button onclick="setMarketPricePreset(500, 1000, this)" class="chip-btn px-3 py-1.5 rounded-full text-[11px] whitespace-nowrap">+1000 XRP</button>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2">
                     <div class="lg:col-span-8 space-y-3 bg-obsidian-dark/80 p-4 rounded-xl border border-obsidian-border">
-                        <div class="flex justify-between items-center text-xs">
+                        <div class="flex justify-between items-center text-xs flex-wrap gap-2">
                             <span id="t-range-label" class="text-slate-400">Selected Price Range:</span>
                             <div class="text-obsidian-gold font-bold bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/30">
                                 <span id="m-range-min-val">1</span> XRP — <span id="m-range-max-val">+1000</span> XRP
@@ -497,37 +503,41 @@
                     </div>
                 </div>
             </div>
-            <div id="market-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+            <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
         </section>
+
         <!-- VIEW 4: MY HOLDINGS -->
         <section id="view-mynfts" class="hidden space-y-8">
-            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-8">
-                <h2 id="t-my-title" class="text-2xl font-light text-white tracking-tight">Personal Digital Holdings</h2>
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8">
+                <h2 id="t-my-title" class="text-xl sm:text-2xl font-light text-white tracking-tight">Personal Digital Holdings</h2>
                 <p id="t-my-desc" class="text-slate-400 text-xs mt-1">Digital NFT assets on the XRP Ledger linked to your connected wallet.</p>
             </div>
-            <div id="my-nfts-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div id="my-nfts-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
                     <p id="t-my-empty" class="text-slate-400 text-sm font-mono">Connect your wallet to synchronize your acquired digital NFTs.</p>
                 </div>
             </div>
         </section>
+
         <!-- VIEW 5: ADMIN STUDIO -->
         <section id="view-admin" class="hidden space-y-8 max-w-3xl mx-auto">
-            <div class="bg-obsidian-card border border-obsidian-border rounded-2xl p-8 space-y-6 shadow-xl">
+            <div class="bg-obsidian-card border border-obsidian-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
                 <div class="border-b border-obsidian-border pb-4">
                     <h3 class="text-xl font-medium text-white flex items-center gap-2">🛡️ Admin Treasury Studio</h3>
                 </div>
             </div>
         </section>
     </main>
+
     <!-- FOOTER -->
-    <footer class="border-t border-obsidian-border bg-obsidian-dark py-6 text-center text-xs text-slate-500 font-mono">
+    <footer class="border-t border-obsidian-border bg-obsidian-dark py-6 px-4 text-center text-xs text-slate-500 font-mono">
         <p>Aeterna Ledger Ecosystem &bull; XRPL XLS-20 Standard & Xaman &bull; NFTs represent digital assets exclusively valid within the XRPL network.</p>
     </footer>
+
     <!-- NFT DETAILS MODAL -->
     <div id="details-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row">
-            <div class="md:w-1/2 h-72 md:h-auto bg-black relative">
+        <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
+            <div class="md:w-1/2 h-60 md:h-auto bg-black relative flex-shrink-0">
                 <img id="detail-img" src="" alt="Asset Art" class="w-full h-full object-cover">
                 <span id="detail-rarity" class="absolute top-3 left-3 bg-obsidian-dark/80 text-obsidian-gold text-[10px] font-mono px-2.5 py-1 rounded border border-obsidian-gold/30"></span>
             </div>
@@ -535,7 +545,7 @@
                 <div class="space-y-3">
                     <div class="flex justify-between items-start">
                         <h3 id="detail-title" class="text-xl font-bold text-white"></h3>
-                        <button onclick="closeDetails()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+                        <button onclick="closeDetails()" class="text-slate-400 hover:text-white text-xl font-bold p-1">&times;</button>
                     </div>
                     <p id="detail-desc" class="text-xs text-slate-300 leading-relaxed"></p>
                 </div>
@@ -551,12 +561,13 @@
             </div>
         </div>
     </div>
+
     <!-- XAMAN QR MODAL -->
     <div id="xaman-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl p-6 max-w-sm w-full space-y-6 text-center shadow-2xl">
             <h3 id="t-modal-title" class="text-base font-medium text-white">Scan with Xaman Wallet</h3>
             <div class="bg-white p-3 rounded-xl inline-block mx-auto border-2 border-obsidian-gold">
-                <img id="qr-code-img" src="" alt="Xaman QR" class="w-48 h-48 mx-auto">
+                <img id="qr-code-img" src="" alt="Xaman QR" class="w-48 h-48 mx-auto object-contain">
             </div>
             <p id="modal-desc" class="text-xs text-slate-300">Approve on your mobile device.</p>
             <div class="flex gap-3 pt-2">
@@ -565,30 +576,29 @@
             </div>
         </div>
     </div>
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // URL completa de tu backend en Render.com (Reemplaza con tu URL real si es diferente)
         const BACKEND_URL = 'https://aeterna-ledger-backend.onrender.com';
-
         let currentUserIsAdmin = false;
         let activeInterval = null;
         let activeCategoryFilterStore = 'ALL';
         let activeCategoryFilterMarket = 'ALL';
         let connectedAccount = null;
-
+        
         const coreStoreNFTs = [
             { id: 1, titleKey: 'nft_1_title', descKey: 'nft_1_desc', price: '25', rarity: 'Planets & Moons', img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80' },
             { id: 2, titleKey: 'nft_2_title', descKey: 'nft_2_desc', price: '10', rarity: 'Botany & Master Flora', img: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80' },
             { id: 3, titleKey: 'nft_3_title', descKey: 'nft_3_desc', price: '15', rarity: 'Concepts, Ideas & Knowledge', img: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80' },
             { id: 4, titleKey: 'nft_4_title', descKey: 'nft_4_desc', price: '30', rarity: 'Stars & Stellar Systems', img: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80' }
         ];
+        
         const secondaryMarketNFTs = [
             { id: 101, titleKey: 'nft_5_title', descKey: 'nft_5_desc', price: '40', rarity: 'Stars & Stellar Systems', img: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80' },
             { id: 102, titleKey: 'nft_6_title', descKey: 'nft_6_desc', price: '180', rarity: 'Global Geography & Waters', img: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=800&q=80' },
             { id: 103, titleKey: 'nft_7_title', descKey: 'nft_7_desc', price: '650', rarity: 'Minerals & Pure Elements', img: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=800&q=80' }
         ];
 
-        // DICCIONARIO MULTILINGÜE COMPLETO Y CORREGIDO
         const translations = {
             en: {
                 subtitle: "Universal Unclaimed Asset Ledger",
@@ -784,7 +794,7 @@
                 marketTitle: "Проверенный вторичный рынок",
                 marketDesc: "Вторичные листинги строго отфильтрованы по подписи эмитента Aeterna Ledger.",
                 myTitle: "Личные цифровые активы", myDesc: "Цифровые активы NFT в XRP Ledger, привязанные к вашему кошельку.",
-                myEmpty: "Подключите кошелек для синхронизации ваших acquired цифровых NFT.",
+                myEmpty: "Подключите кошелек для синхронизации ваших цифровых NFT.",
                 taxoTitle: "Универсальная таксономическая сеть", taxoSubtitle: "Выберите категорию для фильтрации активов",
                 marketTaxoTitle: "Таксономия рынка", marketTaxoSub: "Фильтрация проверенных вторичных листингов по ветвям",
                 catLabel: "Категория:", marketCatLabel: "Категория рынка:", rangeLabel: "Выбранный диапазон цен:", sortLabel: "Порядок активов",
@@ -878,6 +888,7 @@
             
             const detailBuyBtn = document.getElementById('detail-buy-btn');
             if (detailBuyBtn) detailBuyBtn.innerText = t.btnBuy;
+            
             applyFiltersAndSort();
             applyMarketplaceFilters();
         }
@@ -1029,7 +1040,7 @@
                 card.className = "bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden hover:border-obsidian-gold/50 transition duration-300 group flex flex-col justify-between";
                 card.innerHTML = `
                     <div>
-                        <div class="h-60 bg-slate-900 relative overflow-hidden cursor-pointer" onclick="openDetails('${item.titleKey}', '${item.price}', '${item.descKey}', '${item.rarity}', '${item.img}')">
+                        <div class="h-60 bg-slate-900 relative overflow-hidden cursor-pointer" onclick="openDetails('${item.titleKey.replace(/'/g, "\\'")}', '${item.price}', '${item.descKey.replace(/'/g, "\\'")}', '${item.rarity}', '${item.img}')">
                             <img src="${item.img}" alt="${translatedTitle}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             <span class="absolute top-3 right-3 bg-obsidian-dark/80 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2.5 py-1 rounded border border-obsidian-gold/30">${item.rarity}</span>
                         </div>
@@ -1044,10 +1055,10 @@
                             <span class="text-obsidian-gold font-mono font-bold text-sm">${item.price} XRP</span>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="openDetails('${item.titleKey}', '${item.price}', '${item.descKey}', '${item.rarity}', '${item.img}')" class="bg-obsidian-border hover:bg-slate-800 text-slate-300 font-medium px-3 py-2 rounded-lg text-xs transition">
+                            <button onclick="openDetails('${item.titleKey.replace(/'/g, "\\'")}', '${item.price}', '${item.descKey.replace(/'/g, "\\'")}', '${item.rarity}', '${item.img}')" class="bg-obsidian-border hover:bg-slate-800 text-slate-300 font-medium px-3 py-2 rounded-lg text-xs transition">
                                 ${t.detailsBtn}
                             </button>
-                            <button onclick="buyNFT('${translatedTitle}', '${item.price}')" class="btn-buy px-4 py-2 rounded-lg text-xs">
+                            <button onclick="buyNFT('${translatedTitle.replace(/'/g, "\\'")}', '${item.price}')" class="btn-buy px-4 py-2 rounded-lg text-xs">
                                 ${t.btnBuy}
                             </button>
                         </div>
@@ -1071,7 +1082,6 @@
             if (activeTab) activeTab.classList.add('nav-active');
         }
 
-        // INTEGRACIÓN REAL CON XAMAN WALLET Y EL BACKEND EN RENDER
         async function connectXaman() {
             try {
                 const response = await fetch(`${BACKEND_URL}/api/connect-wallet`, {
@@ -1079,16 +1089,13 @@
                     headers: { 'Content-Type': 'application/json' }
                 });
                 const data = await response.json();
-
                 if (response.ok && data.uuid && data.qr_code) {
                     showXamanModal(data.qr_code, data.deep_link, "Scan to connect your Xaman wallet");
                     pollPayloadStatus(data.uuid, (account, isAdmin) => {
                         connectedAccount = account;
                         currentUserIsAdmin = isAdmin;
-
-                       // Guardar persistencia local
-                      localStorage.setItem('aeterna_wallet', account);
-                      localStorage.setItem('aeterna_is_admin', isAdmin);
+                        localStorage.setItem('aeterna_wallet', account);
+                        localStorage.setItem('aeterna_is_admin', isAdmin);
                         
                         updateWalletUI(account);
                         closeModal();
@@ -1113,7 +1120,6 @@
                     body: JSON.stringify({ priceXRP: price })
                 });
                 const data = await response.json();
-
                 if (response.ok && data.uuid && data.qr_code) {
                     showXamanModal(data.qr_code, data.deep_link, `Scan to pay ${price} XRP for ${itemName}`);
                     pollPayloadStatus(data.uuid, (account) => {
@@ -1131,50 +1137,73 @@
         }
 
         async function handleUserMint(event) {
-            event.preventDefault();
-            const legalAgreed = document.getElementById('mint-legal-agree').checked;
-            if (!legalAgreed) {
-                alert("You must accept the Legal Disclaimer & Terms of Minting before proceeding.");
-                return;
-            }
-            const title = document.getElementById('mint-title').value;
-            const price = document.getElementById('mint-price').value;
-            const category = document.getElementById('mint-category').value;
-            const image = document.getElementById('mint-image').value;
-            const video = document.getElementById('mint-video').value;
-            const royalty = document.getElementById('mint-royalty').value;
-            const description = document.getElementById('mint-desc-text').value;
-            const license = document.getElementById('mint-license').value;
+    event.preventDefault();
 
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/mint-nft`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, price, category, image, video, royalty, license, description })
+    const legalAgreed = document.getElementById('mint-legal-agree').checked;
+    if (!legalAgreed) {
+        alert("Debe aceptar los Términos y Descargo de Responsabilidad Legal antes de continuar.");
+        return;
+    }
+
+    if (!connectedAccount) {
+        alert("Por favor, conecta tu billetera Xaman antes de mintear un NFT.");
+        return;
+    }
+
+    const title = document.getElementById('mint-title').value;
+    const price = document.getElementById('mint-price').value;
+    const category = document.getElementById('mint-category').value;
+    const image = document.getElementById('mint-image').value;
+    const royalty = document.getElementById('mint-royalty').value;
+    const description = document.getElementById('mint-desc-text').value;
+
+    try {
+        // Enviar solicitud de payload de minteo a Xaman
+        const response = await fetch(`${BACKEND_URL}/api/mint-payload`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                account: connectedAccount,
+                title: title,
+                category: category,
+                image: image,
+                royalty: royalty,
+                description: description
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.uuid && data.qr_code) {
+            // Mostrar modal de código QR para la app Xaman
+            showXamanModal(data.qr_code, data.deep_link, `Firma en Xaman para mintear "${title}" en XRPL`);
+            
+            // Esperar a que el usuario apruebe y firme en su celular
+            pollPayloadStatus(data.uuid, (account, isAdmin, txHash) => {
+                closeModal();
+                alert(`¡NFT minteado exitosamente en XRPL por tu cuenta! Hash de transacción: ${txHash || data.uuid}`);
+                
+                // Agregar el NFT localmente a la tienda y limpiar formulario
+                coreStoreNFTs.unshift({
+                    id: Date.now(),
+                    titleKey: title,
+                    descKey: description,
+                    price: price,
+                    rarity: category,
+                    img: image
                 });
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    alert('NFT minted successfully on XRPL! TxHash: ' + data.txHash);
-                    coreStoreNFTs.unshift({
-                        id: Date.now(),
-                        titleKey: title,
-                        descKey: description,
-                        price: price,
-                        rarity: category,
-                        img: image
-                    });
-                    applyFiltersAndSort();
-                    document.getElementById('user-mint-form').reset();
-                    switchTab('store');
-                } else {
-                    alert('Minting failed: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Minting error:', error);
-                alert('Could not connect to backend for minting.');
-            }
+                applyFiltersAndSort();
+                document.getElementById('user-mint-form').reset();
+                switchTab('store');
+            });
+        } else {
+            alert('Error al generar la solicitud para Xaman: ' + (data.error || 'Error desconocido'));
         }
+    } catch (error) {
+        console.error('Error durante el minteo:', error);
+        alert('No se pudo conectar con el servidor para iniciar el minteo.');
+    }
+}
 
         async function fetchBalance(address) {
             try {
@@ -1233,10 +1262,8 @@
         function disconnectWallet() {
             connectedAccount = null;
             currentUserIsAdmin = false;
-
-            // Borrar persistencia
-             localStorage.removeItem('aeterna_wallet');
-             localStorage.removeItem('aeterna_is_admin');
+            localStorage.removeItem('aeterna_wallet');
+            localStorage.removeItem('aeterna_is_admin');
             
             document.getElementById('wallet-status').classList.add('hidden');
             document.getElementById('wallet-balances').classList.add('hidden');
@@ -1247,7 +1274,6 @@
 
         function addNftToHoldings(itemName, price) {
             const grid = document.getElementById('my-nfts-grid');
-            // Quitar mensaje de vacío si es el primero
             if (grid.querySelector('p')) {
                 grid.innerHTML = '';
             }
@@ -1272,7 +1298,7 @@
             document.getElementById('detail-desc').innerText = t[descKey] || descKey;
             document.getElementById('detail-rarity').innerText = rarity;
             document.getElementById('detail-img').src = image;
-            document.getElementById('detail-buy-btn').setAttribute('onclick', `buyNFT('${t[titleKey] || titleKey}', '${price}')`);
+            document.getElementById('detail-buy-btn').setAttribute('onclick', `buyNFT('${(t[titleKey] || titleKey).replace(/'/g, "\\'")}', '${price}')`);
             
             const modal = document.getElementById('details-modal');
             modal.classList.remove('hidden');
@@ -1298,17 +1324,16 @@
             if (langSelect) langSelect.value = savedLang;
             changeLanguage(savedLang);
             updateMarketSlider();
-
-            // Recuperar sesión guardada al refrescar
-    const savedAccount = localStorage.getItem('aeterna_wallet');
-    const savedAdmin = localStorage.getItem('aeterna_is_admin') === 'true';
-    
-    if (savedAccount) {
-        connectedAccount = savedAccount;
-        currentUserIsAdmin = savedAdmin;
-        updateWalletUI(savedAccount);
-        fetchBalance(savedAccount);
-        }
+            
+            const savedAccount = localStorage.getItem('aeterna_wallet');
+            const savedAdmin = localStorage.getItem('aeterna_is_admin') === 'true';
+            
+            if (savedAccount) {
+                connectedAccount = savedAccount;
+                currentUserIsAdmin = savedAdmin;
+                updateWalletUI(savedAccount);
+                fetchBalance(savedAccount);
+            }
         });
     </script>
 </body>

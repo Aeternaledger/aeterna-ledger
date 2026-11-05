@@ -163,6 +163,72 @@ app.post('/api/mint-payload', async (req, res) => {
     }
 });
 
+// RUTA 1: Crear oferta para comprar un NFT de la tienda Génesis
+app.post('/api/buy-nft-offer', async (req, res) => {
+    try {
+        const { buyerAccount, nftokenId, priceXRP, ownerAccount } = req.body;
+
+        // Convertir el precio en XRP a drops (1 XRP = 1,000,000 drops)
+        const amountInDrops = (parseFloat(priceXRP) * 1000000).toString();
+
+        // Payload NFTokenCreateOffer oficial para comprar
+        const payload = {
+            txjson: {
+                TransactionType: "NFTokenCreateOffer",
+                Account: buyerAccount,
+                NFTokenID: nftokenId,
+                Amount: amountInDrops,
+                Owner: ownerAccount, // Cuenta dueña del NFT (tu cuenta emisora/tienda)
+                Flags: 0 // Compra directa (Buy Offer)
+            }
+        };
+
+        const xummResponse = await xumm.payload.create(payload);
+
+        res.json({
+            success: true,
+            uuid: xummResponse.uuid,
+            qr_code: xummResponse.refs.qr_png,
+            deep_link: xummResponse.next.always
+        });
+    } catch (error) {
+        console.error('Error al crear oferta de compra:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// RUTA 2: Crear oferta de venta cuando un usuario enlista su propio NFT (List Your NFT)
+app.post('/api/list-nft-offer', async (req, res) => {
+    try {
+        const { sellerAccount, nftokenId, priceXRP } = req.body;
+
+        const amountInDrops = (parseFloat(priceXRP) * 1000000).toString();
+
+        // Payload NFTokenCreateOffer con Flag 1 (tfSellNFToken)
+        const payload = {
+            txjson: {
+                TransactionType: "NFTokenCreateOffer",
+                Account: sellerAccount,
+                NFTokenID: nftokenId,
+                Amount: amountInDrops,
+                Flags: 1 // Flag 1 = tfSellNFToken (Oferta de Venta)
+            }
+        };
+
+        const xummResponse = await xumm.payload.create(payload);
+
+        res.json({
+            success: true,
+            uuid: xummResponse.uuid,
+            qr_code: xummResponse.refs.qr_png,
+            deep_link: xummResponse.next.always
+        });
+    } catch (error) {
+        console.error('Error al enlistar NFT para venta:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // 4. Endpoint para verificar el estado de la firma en Xaman
 app.get('/api/check-status/:uuid', async (req, res) => {
     try {

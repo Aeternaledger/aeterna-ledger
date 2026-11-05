@@ -1139,8 +1139,17 @@
         async function handleUserMint(event) {
     event.preventDefault();
 
+    // 1. Validar si el usuario no ha conectado su billetera
     if (!connectedAccount) {
-        alert("Por favor, conecta tu billetera Xaman antes de mintear.");
+        alert("Por favor, conecta tu billetera Xaman primero para continuar con el minteo.");
+        connectXaman(); // Llama a la función de conexión automática
+        return;
+    }
+
+    // 2. Validar el aviso legal
+    const legalAgreed = document.getElementById('mint-legal-agree').checked;
+    if (!legalAgreed) {
+        alert("Debes aceptar los Términos y Descargo de Responsabilidad Legal antes de proceder.");
         return;
     }
 
@@ -1155,6 +1164,7 @@
     };
 
     try {
+        // 3. Solicitar el QR de minteo interactivo al servidor
         const response = await fetch(`${BACKEND_URL}/api/mint-payload`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1164,22 +1174,33 @@
         const data = await response.json();
 
         if (response.ok && data.uuid && data.qr_code) {
-            // Muestra el QR oficial de Xaman al usuario
-            showXamanModal(data.qr_code, data.deep_link, `Firma en Xaman para mintear "${mintData.title}"`);
+            // Mostrar inmediatamente el código QR de Xaman para firmar el minteo
+            showXamanModal(data.qr_code, data.deep_link, `Escanea con Xaman para autorizar el minteo de "${mintData.title}"`);
             
-            // Monitorear el estado de firma del usuario
+            // Monitorear la aprobación de la transacción en la red XRPL
             pollPayloadStatus(data.uuid, (account, isAdmin, txHash) => {
                 closeModal();
-                alert(`¡NFT minteado exitosamente desde tu cuenta de Xaman!`);
+                alert(`¡NFT minteado exitosamente en XRPL desde tu cuenta!`);
+                
+                // Añadir visualmente a la tienda local y limpiar formulario
+                coreStoreNFTs.unshift({
+                    id: Date.now(),
+                    titleKey: mintData.title,
+                    descKey: mintData.description,
+                    price: mintData.price,
+                    rarity: mintData.category,
+                    img: mintData.image
+                });
+                applyFiltersAndSort();
                 document.getElementById('user-mint-form').reset();
                 switchTab('store');
             });
         } else {
-            alert('Error al iniciar el minteo: ' + (data.error || 'Desconocido'));
+            alert('Error al generar el QR de minteo: ' + (data.error || 'Error desconocido'));
         }
     } catch (err) {
-        console.error('Error de red:', err);
-        alert('Error de conexión al procesar el minteo.');
+        console.error('Error de red al mintear:', err);
+        alert('No se pudo conectar con el servidor para iniciar el minteo.');
     }
 }
 

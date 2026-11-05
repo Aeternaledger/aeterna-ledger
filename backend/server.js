@@ -3,6 +3,7 @@ const cors = require('cors');
 const { XummSdk } = require('xumm-sdk');
 const xrpl = require('xrpl');
 require('dotenv').config();
+const xumm = new XummSdk(process.env.XUMM_API_KEY, process.env.XUMM_API_SECRET);
 
 const app = express();
 app.use(cors());

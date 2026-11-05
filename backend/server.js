@@ -49,6 +49,49 @@ app.post('/api/connect-wallet', async (req, res) => {
     }
 });
 
+// Endpoint para consultar el balance de XRP
+app.get('/api/balances/:address', async (req, res) => {
+    const address = req.params.address;
+    let client;
+    try {
+        // Usa el nodo público oficial de XRPL (Mainnet o Testnet según tu red)
+        client = new xrpl.Client('wss://xrplcluster.com');
+        await client.connect();
+
+        const response = await client.request({
+            command: 'account_info',
+            account: address,
+            ledger_index: 'validated'
+        });
+
+        await client.disconnect();
+
+        // El balance en XRPL viene en drops (1 XRP = 1,000,000 drops)
+        const balanceDrops = response.result.account_data.Balance;
+        const balanceXRP = xrpl.dropsToXrp(balanceDrops);
+
+        res.json({ success: true, xrp: balanceXRP });
+    } catch (error) {
+        if (client && client.isConnected()) {
+            await client.disconnect();
+        }
+        console.error('Error al consultar balance XRPL:', error.message);
+        
+        // Si la cuenta no está activa o no tiene fondos minados, devolvemos 0 en lugar de crashear
+        if (error.data && error.data.error === 'actNotFound') {
+            return res.json({ success: true, xrp: 0 });
+        }
+
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+2. Pasos para aplicarlo
+Reemplaza o ajusta la ruta /api/balances/:address en tu archivo server.js.
+
+Guarda los cambios, haz un git add ., un git commit y un git push origin main para que Render despliegue la nueva versión del servidor automáticamente.
+
+Verificación: Vuelve a conectar tu billetera en la página web; ahora la petición al endpoint devolverá un código 200 OK y el saldo de XRP se pintará correctamente en la interfaz superior.
+
 // 2. Endpoint de Compra / Pago dirigido a la Tesorería (Opción B)
 app.post('/api/buy-nft', async (req, res) => {
     try {

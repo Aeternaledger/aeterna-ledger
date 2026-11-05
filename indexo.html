@@ -1293,6 +1293,17 @@
             if (langSelect) langSelect.value = savedLang;
             changeLanguage(savedLang);
             updateMarketSlider();
+
+            // Recuperar sesión guardada al refrescar
+    const savedAccount = localStorage.getItem('aeterna_wallet');
+    const savedAdmin = localStorage.getItem('aeterna_is_admin') === 'true';
+    
+    if (savedAccount) {
+        connectedAccount = savedAccount;
+        currentUserIsAdmin = savedAdmin;
+        updateWalletUI(savedAccount);
+        fetchBalance(savedAccount);
+        }
         });
     </script>
 </body>

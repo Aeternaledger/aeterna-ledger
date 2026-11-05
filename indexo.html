@@ -1085,6 +1085,11 @@
                     pollPayloadStatus(data.uuid, (account, isAdmin) => {
                         connectedAccount = account;
                         currentUserIsAdmin = isAdmin;
+
+                       // Guardar persistencia local
+                      localStorage.setItem('aeterna_wallet', account);
+                      localStorage.setItem('aeterna_is_admin', isAdmin);
+                        
                         updateWalletUI(account);
                         closeModal();
                         alert('Wallet connected successfully!');

@@ -567,10 +567,15 @@
     </div>
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        // URL completa de tu backend en Render.com (Reemplaza con tu URL real si es diferente)
+        const BACKEND_URL = 'https://aeterna-backend.onrender.com';
+
         let currentUserIsAdmin = false;
         let activeInterval = null;
         let activeCategoryFilterStore = 'ALL';
         let activeCategoryFilterMarket = 'ALL';
+        let connectedAccount = null;
+
         const coreStoreNFTs = [
             { id: 1, titleKey: 'nft_1_title', descKey: 'nft_1_desc', price: '25', rarity: 'Planets & Moons', img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80' },
             { id: 2, titleKey: 'nft_2_title', descKey: 'nft_2_desc', price: '10', rarity: 'Botany & Master Flora', img: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80' },
@@ -582,7 +587,8 @@
             { id: 102, titleKey: 'nft_6_title', descKey: 'nft_6_desc', price: '180', rarity: 'Global Geography & Waters', img: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=800&q=80' },
             { id: 103, titleKey: 'nft_7_title', descKey: 'nft_7_desc', price: '650', rarity: 'Minerals & Pure Elements', img: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=800&q=80' }
         ];
-        // DICCIONARIO MULTILINGÜE COMPLETO Y CORREGIDO SIN REFERENCIAS A SOBERANÍA O DERECHOS REALES
+
+        // DICCIONARIO MULTILINGÜE COMPLETO Y CORREGIDO
         const translations = {
             en: {
                 subtitle: "Universal Unclaimed Asset Ledger",
@@ -801,6 +807,7 @@
                 nft_7_title: "Модель синтеза элемента золота", nft_7_desc: "NFT набора данных атомной структуры в XRPL."
             }
         };
+
         function changeLanguage(lang) {
             localStorage.setItem('aeterna_lang', lang);
             const t = translations[lang] || translations.en;
@@ -808,13 +815,13 @@
             const sub = document.getElementById('t-subtitle');
             if (sub) sub.innerText = t.subtitle;
             const btnConnect = document.getElementById('connect-btn');
-            if (btnConnect) btnConnect.innerText = t.connectBtn;
+            if (btnConnect && !connectedAccount) btnConnect.innerText = t.connectBtn;
             document.getElementById('tab-about').innerText = t.tabAbout;
             document.getElementById('tab-store').innerText = t.tabStore;
             document.getElementById('tab-mint').innerText = t.tabMint;
             document.getElementById('tab-market').innerText = t.tabMarket;
             document.getElementById('tab-mynfts').innerText = t.tabMyNfts;
-            // About Us Texts
+            
             document.getElementById('t-about-badge').innerText = t.aboutBadge;
             document.getElementById('t-about-title').innerText = t.aboutTitle;
             document.getElementById('t-about-desc').innerText = t.aboutDesc;
@@ -826,7 +833,7 @@
             document.getElementById('t-about-box2-desc').innerText = t.aboutBox2Desc;
             document.getElementById('t-about-quote').innerText = t.aboutQuote;
             document.getElementById('t-about-btn').innerText = t.aboutBtn;
-            // Mint Studio Texts
+            
             document.getElementById('t-mint-badge').innerText = t.mintBadge;
             document.getElementById('t-mint-title').innerText = t.mintTitle;
             document.getElementById('t-mint-desc').innerText = t.mintDesc;
@@ -840,7 +847,7 @@
             document.getElementById('t-lbl-hist').innerText = t.lblHist;
             document.getElementById('t-legal-text').innerText = t.legalText;
             document.getElementById('t-mint-submit').innerText = t.mintSubmit;
-            // Store & Market general labels
+            
             document.getElementById('t-tag').innerText = t.tag;
             document.getElementById('t-hero-title').innerText = t.heroTitle;
             document.getElementById('t-hero-desc').innerHTML = `${t.heroDesc.replace('XRP', '<strong class="text-obsidian-gold">XRP</strong>')}`;
@@ -871,10 +878,10 @@
             
             const detailBuyBtn = document.getElementById('detail-buy-btn');
             if (detailBuyBtn) detailBuyBtn.innerText = t.btnBuy;
-
             applyFiltersAndSort();
             applyMarketplaceFilters();
         }
+
         function filterCategory(catKey, targetSection) {
             const categoryMap = {
                 'Planets': 'Planets & Moons',
@@ -899,6 +906,7 @@
                 applyMarketplaceFilters();
             }
         }
+
         function resetFilter(targetSection) {
             if (targetSection === 'store') {
                 activeCategoryFilterStore = 'ALL';
@@ -912,6 +920,7 @@
                 applyMarketplaceFilters();
             }
         }
+
         function applyFiltersAndSort() {
             let items = [...coreStoreNFTs];
             if (activeCategoryFilterStore !== 'ALL') {
@@ -937,6 +946,7 @@
             else if (sortVal === 'name-desc') items.sort((a, b) => b.titleKey.localeCompare(a.titleKey));
             renderCards('nft-grid', items);
         }
+
         function updateMarketSlider() {
             const minInput = document.getElementById('m-slider-min');
             const maxInput = document.getElementById('m-slider-max');
@@ -956,6 +966,7 @@
             track.style.right = percentMax + '%';
             applyMarketplaceFilters();
         }
+
         function setMarketPricePreset(min, max, btnEl) {
             document.querySelectorAll('.chip-btn').forEach(btn => btn.classList.remove('active'));
             if (btnEl) btnEl.classList.add('active');
@@ -963,6 +974,7 @@
             document.getElementById('m-slider-max').value = max;
             updateMarketSlider();
         }
+
         function applyMarketplaceFilters() {
             let items = [...secondaryMarketNFTs];
             if (activeCategoryFilterMarket !== 'ALL') {
@@ -995,6 +1007,7 @@
             else if (sortVal === 'name-desc') items.sort((a, b) => b.titleKey.localeCompare(a.titleKey));
             renderCards('market-grid', items);
         }
+
         function renderCards(containerId, items) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1043,6 +1056,7 @@
                 container.appendChild(card);
             });
         }
+
         function switchTab(tab) {
             const views = ['about', 'store', 'mint', 'market', 'mynfts', 'admin'];
             views.forEach(v => {
@@ -1056,6 +1070,61 @@
             if (activeView) activeView.classList.remove('hidden');
             if (activeTab) activeTab.classList.add('nav-active');
         }
+
+        // INTEGRACIÓN REAL CON XAMAN WALLET Y EL BACKEND EN RENDER
+        async function connectXaman() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/connect-wallet`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+
+                if (response.ok && data.uuid && data.qr_code) {
+                    showXamanModal(data.qr_code, data.deep_link, "Scan to connect your Xaman wallet");
+                    pollPayloadStatus(data.uuid, (account, isAdmin) => {
+                        connectedAccount = account;
+                        currentUserIsAdmin = isAdmin;
+                        updateWalletUI(account);
+                        closeModal();
+                        alert('Wallet connected successfully!');
+                        fetchBalance(account);
+                    });
+                } else {
+                    alert('Error creating Xaman session: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Connection error:', error);
+                alert('Could not connect to backend server in Render.');
+            }
+        }
+
+        async function buyNFT(itemName, price) {
+            closeDetails();
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/buy-nft`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ priceXRP: price })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.uuid && data.qr_code) {
+                    showXamanModal(data.qr_code, data.deep_link, `Scan to pay ${price} XRP for ${itemName}`);
+                    pollPayloadStatus(data.uuid, (account) => {
+                        closeModal();
+                        alert(`Purchase successful for ${itemName}!`);
+                        addNftToHoldings(itemName, price);
+                    });
+                } else {
+                    alert('Error initiating purchase: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Buy error:', error);
+                alert('Could not process purchase request.');
+            }
+        }
+
         async function handleUserMint(event) {
             event.preventDefault();
             const legalAgreed = document.getElementById('mint-legal-agree').checked;
@@ -1067,21 +1136,123 @@
             const price = document.getElementById('mint-price').value;
             const category = document.getElementById('mint-category').value;
             const image = document.getElementById('mint-image').value;
+            const video = document.getElementById('mint-video').value;
+            const royalty = document.getElementById('mint-royalty').value;
             const description = document.getElementById('mint-desc-text').value;
-            
-            alert('Connecting to XRPL Mainnet... Minting NFT asset via Aeterna Ledger protocol.');
-            coreStoreNFTs.unshift({
-                id: Date.now(),
-                titleKey: title,
-                descKey: description,
-                price: price,
-                rarity: category,
-                img: image
-            });
-            applyFiltersAndSort();
-            document.getElementById('user-mint-form').reset();
-            switchTab('store');
+            const license = document.getElementById('mint-license').value;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/mint-nft`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, price, category, image, video, royalty, license, description })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alert('NFT minted successfully on XRPL! TxHash: ' + data.txHash);
+                    coreStoreNFTs.unshift({
+                        id: Date.now(),
+                        titleKey: title,
+                        descKey: description,
+                        price: price,
+                        rarity: category,
+                        img: image
+                    });
+                    applyFiltersAndSort();
+                    document.getElementById('user-mint-form').reset();
+                    switchTab('store');
+                } else {
+                    alert('Minting failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Minting error:', error);
+                alert('Could not connect to backend for minting.');
+            }
         }
+
+        async function fetchBalance(address) {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/balances/${address}`);
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('balance-xrp').innerText = parseFloat(data.xrp).toFixed(2);
+                    document.getElementById('wallet-balances').classList.remove('hidden');
+                    document.getElementById('wallet-balances').classList.add('flex');
+                }
+            } catch (e) {
+                console.error('Error fetching balance:', e);
+            }
+        }
+
+        function pollPayloadStatus(uuid, onSuccess) {
+            if (activeInterval) clearInterval(activeInterval);
+            activeInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/check-status/${uuid}`);
+                    const data = await res.json();
+                    if (data.signed) {
+                        clearInterval(activeInterval);
+                        onSuccess(data.account, data.isAdmin);
+                    } else if (data.expired) {
+                        clearInterval(activeInterval);
+                        alert('Xaman QR code expired. Please try again.');
+                        closeModal();
+                    }
+                } catch (err) {
+                    console.error('Polling error:', err);
+                }
+            }, 3000);
+        }
+
+        function showXamanModal(qrCodeUrl, deepLinkUrl, descriptionText) {
+            document.getElementById('qr-code-img').src = qrCodeUrl;
+            document.getElementById('deep-link-btn').href = deepLinkUrl;
+            document.getElementById('modal-desc').innerText = descriptionText;
+            const modal = document.getElementById('xaman-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function updateWalletUI(address) {
+            const shortAddr = address.substring(0, 6) + '...' + address.substring(address.length - 4);
+            document.getElementById('wallet-address-text').innerText = shortAddr;
+            document.getElementById('wallet-status').classList.remove('hidden');
+            document.getElementById('wallet-status').classList.add('flex');
+            document.getElementById('connect-btn').classList.add('hidden');
+            if (currentUserIsAdmin) {
+                document.getElementById('tab-admin').classList.remove('hidden');
+            }
+        }
+
+        function disconnectWallet() {
+            connectedAccount = null;
+            currentUserIsAdmin = false;
+            document.getElementById('wallet-status').classList.add('hidden');
+            document.getElementById('wallet-balances').classList.add('hidden');
+            document.getElementById('connect-btn').classList.remove('hidden');
+            document.getElementById('tab-admin').classList.add('hidden');
+            alert('Wallet disconnected.');
+        }
+
+        function addNftToHoldings(itemName, price) {
+            const grid = document.getElementById('my-nfts-grid');
+            // Quitar mensaje de vacío si es el primero
+            if (grid.querySelector('p')) {
+                grid.innerHTML = '';
+            }
+            const div = document.createElement('div');
+            div.className = "bg-obsidian-card border border-obsidian-border rounded-xl p-6 space-y-3";
+            div.innerHTML = `
+                <div class="h-40 bg-slate-900 rounded-lg overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80" alt="${itemName}" class="w-full h-full object-cover">
+                </div>
+                <h4 class="text-sm font-medium text-white">${itemName}</h4>
+                <p class="text-xs text-obsidian-gold font-mono">Acquired for ${price} XRP</p>
+            `;
+            grid.appendChild(div);
+        }
+
         function openDetails(titleKey, price, descKey, rarity, image) {
             const lang = localStorage.getItem('aeterna_lang') || 'en';
             const t = translations[lang] || translations.en;
@@ -1097,23 +1268,20 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
+
         function closeDetails() {
             const modal = document.getElementById('details-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
+
         function closeModal() {
+            if (activeInterval) clearInterval(activeInterval);
             const modal = document.getElementById('xaman-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
-        async function connectXaman() {
-            alert('Connecting to Xaman Wallet...');
-        }
-        async function buyNFT(itemName, price) {
-            closeDetails();
-            alert(`Initiating purchase for ${itemName} at ${price} XRP.`);
-        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('aeterna_lang') || 'en';
             const langSelect = document.getElementById('language-select');

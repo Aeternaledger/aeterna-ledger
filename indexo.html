@@ -1233,6 +1233,11 @@
         function disconnectWallet() {
             connectedAccount = null;
             currentUserIsAdmin = false;
+
+            // Borrar persistencia
+             localStorage.removeItem('aeterna_wallet');
+             localStorage.removeItem('aeterna_is_admin');
+            
             document.getElementById('wallet-status').classList.add('hidden');
             document.getElementById('wallet-balances').classList.add('hidden');
             document.getElementById('connect-btn').classList.remove('hidden');

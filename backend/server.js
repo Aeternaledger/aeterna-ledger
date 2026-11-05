@@ -84,13 +84,7 @@ app.get('/api/balances/:address', async (req, res) => {
 
         res.status(500).json({ success: false, error: error.message });
     }
-});
-2. Pasos para aplicarlo
-Reemplaza o ajusta la ruta /api/balances/:address en tu archivo server.js.
-
-Guarda los cambios, haz un git add ., un git commit y un git push origin main para que Render despliegue la nueva versión del servidor automáticamente.
-
-Verificación: Vuelve a conectar tu billetera en la página web; ahora la petición al endpoint devolverá un código 200 OK y el saldo de XRP se pintará correctamente en la interfaz superior.
+});  
 
 // 2. Endpoint de Compra / Pago dirigido a la Tesorería (Opción B)
 app.post('/api/buy-nft', async (req, res) => {

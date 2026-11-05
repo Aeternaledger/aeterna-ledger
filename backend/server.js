@@ -49,12 +49,11 @@ app.post('/api/connect-wallet', async (req, res) => {
     }
 });
 
-// Endpoint para consultar el balance de XRP
+// 2. Endpoint unificado para consultar el balance de XRP (Mainnet)
 app.get('/api/balances/:address', async (req, res) => {
     const address = req.params.address;
     let client;
     try {
-        // Usa el nodo público oficial de XRPL (Mainnet o Testnet según tu red)
         client = new xrpl.Client('wss://xrplcluster.com');
         await client.connect();
 
@@ -66,7 +65,6 @@ app.get('/api/balances/:address', async (req, res) => {
 
         await client.disconnect();
 
-        // El balance en XRPL viene en drops (1 XRP = 1,000,000 drops)
         const balanceDrops = response.result.account_data.Balance;
         const balanceXRP = xrpl.dropsToXrp(balanceDrops);
 
@@ -77,22 +75,20 @@ app.get('/api/balances/:address', async (req, res) => {
         }
         console.error('Error al consultar balance XRPL:', error.message);
         
-        // Si la cuenta no está activa o no tiene fondos minados, devolvemos 0 en lugar de crashear
         if (error.data && error.data.error === 'actNotFound') {
             return res.json({ success: true, xrp: 0 });
         }
 
         res.status(500).json({ success: false, error: error.message });
     }
-});  
+});
 
-// 2. Endpoint de Compra / Pago dirigido a la Tesorería (Opción B)
+// 3. Endpoint de Compra / Pago dirigido a la Tesorería
 app.post('/api/buy-nft', async (req, res) => {
     try {
         const { priceXRP } = req.body;
         const drops = Math.floor(parseFloat(priceXRP) * 1000000).toString();
 
-        // El pago va DIRECTO a la dirección de Tesorería
         const payload = {
             txjson: {
                 TransactionType: "Payment",
@@ -119,7 +115,7 @@ app.post('/api/buy-nft', async (req, res) => {
     }
 });
 
-// 3. Endpoint para verificar el estado de la firma en Xaman
+// 4. Endpoint para verificar el estado de la firma en Xaman
 app.get('/api/check-status/:uuid', async (req, res) => {
     try {
         const uuid = req.params.uuid;
@@ -140,7 +136,6 @@ app.get('/api/check-status/:uuid', async (req, res) => {
                 expired: false
             };
 
-            // Validar si la cuenta conectada es la tesorería (Admin)
             const isAdmin = (account === TREASURY_ADDRESS);
 
             return res.json({
@@ -162,79 +157,14 @@ app.get('/api/check-status/:uuid', async (req, res) => {
     }
 });
 
-// 4. Endpoint para consultar balances en XRP de cualquier cuenta
-app.get('/api/balances/:address', async (req, res) => {
-    const address = req.params.address;
-    const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233'); // Cambiar a Mainnet cuando esté en producción
-
-    try {
-        await client.connect();
-        const response = await client.request({
-            command: 'account_info',
-            account: address,
-            ledger_index: 'validated'
-        });
-
-        const drops = response.result.account_data.Balance;
-        const xrp = xrpl.dropsToXrp(drops);
-
-        await client.disconnect();
-        res.json({ success: true, xrp: xrp });
-    } catch (error) {
-        await client.disconnect();
-        console.error('Error obteniendo balance:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// 5. Función de Minteo Automático XLS-20 (Ejecutada por la cuenta de minteo)
-async function executeAutomaticMint(nftMetadataURI) {
-    const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
-    try {
-        await client.connect();
-
-        const mintingWallet = xrpl.Wallet.fromSeed(MINTING_SECRET);
-
-        const mintTx = {
-            TransactionType: "NFTokenMint",
-            Account: mintingWallet.classicAddress,
-            NFTokenTaxon: 1,
-            Flags: 8, // tfTransferable
-            URI: xrpl.convertStringToHex(nftMetadataURI),
-            TransferFee: 250 // 2.5% regalía de reventa
-        };
-
-        const result = await client.submitAndWait(mintTx, { wallet: mintingWallet });
-        console.log("¡NFT minteado exitosamente por la cuenta de minteo!", result.result.hash);
-
-        await client.disconnect();
-        return result.result.hash;
-    } catch (error) {
-        await client.disconnect();
-        console.error('Error en minteo automático XLS-20:', error);
-        throw error;
-    }
-}
-// Endpoint para procesar el minteo automático XLS-20 desde la web
-// Endpoint para procesar el minteo automático XLS-20 desde la web
+// 5. Endpoint para procesar el minteo automático XLS-20 desde la web (Mainnet)
 app.post('/api/mint-nft', async (req, res) => {
     try {
         const { title, price, category, image, video, license, description, royalty } = req.body;
         
-        const metadata = {
-            name: title,
-            description: description,
-            image: image,
-            animation_url: video || null,
-            attributes: [
-                { trait_type: "Category", value: category },
-                { trait_type: "License", value: license }
-            ]
-        };
-
         const metadataURI = "ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf4dfuyljbad43rk2q5i4chkuai/" + encodeURIComponent(title);
 
-        const client = new xrpl.Client('wss://s.altnet.rippletest.net:51233');
+        const client = new xrpl.Client('wss://xrplcluster.com');
         await client.connect();
 
         const mintingWallet = xrpl.Wallet.fromSeed(MINTING_SECRET);
@@ -269,6 +199,7 @@ app.post('/api/mint-nft', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
 app.listen(PORT, () => {
     console.log(`Servidor de Aeterna Ledger corriendo en http://localhost:${PORT}`);
 });

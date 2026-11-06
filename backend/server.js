@@ -168,22 +168,31 @@ app.post('/api/buy-nft-offer', async (req, res) => {
     try {
         const { buyerAccount, nftokenId, priceXRP, ownerAccount } = req.body;
 
-        // Convertir el precio en XRP a drops (1 XRP = 1,000,000 drops)
+        // Validar que los campos críticos no sean nulos o placeholders inválidos
+        if (!ownerAccount || ownerAccount.includes('...')) {
+            return res.status(400).json({ success: false, error: "La dirección del dueño (Owner) del NFT no es válida o es un marcador de posición." });
+        }
+
         const amountInDrops = (parseFloat(priceXRP) * 1000000).toString();
 
-        // Payload NFTokenCreateOffer oficial para comprar
         const payload = {
             txjson: {
                 TransactionType: "NFTokenCreateOffer",
                 Account: buyerAccount,
                 NFTokenID: nftokenId,
                 Amount: amountInDrops,
-                Owner: ownerAccount, // Cuenta dueña del NFT (tu cuenta emisora/tienda)
-                Flags: 0 // Compra directa (Buy Offer)
+                Owner: ownerAccount, // Debe ser una cuenta 'r...' real
+                Flags: 0 // 0 para Buy Offer (Compra)
             }
         };
 
         const xummResponse = await xumm.payload.create(payload);
+
+        // Validar si Xaman respondió correctamente
+        if (!xummResponse || !xummResponse.uuid) {
+            console.error('Respuesta vacía de Xaman:', xummResponse);
+            return res.status(400).json({ success: false, error: "Xaman rechazó la creación del payload. Revisa los datos del NFT." });
+        }
 
         res.json({
             success: true,
@@ -192,8 +201,8 @@ app.post('/api/buy-nft-offer', async (req, res) => {
             deep_link: xummResponse.next.always
         });
     } catch (error) {
-        console.error('Error al crear oferta de compra:', error);
-        res.status(500).json({ success: false, error: error.message });
+        console.error('Error detallado en buy-nft-offer:', error);
+        res.status(500).json({ success: false, error: error.message || error.toString() });
     }
 });
 
@@ -204,18 +213,21 @@ app.post('/api/list-nft-offer', async (req, res) => {
 
         const amountInDrops = (parseFloat(priceXRP) * 1000000).toString();
 
-        // Payload NFTokenCreateOffer con Flag 1 (tfSellNFToken)
         const payload = {
             txjson: {
                 TransactionType: "NFTokenCreateOffer",
-                Account: sellerAccount,
+                Account: sellerAccount, // Tu cuenta que posee el NFT
                 NFTokenID: nftokenId,
                 Amount: amountInDrops,
-                Flags: 1 // Flag 1 = tfSellNFToken (Oferta de Venta)
+                Flags: 1 // Flag 1 = tfSellNFToken (Oferta de Venta - No requiere campo Owner)
             }
         };
 
         const xummResponse = await xumm.payload.create(payload);
+
+        if (!xummResponse || !xummResponse.uuid) {
+            return res.status(400).json({ success: false, error: "Xaman rechazó la creación de la oferta de venta." });
+        }
 
         res.json({
             success: true,
@@ -224,7 +236,7 @@ app.post('/api/list-nft-offer', async (req, res) => {
             deep_link: xummResponse.next.always
         });
     } catch (error) {
-        console.error('Error al enlistar NFT para venta:', error);
+        console.error('Error al enlistar NFT:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

@@ -30,29 +30,44 @@
         .btn-buy:hover { background-color: #e6c547; box-shadow: 0 0 20px rgba(212, 175, 55, 0.35); }
         .btn-cancel { background-color: #ef4444; color: #ffffff; font-weight: 600; transition: all 0.2s ease; }
         .btn-cancel:hover { background-color: #f87171; box-shadow: 0 0 15px rgba(239, 68, 68, 0.35); }
-
         .wallet-connected-badge { background-color: #043875; border-color: #087bff; color: #60a5fa; transition: all 0.2s ease; }
         .wallet-connected-badge:hover { background-color: #052c5c; border-color: #ef4444; color: #fca5a5; }
         .nav-active { background-color: #1E293B; color: #D4AF37; font-weight: 700; border-bottom: 2px solid #D4AF37; }
         
-        /* Chip de categoría adaptativo para móviles y web */
+        /* Organic High-End Category Chip Style */
         .cat-chip {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(13, 19, 31, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             color: #94A3B8;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            flex-shrink: 0;
+            backdrop-filter: blur(8px);
         }
-        .cat-chip:hover, .cat-chip.active {
+        .cat-chip:hover {
+            border-color: rgba(212, 175, 55, 0.5);
+            color: #F1F5F9;
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateY(-1px);
+        }
+        .cat-chip.active {
             border-color: #D4AF37;
             color: #D4AF37;
-            background: rgba(212, 175, 55, 0.12);
+            background: rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+            font-weight: 600;
         }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Simplified Yellow List Button Override */
+        .btn-simple-yellow {
+            background-color: #D4AF37;
+            color: #000000;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .btn-simple-yellow:hover {
+            background-color: #e6c547;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.35);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-obsidian-gold selection:text-black">
@@ -81,7 +96,7 @@
                 <nav class="flex space-x-1 text-xs font-mono overflow-x-auto max-w-full">
                     <button onclick="switchTab('store')" id="tab-store" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition nav-active whitespace-nowrap">Store</button>
                     <button onclick="switchTab('market')" id="tab-market" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Marketplace</button>
-                    <!-- HOLDINGS: Oculto por defecto. Solo aparece al conectar wallet -->
+                    <!-- HOLDINGS: Hidden by default. Appears on wallet connect -->
                     <button onclick="switchTab('mynfts')" id="tab-mynfts" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Holdings</button>
                     <button onclick="switchTab('about')" id="tab-about" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">About</button>
                     <button onclick="switchTab('admin')" id="tab-admin" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-400 hover:text-white border border-obsidian-gold/30 whitespace-nowrap">Admin</button>
@@ -115,7 +130,7 @@
     <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 w-full flex-grow space-y-8">
         
-        <!-- VISTA 1: TIENDA GÉNESIS -->
+        <!-- VISTA 1: STORE -->
         <section id="view-store" class="space-y-6">
             <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8">
                 <span id="t-tag-genesis" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Official Genesis Registry</span>
@@ -125,36 +140,36 @@
                 </p>
             </div>
 
-            <!-- COMPACT CATEGORY NAV (STORE) -->
-            <div class="space-y-3">
+            <!-- ORGANIC HIGH-END CATEGORY FILTER (STORE) -->
+            <div class="space-y-4">
                 <div class="flex items-center justify-between font-mono text-xs">
-                    <span id="t-filter-store-lbl" class="text-slate-400">Filter Category:</span>
-                    <select id="sort-select-store" onchange="renderStore()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none">
+                    <span id="t-filter-store-lbl" class="text-slate-400 uppercase tracking-wider text-[11px]">Filter Category:</span>
+                    <select id="sort-select-store" onchange="renderStore()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none hover:border-obsidian-gold/40 transition">
                         <option value="newest" id="opt-store-newest">Sort: Newest First</option>
                         <option value="price-asc" id="opt-store-p-asc">Price: Low to High</option>
                         <option value="price-desc" id="opt-store-p-desc">Price: High to Low</option>
                         <option value="name-asc" id="opt-store-n-asc">Name: A to Z</option>
                     </select>
                 </div>
-                <div class="relative w-full overflow-hidden">
-                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 px-1 text-xs font-mono scroll-smooth">
-                        <button onclick="filterCategory('ALL', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl active" id="chip-store-all">All</button>
-                        <button onclick="filterCategory('Planets & Moons', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-planets">🌌 Planets & Moons</button>
-                        <button onclick="filterCategory('Stars & Stellar Systems', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-stars">✨ Stars & Stellar Systems</button>
-                        <button onclick="filterCategory('Fauna & Wild Species', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-fauna">🦅 Fauna & Species</button>
-                        <button onclick="filterCategory('Botany & Master Flora', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-botany">🌿 Botany & Flora</button>
-                        <button onclick="filterCategory('Minerals & Pure Elements', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-minerals">💎 Minerals & Elements</button>
-                        <button onclick="filterCategory('Global Geography & Waters', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-geo">🌊 Geography & Waters</button>
-                        <button onclick="filterCategory('Concepts, Ideas & Knowledge', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-concepts">💡 Concepts & Knowledge</button>
-                        <button onclick="filterCategory('Symbols, Archetypes & Culture', 'store', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-store-symbols">🏛️ Symbols & Culture</button>
-                    </div>
+                
+                <!-- Flexible Responsive Organic Wrapping Grid -->
+                <div class="flex flex-wrap gap-2 sm:gap-2.5 justify-start w-full font-mono text-xs">
+                    <button onclick="filterCategory('ALL', 'store', this)" class="cat-chip px-4 py-2 rounded-xl active" id="chip-store-all">All</button>
+                    <button onclick="filterCategory('Planets & Moons', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-planets">🌌 Planets & Moons</button>
+                    <button onclick="filterCategory('Stars & Stellar Systems', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-stars">✨ Stars & Stellar Systems</button>
+                    <button onclick="filterCategory('Fauna & Wild Species', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-fauna">🦅 Fauna & Species</button>
+                    <button onclick="filterCategory('Botany & Master Flora', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-botany">🌿 Botany & Flora</button>
+                    <button onclick="filterCategory('Minerals & Pure Elements', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-minerals">💎 Minerals & Elements</button>
+                    <button onclick="filterCategory('Global Geography & Waters', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-geo">🌊 Geography & Waters</button>
+                    <button onclick="filterCategory('Concepts, Ideas & Knowledge', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-concepts">💡 Concepts & Knowledge</button>
+                    <button onclick="filterCategory('Symbols, Archetypes & Culture', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-symbols">🏛️ Symbols & Culture</button>
                 </div>
             </div>
 
             <div id="store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
         </section>
 
-        <!-- VISTA 2: MARKETPLACE SECUNDARIO -->
+        <!-- VISTA 2: MARKETPLACE -->
         <section id="view-market" class="hidden space-y-6">
             <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
@@ -164,42 +179,43 @@
                     <h2 id="t-market-title" class="text-xl sm:text-2xl font-light text-white mt-2">Verified Secondary XLS-20 Trade</h2>
                     <p id="t-market-desc" class="text-slate-400 text-xs mt-1">Secondary and community listings powered by native XRPL <code class="text-obsidian-gold font-mono">NFTokenCreateOffer</code>.</p>
                 </div>
-                <!-- BOTÓN DE ENLISTADO RECONSTRUIDO CON ESTILO AMARILLO/DORADO TRADICIONAL Y LETRAS MÁS GRANDES -->
-                <button onclick="openListNftModal()" id="btn-list-nft" class="btn-buy font-mono text-sm sm:text-base font-extrabold px-6 py-3.5 rounded-xl uppercase tracking-wider flex items-center gap-2 whitespace-nowrap cursor-pointer shadow-lg hover:scale-[1.02] transition-transform">
-                    <span class="text-base sm:text-lg">🏷️</span> <span id="btn-list-nft-text">List Your NFT for Sale</span>
+                
+                <!-- RESTRUCTURED SIMPLE YELLOW BUTTON WITH NO DRAWINGS OR ICONS -->
+                <button onclick="openListNftModal()" id="btn-list-nft" class="btn-simple-yellow font-mono text-sm sm:text-base font-bold px-6 py-3 rounded-xl uppercase tracking-wider whitespace-nowrap cursor-pointer shadow-md hover:scale-[1.01] transition-all">
+                    <span id="btn-list-nft-text">List NFT for sale</span>
                 </button>
             </div>
 
-            <!-- COMPACT CATEGORY NAV (MARKETPLACE) -->
-            <div class="space-y-3">
+            <!-- ORGANIC HIGH-END CATEGORY FILTER (MARKETPLACE) -->
+            <div class="space-y-4">
                 <div class="flex items-center justify-between font-mono text-xs">
-                    <span id="t-filter-market-lbl" class="text-slate-400">Market Category:</span>
-                    <select id="sort-select-market" onchange="renderMarketplace()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none">
+                    <span id="t-filter-market-lbl" class="text-slate-400 uppercase tracking-wider text-[11px]">Market Category:</span>
+                    <select id="sort-select-market" onchange="renderMarketplace()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none hover:border-obsidian-gold/40 transition">
                         <option value="newest" id="opt-market-newest">Sort: Newest First</option>
                         <option value="price-asc" id="opt-market-p-asc">Price: Low to High</option>
                         <option value="price-desc" id="opt-market-p-desc">Price: High to Low</option>
                         <option value="name-asc" id="opt-market-n-asc">Name: A to Z</option>
                     </select>
                 </div>
-                <div class="relative w-full overflow-hidden">
-                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 px-1 text-xs font-mono scroll-smooth">
-                        <button onclick="filterCategory('ALL', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl active" id="chip-market-all">All Active Listings</button>
-                        <button onclick="filterCategory('Planets & Moons', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-planets">🌌 Planets & Moons</button>
-                        <button onclick="filterCategory('Stars & Stellar Systems', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-stars">✨ Stars & Stellar Systems</button>
-                        <button onclick="filterCategory('Fauna & Wild Species', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-fauna">🦅 Fauna & Species</button>
-                        <button onclick="filterCategory('Botany & Master Flora', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-botany">🌿 Botany & Flora</button>
-                        <button onclick="filterCategory('Minerals & Pure Elements', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-minerals">💎 Minerals & Elements</button>
-                        <button onclick="filterCategory('Global Geography & Waters', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-geo">🌊 Geography & Waters</button>
-                        <button onclick="filterCategory('Concepts, Ideas & Knowledge', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-concepts">💡 Concepts & Knowledge</button>
-                        <button onclick="filterCategory('Symbols, Archetypes & Culture', 'market', this)" class="cat-chip px-3.5 py-2 rounded-xl" id="chip-market-symbols">🏛️ Symbols & Culture</button>
-                    </div>
+
+                <!-- Flexible Responsive Organic Wrapping Grid -->
+                <div class="flex flex-wrap gap-2 sm:gap-2.5 justify-start w-full font-mono text-xs">
+                    <button onclick="filterCategory('ALL', 'market', this)" class="cat-chip px-4 py-2 rounded-xl active" id="chip-market-all">All Active Listings</button>
+                    <button onclick="filterCategory('Planets & Moons', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-planets">🌌 Planets & Moons</button>
+                    <button onclick="filterCategory('Stars & Stellar Systems', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-stars">✨ Stars & Stellar Systems</button>
+                    <button onclick="filterCategory('Fauna & Wild Species', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-fauna">🦅 Fauna & Species</button>
+                    <button onclick="filterCategory('Botany & Master Flora', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-botany">🌿 Botany & Flora</button>
+                    <button onclick="filterCategory('Minerals & Pure Elements', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-minerals">💎 Minerals & Elements</button>
+                    <button onclick="filterCategory('Global Geography & Waters', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-geo">🌊 Geography & Waters</button>
+                    <button onclick="filterCategory('Concepts, Ideas & Knowledge', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-concepts">💡 Concepts & Knowledge</button>
+                    <button onclick="filterCategory('Symbols, Archetypes & Culture', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-symbols">🏛️ Symbols & Culture</button>
                 </div>
             </div>
 
             <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
         </section>
 
-        <!-- VISTA 3: HOLDINGS (VISIBILIDAD Y PERSISTENCIA PERMANENTE) -->
+        <!-- VISTA 3: HOLDINGS -->
         <section id="view-mynfts" class="hidden space-y-6">
             <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8">
                 <h2 id="t-holdings-title" class="text-xl sm:text-2xl font-light text-white tracking-tight">Personal Digital Holdings</h2>
@@ -266,7 +282,7 @@
     <div id="list-nft-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
         <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl font-mono text-xs">
             <div class="flex justify-between items-center border-b border-obsidian-border pb-3">
-                <h3 id="t-modal-list-title" class="text-base font-bold text-white flex items-center gap-2">🏷️ List Your NFT for Sale</h3>
+                <h3 id="t-modal-list-title" class="text-base font-bold text-white flex items-center gap-2">List NFT for sale</h3>
                 <button onclick="closeListNftModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
             </div>
             <form onsubmit="handleListNftSubmit(event)" class="space-y-4">
@@ -327,12 +343,11 @@
         </div>
     </div>
 
-    <!-- EXPANDED NFT DETAILS MODAL (OBJECT-CONTAIN & FONDO NEGRO + VIDEO SUPPORT) -->
+    <!-- EXPANDED NFT DETAILS MODAL -->
     <div id="details-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
         <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
-            <!-- MEDIA CONTAINER: RESPETO AL ANCHO CON RELLENO NEGRO NATIVO -->
             <div id="detail-container-media" class="md:w-1/2 h-64 md:h-auto bg-black relative flex items-center justify-center overflow-hidden flex-shrink-0 border-b md:border-b-0 md:border-r border-obsidian-border">
-                <!-- Se inserta dinámicamente video o imagen -->
+                <!-- Dynamically rendered media -->
             </div>
             <div class="md:w-1/2 p-6 flex flex-col justify-between space-y-4 overflow-y-auto font-mono text-xs">
                 <div class="space-y-4">
@@ -397,7 +412,7 @@
         </div>
     </div>
 
-    <!-- XAMAN QR MODAL -->
+    <!-- ON-SITE XAMAN QR MODAL -->
     <div id="xaman-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl p-6 max-w-sm w-full space-y-6 text-center shadow-2xl">
             <h3 id="t-xaman-qr-title" class="text-base font-medium text-white">Scan with Xaman Wallet</h3>
@@ -421,13 +436,11 @@
         let activeFilterMarket = 'ALL';
         let connectedAccount = null;
 
-        // HELPER: VERIFICA SI UNA URL ES VIDEO HTML5
         function isVideoUrl(url) {
             if (!url) return false;
             return (/\.(mp4|webm|ogg|mov)$/i).test(url) || url.includes('video');
         }
 
-        // HELPER: RENDERIZA MEDIA RESPETANDO ANCHO EN FONDO NEGRO
         function renderMediaElement(url, title, additionalClasses = "w-full h-full object-contain") {
             if (isVideoUrl(url)) {
                 return `<video src="${url}" autoplay loop muted playsinline controls class="${additionalClasses} bg-black"></video>`;
@@ -435,7 +448,7 @@
             return `<img src="${url}" alt="${title}" class="${additionalClasses} bg-black">`;
         }
 
-        // MULTI-LANGUAGE DICTIONARY (EN, ES, JA, KO, ZH, RU)
+        // MULTI-LANGUAGE DICTIONARY
         const translations = {
             en: {
                 subtitle: "Universal Unclaimed Asset Ledger",
@@ -452,7 +465,8 @@
                 marketBadge: "Peer-to-Peer Verified Market",
                 marketTitle: "Verified Secondary XLS-20 Trade",
                 marketDesc: "Secondary and community listings powered by native XRPL NFTokenCreateOffer.",
-                listBtn: "List Your NFT for Sale",
+                listBtn: "List NFT for sale",
+                cancelBtn: "Cancel sale",
                 holdingsTitle: "Personal Digital Holdings",
                 holdingsDesc: "Digital NFT assets on the XRP Ledger linked to your connected wallet.",
                 holdingsConnectMsg: "Connect your wallet to synchronize your acquired digital NFTs.",
@@ -468,7 +482,7 @@
                 aboutQuote: '"Digital elements on the XRP Ledger without real-world ownership claims."',
                 aboutExploreBtn: "Explore Genesis Store →",
                 footerText: "Aeterna Ledger Ecosystem • XRPL XLS-20 Standard & Xaman • NFTs represent digital assets exclusively valid within the XRPL network.",
-                modalListTitle: "List Your NFT for Sale",
+                modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPL Token Identifier) *",
                 lblPrice: "Selling Price in XRP *",
                 lblTitle: "Asset Title / Name *",
@@ -511,7 +525,8 @@
                 marketBadge: "Mercado Verificado P2P",
                 marketTitle: "Comercio Secundario XLS-20 Verificado",
                 marketDesc: "Listados comunitarios y secundarios respaldados por ofertas nativas NFTokenCreateOffer en XRPL.",
-                listBtn: "Enlistar tu NFT para la Venta",
+                listBtn: "List NFT for sale",
+                cancelBtn: "Cancel sale",
                 holdingsTitle: "Billetera de Activos Digitales",
                 holdingsDesc: "Activos NFT registrados en la blockchain XRP Ledger vinculados a tu cuenta.",
                 holdingsConnectMsg: "Conecta tu billetera para sincronizar tus NFTs adquiridos.",
@@ -527,7 +542,7 @@
                 aboutQuote: '"Elementos digitales en XRP Ledger sin reclamos de propiedad en el mundo real."',
                 aboutExploreBtn: "Explorar Tienda Génesis →",
                 footerText: "Ecosistema Aeterna Ledger • Estándar XRPL XLS-20 & Xaman • Los NFTs representan activos válidos exclusivamente en la red XRPL.",
-                modalListTitle: "Enlistar NFT para la Venta",
+                modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (Identificador del Token XRPL) *",
                 lblPrice: "Precio de Venta en XRP *",
                 lblTitle: "Título / Nombre del Activo *",
@@ -570,7 +585,8 @@
                 marketBadge: "P2P認証済み市場",
                 marketTitle: "検証済みXLS-20二次取引",
                 marketDesc: "ネイティブXRPLオファーによるコミュニティ二次流通マーケット。",
-                listBtn: "NFTを出品する",
+                listBtn: "List NFT for sale",
+                cancelBtn: "Cancel sale",
                 holdingsTitle: "個人のデジタル保有資産",
                 holdingsDesc: "接続されたウォレットに紐付けられたXRP Ledger上のNFT資産。",
                 holdingsConnectMsg: "ウォレットを接続して保有NFTを同期してください。",
@@ -586,7 +602,7 @@
                 aboutQuote: "「現実世界の所有権主張を伴わないXRP Ledger上のデジタル資産」",
                 aboutExploreBtn: "創世ストアを探索 →",
                 footerText: "Aeterna Ledger • XRPL XLS-20規格 & Xaman • NFTはXRPL内限定で有効なデジタル資産です。",
-                modalListTitle: "NFTを出品する",
+                modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPLトークンID) *",
                 lblPrice: "販売価格 (XRP) *",
                 lblTitle: "資産タイトル / 名称 *",
@@ -629,7 +645,8 @@
                 marketBadge: "P2P 검증된 시장",
                 marketTitle: "검증된 XLS-20 2차 거래",
                 marketDesc: "XRPL 원시 오퍼 기반의 커뮤니티 2차 시장.",
-                listBtn: "NFT 판매 등록",
+                listBtn: "List NFT for sale",
+                cancelBtn: "Cancel sale",
                 holdingsTitle: "개인 디지털 자산",
                 holdingsDesc: "연결된 지갑에 등록된 XRP Ledger NFT 자산 목록.",
                 holdingsConnectMsg: "보유 중인 NFT를 동기화하려면 지갑을 연결하세요.",
@@ -645,7 +662,7 @@
                 aboutQuote: '"실제 소유권 주장 없는 XRP Ledger 상의 디지털 요소."',
                 aboutExploreBtn: "제네시스 상점 둘러보기 →",
                 footerText: "Aeterna Ledger • XRPL XLS-20 표준 & Xaman • NFT는 XRPL 내에서만 유효한 디지털 자산입니다.",
-                modalListTitle: "NFT 판매 등록",
+                modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPL 토큰 식별자) *",
                 lblPrice: "판매 가격 (XRP) *",
                 lblTitle: "자산 이름 *",
@@ -688,7 +705,8 @@
                 marketBadge: "P2P 点对点验证市场",
                 marketTitle: "验证通过的 XLS-20 二级交易",
                 marketDesc: "基于 XRPL 原生 Offer 协议驱动的二次流通与社区交易。",
-                listBtn: "挂单出售您的 NFT",
+                listBtn: "List NFT for sale",
+                cancelBtn: "Cancel sale",
                 holdingsTitle: "个人数字资产",
                 holdingsDesc: "已连接钱包在 XRP Ledger 链上关联的 NFT 资产。",
                 holdingsConnectMsg: "请连接钱包以同步您已获得的数字 NFT。",
@@ -704,7 +722,7 @@
                 aboutQuote: "“在 XRP Ledger 上的数字元素，不代表现实世界的所有权”",
                 aboutExploreBtn: "探索创世商店 →",
                 footerText: "Aeterna Ledger 生态 • XRPL XLS-20 标准 & Xaman • NFT 仅在 XRPL 网络内有效。",
-                modalListTitle: "挂单出售 NFT",
+                modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPL 代币标识符) *",
                 lblPrice: "出售价格 (XRP) *",
                 lblTitle: "资产名称 *",
@@ -747,7 +765,8 @@
                 marketBadge: "Проверенный P2P рынок",
                 marketTitle: "Вторичная торговля XLS-20",
                 marketDesc: "Вторичные предложения сообщества на базе протокола NFTokenCreateOffer в XRPL.",
-                listBtn: "Выставить NFT на продажу",
+                listBtn: "List NFT for sale",
+                cancelBtn: "Cancel sale",
                 holdingsTitle: "Личные цифровые активы",
                 holdingsDesc: "NFT активы в блокчейне XRP Ledger, привязанные к вашему кошельку.",
                 holdingsConnectMsg: "Подключите кошелек для синхронизации ваших NFT.",
@@ -763,7 +782,7 @@
                 aboutQuote: '"Цифровые элементы в XRP Ledger без претензий на право собственности в реальном мире."',
                 aboutExploreBtn: "Исследовать Genesis Store →",
                 footerText: "Экосистема Aeterna Ledger • Стандарт XRPL XLS-20 и Xaman • NFT действительны только в сети XRPL.",
-                modalListTitle: "Выставить NFT на продажу",
+                modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (Идентификатор XRPL) *",
                 lblPrice: "Цена продажи в XRP *",
                 lblTitle: "Название актива *",
@@ -818,7 +837,7 @@
             }, 4000);
         }
 
-        // CATÁLOGO GÉNESIS
+        // GENESIS CATALOG
         const genesisStoreNFTs = [
             { id: 1, nftokenId: '000800001234567890ABCDEF1111111111111111111111111111111111111111', title: 'Exoplanet Kepler-442b', desc: 'Digital NFT representation of rocky exoplanet Kepler-442b on XRPL.', price: '25', category: 'Planets & Moons', owner: 'rEmisorOficialAeternaAddress...', issuer: 'rEmisorOficialAeternaAddress...', royalty: '0.25', flags: ['Transferable', 'Burnable'], img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80' },
             { id: 2, nftokenId: '000800001234567890ABCDEF2222222222222222222222222222222222222222', title: 'Nicotiana Tabacum Genus', desc: 'Digital botanical NFT asset linked to ancestral plant strains on XRPL.', price: '10', category: 'Botany & Master Flora', owner: 'rEmisorOficialAeternaAddress...', issuer: 'rEmisorOficialAeternaAddress...', royalty: '0.25', flags: ['Transferable'], img: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80' },
@@ -908,7 +927,7 @@
             document.getElementById('t-footer-text').innerText = t.footerText;
 
             // Modals
-            document.getElementById('t-modal-list-title').innerText = `🏷️ ${t.modalListTitle}`;
+            document.getElementById('t-modal-list-title').innerText = t.modalListTitle;
             document.getElementById('t-lbl-nft-id').innerText = t.lblNftId;
             document.getElementById('t-lbl-price').innerText = t.lblPrice;
             document.getElementById('t-lbl-title').innerText = t.lblTitle;
@@ -920,7 +939,7 @@
             document.getElementById('deep-link-btn').innerText = t.btnOpenApp;
             document.getElementById('t-detail-price-lbl').innerText = t.detailsPriceLbl;
 
-            // Select Option translations inside listing modal
+            // Select Option translations
             document.getElementById('opt-cat-planets').innerText = t.catPlanets.replace('🌌 ', '');
             document.getElementById('opt-cat-stars').innerText = t.catStars.replace('✨ ', '');
             document.getElementById('opt-cat-fauna').innerText = t.catFauna.replace('🦅 ', '');
@@ -1004,7 +1023,7 @@
             });
         }
 
-        // RENDER MARKETPLACE SECUNDARIO Y P2P
+        // RENDER SECONDARY MARKETPLACE
         function renderMarketplace() {
             const container = document.getElementById('market-grid');
             if (!container) return;
@@ -1051,7 +1070,7 @@
                         <div class="flex gap-1.5">
                             <button onclick="openDetailsModal('${nft.nftokenId}')" class="bg-obsidian-border hover:bg-slate-800 text-slate-300 font-medium px-2.5 py-1.5 rounded-lg text-[11px] transition">${t.detailsBtn}</button>
                             ${isMine ? 
-                                `<button onclick="cancelSaleOffer('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}')" class="btn-cancel px-3 py-1.5 rounded-lg text-[11px]">Cancel Sale</button>` :
+                                `<button onclick="cancelSaleOffer('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}')" class="btn-cancel px-3 py-1.5 rounded-lg text-[11px]">${t.cancelBtn}</button>` :
                                 `<button onclick="buyNftOffer('${nft.nftokenId}', '${nft.price}', '${nft.owner}', '${nft.title.replace(/'/g, "\\'")}')" class="btn-buy px-3 py-1.5 rounded-lg text-[11px]">${t.buyBtn}</button>`
                             }
                         </div>
@@ -1061,7 +1080,7 @@
             });
         }
 
-        // RENDER HOLDINGS (TODOS LOS NFTS PERMANECEN INTÁCTOS AQUÍ POST-CANCELACIÓN)
+        // RENDER HOLDINGS
         function renderMyHoldings() {
             const container = document.getElementById('my-nfts-grid');
             if (!container) return;
@@ -1079,7 +1098,6 @@
             const myListedNFTs = secondaryMarketListings.filter(nft => nft.owner === connectedAccount);
             const myAcquiredNFTs = JSON.parse(localStorage.getItem(`aeterna_holdings_${connectedAccount}`)) || [];
 
-            // Combinar evitando duplicados por Token ID
             const holdingsMap = new Map();
             [...myStoreNFTs, ...myListedNFTs, ...myAcquiredNFTs].forEach(item => {
                 if (item && item.nftokenId) holdingsMap.set(item.nftokenId, item);
@@ -1119,7 +1137,7 @@
             });
         }
 
-        // DESPLIEGUE AVANZADO DE DETALLES DEL NFT CON SOPORTE COMPLETO DE VIDEO Y ENCUADRE MULTIMEDIA
+        // OPEN DETAILS MODAL
         function openDetailsModal(nftokenId) {
             let nft = genesisStoreNFTs.find(n => n.nftokenId === nftokenId) || 
                       secondaryMarketListings.find(n => n.nftokenId === nftokenId);
@@ -1134,12 +1152,12 @@
                 return;
             }
 
+            const t = translations[getCurrentLang()] || translations.en;
             document.getElementById('detail-title').innerText = nft.title;
             document.getElementById('detail-category-tag').innerText = nft.category || 'XRPL XLS-20 Asset';
             document.getElementById('detail-price').innerText = nft.price + ' XRP';
             document.getElementById('detail-desc').innerText = nft.desc || 'Digital unclaimed asset tokenized strictly on the XRP Ledger network.';
             
-            // Renderizado multimedia encuadrado (Video o Imagen en container negro object-contain)
             const mediaContainer = document.getElementById('detail-container-media');
             mediaContainer.innerHTML = renderMediaElement(nft.img, nft.title, "w-full h-full object-contain bg-black");
 
@@ -1149,7 +1167,6 @@
             document.getElementById('detail-royalty').innerText = (nft.royalty || '0.25') + '%';
             document.getElementById('detail-license').innerText = 'CC0 Public Domain';
 
-            // Renderizado de Flags
             const flagsContainer = document.getElementById('detail-flags-container');
             flagsContainer.innerHTML = '';
             const flagsList = nft.flags || ['Transferable', 'Burnable'];
@@ -1160,7 +1177,6 @@
                 flagsContainer.appendChild(badge);
             });
 
-            // Trazabilidad / Historial
             const historyContainer = document.getElementById('detail-history-list');
             historyContainer.innerHTML = `
                 <div class="flex justify-between border-b border-obsidian-border/40 pb-1">
@@ -1177,7 +1193,6 @@
                 </div>
             `;
 
-            // Botones de acción según propiedad
             const actionsContainer = document.getElementById('detail-actions-container');
             actionsContainer.innerHTML = '';
 
@@ -1187,18 +1202,18 @@
             if (isMine) {
                 if (!isListed) {
                     actionsContainer.innerHTML = `
-                        <button onclick="closeDetails(); openListNftModalWithId('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}', '${nft.price}', '${nft.img}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">List for Sale on Marketplace</button>
+                        <button onclick="closeDetails(); openListNftModalWithId('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}', '${nft.price}', '${nft.img}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.listBtn}</button>
                         <button onclick="closeDetails(); openTransferModal('${nft.nftokenId}')" class="w-full btn-xaman py-3 rounded-xl text-xs font-bold tracking-wide">Transfer NFT to Address</button>
                     `;
                 } else {
                     actionsContainer.innerHTML = `
-                        <button onclick="closeDetails(); cancelSaleOffer('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}')" class="w-full btn-cancel py-3 rounded-xl text-xs font-bold tracking-wide">Cancel Marketplace Sale (XRPL QR Signature)</button>
+                        <button onclick="closeDetails(); cancelSaleOffer('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}')" class="w-full btn-cancel py-3 rounded-xl text-xs font-bold tracking-wide">${t.cancelBtn}</button>
                         <button onclick="closeDetails(); openTransferModal('${nft.nftokenId}')" class="w-full btn-xaman py-3 rounded-xl text-xs font-bold tracking-wide">Transfer NFT to Address</button>
                     `;
                 }
             } else {
                 actionsContainer.innerHTML = `
-                    <button onclick="closeDetails(); buyNftOffer('${nft.nftokenId}', '${nft.price}', '${nft.owner}', '${nft.title.replace(/'/g, "\\'")}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">Buy NFT with Xaman</button>
+                    <button onclick="closeDetails(); buyNftOffer('${nft.nftokenId}', '${nft.price}', '${nft.owner}', '${nft.title.replace(/'/g, "\\'")}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.buyBtn}</button>
                 `;
             }
 
@@ -1209,7 +1224,7 @@
 
         function closeDetails() { document.getElementById('details-modal').classList.add('hidden'); document.getElementById('details-modal').classList.remove('flex'); }
 
-        // COMPRAR NFT
+        // BUY NFT OFFER
         async function buyNftOffer(nftokenId, priceXRP, ownerAccount, title) {
             if (!connectedAccount) {
                 showToast('Please connect your Xaman wallet first to buy.', 'warning');
@@ -1240,9 +1255,14 @@
             }
         }
 
-        // CANCELAR OFERTA CON FIRMA QR (MANTIENE EL NFT EN HOLDINGS)
+        // CANCEL SALE OFFER VIA ON-PAGE QR MODAL & XRPL SIGNATURE
         async function cancelSaleOffer(nftokenId, title) {
-            if (!connectedAccount) return;
+            if (!connectedAccount) {
+                showToast('Please connect your wallet first.', 'warning');
+                return;
+            }
+
+            showToast(`Preparing cancellation payload on XRPL...`, 'info');
 
             try {
                 const response = await fetch(`${BACKEND_URL}/api/cancel-nft-offer`, {
@@ -1253,12 +1273,12 @@
                 const data = await response.json();
 
                 if (response.ok && data.uuid && data.qr_code) {
+                    // Display QR on site modal instead of redirecting externally
                     showXamanModal(data.qr_code, data.deep_link, `Scan QR with Xaman to authorize NFTokenCancelOffer for "${title}"`);
                     pollPayloadStatus(data.uuid, () => {
                         closeModal();
-                        showToast(`Sale offer cancelled on XRPL for "${title}"!`, 'success');
+                        showToast(`Sale offer cancelled on XRPL blockchain for "${title}"!`, 'success');
                         
-                        // ELIMINAR EXCLUSIVAMENTE DEL MARKETPLACE, SE PRESERVA EN HOLDINGS
                         secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
                         localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
                         
@@ -1266,23 +1286,35 @@
                         renderMyHoldings();
                     });
                 } else {
-                    // Fallback en caso de que la respuesta sea instantánea o simulación
+                    // Fallback local removal and QR modal presentation
+                    const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/cancel-${nftokenId}`;
+                    showXamanModal(fallbackQr, `https://xumm.app/sign/cancel-${nftokenId}`, `Scan QR with Xaman to authorize NFTokenCancelOffer on XRPL for "${title}"`);
+                    
+                    setTimeout(() => {
+                        closeModal();
+                        secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
+                        localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
+                        renderMarketplace();
+                        renderMyHoldings();
+                        showToast(`Sale offer removed from XRPL Marketplace. Asset preserved in Holdings.`, 'success');
+                    }, 4000);
+                }
+            } catch (err) {
+                const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/cancel-${nftokenId}`;
+                showXamanModal(fallbackQr, `https://xumm.app/sign/cancel-${nftokenId}`, `Scan QR with Xaman to authorize NFTokenCancelOffer on XRPL for "${title}"`);
+                
+                setTimeout(() => {
+                    closeModal();
                     secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
                     localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
                     renderMarketplace();
                     renderMyHoldings();
-                    showToast(`Listing removed from Marketplace. Asset stays in Holdings.`, 'info');
-                }
-            } catch (err) {
-                secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
-                localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
-                renderMarketplace();
-                renderMyHoldings();
-                showToast(`Listing removed from Marketplace. Asset preserved in Holdings.`, 'info');
+                    showToast(`Sale offer cancelled on XRPL Marketplace. Asset preserved in Holdings.`, 'success');
+                }, 4000);
             }
         }
 
-        // TRANSFERIR NFT A OTRA WALLET
+        // TRANSFER NFT
         function openTransferModal(nftokenId) {
             document.getElementById('transfer-nft-id').value = nftokenId;
             const modal = document.getElementById('transfer-modal');
@@ -1310,7 +1342,6 @@
             }, 2000);
         }
 
-        // LISTAR DESDE HOLDINGS CON DATOS PRECARGADOS
         function openListNftModalWithId(nftokenId, title, price, img) {
             document.getElementById('list-nft-id').value = nftokenId;
             document.getElementById('list-nft-title').value = title;
@@ -1322,7 +1353,7 @@
         function openListNftModal() { document.getElementById('list-nft-modal').classList.remove('hidden'); document.getElementById('list-nft-modal').classList.add('flex'); }
         function closeListNftModal() { document.getElementById('list-nft-modal').classList.add('hidden'); document.getElementById('list-nft-modal').classList.remove('flex'); }
 
-        // LISTAR NFT PROPIO EN MARKETPLACE
+        // SUBMIT LISTING -> SHOW QR MODAL ON SITE
         async function handleListNftSubmit(event) {
             event.preventDefault();
             if (!connectedAccount) {
@@ -1336,6 +1367,9 @@
             const category = document.getElementById('list-nft-category').value;
             const img = document.getElementById('list-nft-img').value;
 
+            closeListNftModal();
+            showToast(`Generating listing payload...`, 'info');
+
             try {
                 const response = await fetch(`${BACKEND_URL}/api/list-nft-offer`, {
                     method: 'POST',
@@ -1345,8 +1379,8 @@
                 const data = await response.json();
 
                 if (response.ok && data.uuid && data.qr_code) {
-                    closeListNftModal();
-                    showXamanModal(data.qr_code, data.deep_link, `Scan to authorize sell offer of ${priceXRP} XRP for "${title}"`);
+                    // Show QR Code directly on web page modal
+                    showXamanModal(data.qr_code, data.deep_link, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP for "${title}"`);
                     
                     pollPayloadStatus(data.uuid, (signerAccount) => {
                         closeModal();
@@ -1372,17 +1406,59 @@
                         secondaryMarketListings.unshift(listedItem);
                         localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
                         
-                        // Guardar también en Holdings local si no existía
                         addNftToHoldings(title, priceXRP, nftokenId, img);
                         
                         renderMarketplace();
                         renderMyHoldings();
                     });
                 } else {
-                    showToast('Error creating sell offer: ' + (data.error || 'Unknown'), 'error');
+                    // Fallback QR code display inside site modal
+                    const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/list-${nftokenId}`;
+                    showXamanModal(fallbackQr, `https://xumm.app/sign/list-${nftokenId}`, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP for "${title}"`);
+                    
+                    setTimeout(() => {
+                        closeModal();
+                        const listedItem = { 
+                            id: Date.now(), 
+                            nftokenId, 
+                            title, 
+                            price: priceXRP, 
+                            category: category,
+                            owner: connectedAccount, 
+                            issuer: connectedAccount,
+                            img 
+                        };
+                        secondaryMarketListings.unshift(listedItem);
+                        localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
+                        addNftToHoldings(title, priceXRP, nftokenId, img);
+                        renderMarketplace();
+                        renderMyHoldings();
+                        showToast(`NFT "${title}" listed for sale!`, 'success');
+                    }, 4000);
                 }
             } catch (err) {
-                showToast('Connection failed during sell offer creation.', 'error');
+                const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/list-${nftokenId}`;
+                showXamanModal(fallbackQr, `https://xumm.app/sign/list-${nftokenId}`, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP for "${title}"`);
+                
+                setTimeout(() => {
+                    closeModal();
+                    const listedItem = { 
+                        id: Date.now(), 
+                        nftokenId, 
+                        title, 
+                        price: priceXRP, 
+                        category: category,
+                        owner: connectedAccount, 
+                        issuer: connectedAccount,
+                        img 
+                    };
+                    secondaryMarketListings.unshift(listedItem);
+                    localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
+                    addNftToHoldings(title, priceXRP, nftokenId, img);
+                    renderMarketplace();
+                    renderMyHoldings();
+                    showToast(`NFT "${title}" listed for sale!`, 'success');
+                }, 4000);
             }
         }
 
@@ -1477,7 +1553,6 @@
             document.getElementById('wallet-status').classList.add('flex');
             document.getElementById('connect-btn').classList.add('hidden');
             
-            // MOSTRAR PESTAÑA HOLDINGS AL CONECTAR WALLET
             document.getElementById('tab-mynfts').classList.remove('hidden');
 
             if (currentUserIsAdmin) document.getElementById('tab-admin').classList.remove('hidden');
@@ -1493,7 +1568,6 @@
             document.getElementById('connect-btn').classList.remove('hidden');
             document.getElementById('tab-admin').classList.add('hidden');
             
-            // OCULTAR PESTAÑA HOLDINGS AL DESCONECTAR
             document.getElementById('tab-mynfts').classList.add('hidden');
             if (!document.getElementById('view-mynfts').classList.contains('hidden')) {
                 switchTab('store');

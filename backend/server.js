@@ -241,6 +241,48 @@ app.post('/api/list-nft-offer', async (req, res) => {
     }
 });
 
+// --- Otras rutas existentes en tu backend ---
+app.post('/api/list-nft-offer', async (req, res) => {
+    // ... tu código existente de listado ...
+});
+
+app.post('/api/buy-nft-offer', async (req, res) => {
+    // ... tu código existente de compra ...
+});
+
+// >>> PEGA AQUÍ EL NUEVO ENDPOINT DE CANCELACIÓN <<<
+app.post('/api/cancel-nft-offer', async (req, res) => {
+    try {
+        const { sellerAccount, nftokenId } = req.body;
+
+        if (!sellerAccount || !nftokenId) {
+            return res.status(400).json({ error: 'Faltan parámetros: sellerAccount y nftokenId son obligatorios' });
+        }
+
+        // Crear el payload en Xaman para NFTokenCancelOffer
+        const payload = {
+            TransactionType: 'NFTokenCancelOffer',
+            Account: sellerAccount,
+            NFTokenOffers: [nftokenId] // ID de la oferta de venta a cancelar en la blockchain
+        };
+
+        const response = await xumm.payload.create(payload);
+        
+        if (response && response.uuid) {
+            return res.json({
+                uuid: response.uuid,
+                qr_code: response.refs.qr_png,
+                deep_link: response.next.always
+            });
+        } else {
+            return res.status(500).json({ error: 'No se pudo generar el payload en Xaman' });
+        }
+    } catch (error) {
+        console.error('Error en /api/cancel-nft-offer:', error);
+        res.status(500).json({ error: error.message || 'Error interno del servidor' });
+    }
+});
+
 // 4. Endpoint para verificar el estado de la firma en Xaman
 app.get('/api/check-status/:uuid', async (req, res) => {
     try {

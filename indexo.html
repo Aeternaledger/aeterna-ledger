@@ -56,7 +56,6 @@
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
             font-weight: 600;
         }
-
         /* Simplified Yellow List Button Override */
         .btn-simple-yellow {
             background-color: #D4AF37;
@@ -74,7 +73,7 @@
     
     <!-- TOAST NOTIFICATIONS CONTAINER -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
+    
     <!-- HEADER / NAVIGATION -->
     <header class="border-b border-obsidian-border bg-obsidian-dark/95 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -139,7 +138,7 @@
                     Acquire digital NFTs for natural elements, celestial bodies, flora, and archetypes with direct settlement in <strong class="text-obsidian-gold">XRP</strong> via <code class="text-obsidian-gold font-mono">NFTokenCreateOffer</code>.
                 </p>
             </div>
-
+            
             <!-- ORGANIC HIGH-END CATEGORY FILTER (STORE) -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between font-mono text-xs">
@@ -152,7 +151,6 @@
                     </select>
                 </div>
                 
-                <!-- Flexible Responsive Organic Wrapping Grid -->
                 <div class="flex flex-wrap gap-2 sm:gap-2.5 justify-start w-full font-mono text-xs">
                     <button onclick="filterCategory('ALL', 'store', this)" class="cat-chip px-4 py-2 rounded-xl active" id="chip-store-all">All</button>
                     <button onclick="filterCategory('Planets & Moons', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-planets">🌌 Planets & Moons</button>
@@ -165,7 +163,7 @@
                     <button onclick="filterCategory('Symbols, Archetypes & Culture', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-symbols">🏛️ Symbols & Culture</button>
                 </div>
             </div>
-
+            
             <div id="store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
         </section>
 
@@ -180,12 +178,12 @@
                     <p id="t-market-desc" class="text-slate-400 text-xs mt-1">Secondary and community listings powered by native XRPL <code class="text-obsidian-gold font-mono">NFTokenCreateOffer</code>.</p>
                 </div>
                 
-                <!-- RESTRUCTURED SIMPLE YELLOW BUTTON WITH NO DRAWINGS OR ICONS -->
+                <!-- SIMPLE YELLOW BUTTON WITHOUT ICONS OR DRAWINGS -->
                 <button onclick="openListNftModal()" id="btn-list-nft" class="btn-simple-yellow font-mono text-sm sm:text-base font-bold px-6 py-3 rounded-xl uppercase tracking-wider whitespace-nowrap cursor-pointer shadow-md hover:scale-[1.01] transition-all">
                     <span id="btn-list-nft-text">List NFT for sale</span>
                 </button>
             </div>
-
+            
             <!-- ORGANIC HIGH-END CATEGORY FILTER (MARKETPLACE) -->
             <div class="space-y-4">
                 <div class="flex items-center justify-between font-mono text-xs">
@@ -197,8 +195,7 @@
                         <option value="name-asc" id="opt-market-n-asc">Name: A to Z</option>
                     </select>
                 </div>
-
-                <!-- Flexible Responsive Organic Wrapping Grid -->
+                
                 <div class="flex flex-wrap gap-2 sm:gap-2.5 justify-start w-full font-mono text-xs">
                     <button onclick="filterCategory('ALL', 'market', this)" class="cat-chip px-4 py-2 rounded-xl active" id="chip-market-all">All Active Listings</button>
                     <button onclick="filterCategory('Planets & Moons', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-planets">🌌 Planets & Moons</button>
@@ -211,7 +208,7 @@
                     <button onclick="filterCategory('Symbols, Archetypes & Culture', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-symbols">🏛️ Symbols & Culture</button>
                 </div>
             </div>
-
+            
             <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
         </section>
 
@@ -278,7 +275,7 @@
         <p id="t-footer-text">Aeterna Ledger Ecosystem &bull; XRPL XLS-20 Standard & Xaman &bull; NFTs represent digital assets exclusively valid within the XRPL network.</p>
     </footer>
 
-    <!-- MODAL: LIST YOUR NFT FOR SALE -->
+    <!-- MODAL: LIST NFT FOR SALE -->
     <div id="list-nft-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
         <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl font-mono text-xs">
             <div class="flex justify-between items-center border-b border-obsidian-border pb-3">
@@ -346,9 +343,7 @@
     <!-- EXPANDED NFT DETAILS MODAL -->
     <div id="details-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center z-50 p-4">
         <div class="bg-obsidian-card border border-obsidian-gold/40 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh]">
-            <div id="detail-container-media" class="md:w-1/2 h-64 md:h-auto bg-black relative flex items-center justify-center overflow-hidden flex-shrink-0 border-b md:border-b-0 md:border-r border-obsidian-border">
-                <!-- Dynamically rendered media -->
-            </div>
+            <div id="detail-container-media" class="md:w-1/2 h-64 md:h-auto bg-black relative flex items-center justify-center overflow-hidden flex-shrink-0 border-b md:border-b-0 md:border-r border-obsidian-border"></div>
             <div class="md:w-1/2 p-6 flex flex-col justify-between space-y-4 overflow-y-auto font-mono text-xs">
                 <div class="space-y-4">
                     <div class="flex justify-between items-start border-b border-obsidian-border pb-3">
@@ -358,10 +353,7 @@
                         </div>
                         <button onclick="closeDetails()" class="text-slate-400 hover:text-white text-xl font-bold p-1">&times;</button>
                     </div>
-
                     <p id="detail-desc" class="text-xs text-slate-300 leading-relaxed font-sans"></p>
-
-                    <!-- METADATA & TOKEN ID -->
                     <div class="space-y-2 bg-obsidian-dark/60 p-3 rounded-xl border border-obsidian-border text-[11px]">
                         <div>
                             <span class="text-slate-400 block text-[9px] uppercase">NFTokenID (64 Characters)</span>
@@ -381,8 +373,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- PROPERTIES & XLS-20 FLAGS -->
                     <div class="space-y-2">
                         <span class="text-slate-400 text-[10px] uppercase block tracking-wider">Protocol Properties & XLS-20 Flags</span>
                         <div class="grid grid-cols-2 gap-2 text-[10px]">
@@ -391,22 +381,17 @@
                         </div>
                         <div id="detail-flags-container" class="flex flex-wrap gap-1.5 pt-1"></div>
                     </div>
-
-                    <!-- HISTORIAL / TRACEABILITY -->
                     <div class="space-y-2 pt-1">
                         <span class="text-slate-400 text-[10px] uppercase block tracking-wider">Asset History & Traceability</span>
                         <div id="detail-history-list" class="space-y-1.5 text-[10px] text-slate-400 max-h-24 overflow-y-auto bg-obsidian-dark/40 p-2.5 rounded border border-obsidian-border"></div>
                     </div>
                 </div>
-
                 <div class="space-y-3 pt-3 border-t border-obsidian-border">
                     <div class="flex justify-between items-center font-mono">
                         <span id="t-detail-price-lbl" class="text-xs text-slate-400">Price:</span>
                         <span id="detail-price" class="text-obsidian-gold font-bold text-base"></span>
                     </div>
-                    <div id="detail-actions-container" class="space-y-2">
-                        <!-- Dynamic render of action buttons -->
-                    </div>
+                    <div id="detail-actions-container" class="space-y-2"></div>
                 </div>
             </div>
         </div>
@@ -448,7 +433,6 @@
             return `<img src="${url}" alt="${title}" class="${additionalClasses} bg-black">`;
         }
 
-        // MULTI-LANGUAGE DICTIONARY
         const translations = {
             en: {
                 subtitle: "Universal Unclaimed Asset Ledger",
@@ -837,7 +821,6 @@
             }, 4000);
         }
 
-        // GENESIS CATALOG
         const genesisStoreNFTs = [
             { id: 1, nftokenId: '000800001234567890ABCDEF1111111111111111111111111111111111111111', title: 'Exoplanet Kepler-442b', desc: 'Digital NFT representation of rocky exoplanet Kepler-442b on XRPL.', price: '25', category: 'Planets & Moons', owner: 'rEmisorOficialAeternaAddress...', issuer: 'rEmisorOficialAeternaAddress...', royalty: '0.25', flags: ['Transferable', 'Burnable'], img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80' },
             { id: 2, nftokenId: '000800001234567890ABCDEF2222222222222222222222222222222222222222', title: 'Nicotiana Tabacum Genus', desc: 'Digital botanical NFT asset linked to ancestral plant strains on XRPL.', price: '10', category: 'Botany & Master Flora', owner: 'rEmisorOficialAeternaAddress...', issuer: 'rEmisorOficialAeternaAddress...', royalty: '0.25', flags: ['Transferable'], img: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80' },
@@ -855,15 +838,13 @@
             localStorage.setItem('aeterna_lang', lang);
             const t = translations[lang] || translations.en;
             
-            // Header & Nav
             document.getElementById('t-subtitle').innerText = t.subtitle;
             document.getElementById('tab-store').innerText = t.navStore;
             document.getElementById('tab-market').innerText = t.navMarket;
             document.getElementById('tab-mynfts').innerText = t.navHoldings;
             document.getElementById('tab-about').innerText = t.navAbout;
             document.getElementById('connect-btn').innerText = t.connectWallet;
-
-            // Store View
+            
             document.getElementById('t-tag-genesis').innerText = t.tagGenesis;
             document.getElementById('t-store-title').innerText = t.storeTitle;
             document.getElementById('t-store-desc').innerHTML = t.storeDesc.replace('XRP', '<strong class="text-obsidian-gold">XRP</strong>');
@@ -872,8 +853,7 @@
             document.getElementById('opt-store-p-asc').innerText = t.sortPAsc;
             document.getElementById('opt-store-p-desc').innerText = t.sortPDesc;
             document.getElementById('opt-store-n-asc').innerText = t.sortNAsc;
-
-            // Chips Store
+            
             document.getElementById('chip-store-all').innerText = t.catAll;
             document.getElementById('chip-store-planets').innerText = t.catPlanets;
             document.getElementById('chip-store-stars').innerText = t.catStars;
@@ -883,8 +863,7 @@
             document.getElementById('chip-store-geo').innerText = t.catGeo;
             document.getElementById('chip-store-concepts').innerText = t.catConcepts;
             document.getElementById('chip-store-symbols').innerText = t.catSymbols;
-
-            // Market View
+            
             document.getElementById('t-market-badge').innerHTML = `<span>🛡️</span> ${t.marketBadge}`;
             document.getElementById('t-market-title').innerText = t.marketTitle;
             document.getElementById('t-market-desc').innerHTML = t.marketDesc;
@@ -894,8 +873,7 @@
             document.getElementById('opt-market-p-asc').innerText = t.sortPAsc;
             document.getElementById('opt-market-p-desc').innerText = t.sortPDesc;
             document.getElementById('opt-market-n-asc').innerText = t.sortNAsc;
-
-            // Chips Market
+            
             document.getElementById('chip-market-all').innerText = t.catAllMarket;
             document.getElementById('chip-market-planets').innerText = t.catPlanets;
             document.getElementById('chip-market-stars').innerText = t.catStars;
@@ -905,12 +883,10 @@
             document.getElementById('chip-market-geo').innerText = t.catGeo;
             document.getElementById('chip-market-concepts').innerText = t.catConcepts;
             document.getElementById('chip-market-symbols').innerText = t.catSymbols;
-
-            // Holdings
+            
             document.getElementById('t-holdings-title').innerText = t.holdingsTitle;
             document.getElementById('t-holdings-desc').innerText = t.holdingsDesc;
-
-            // About View
+            
             document.getElementById('t-about-badge').innerText = t.aboutBadge;
             document.getElementById('t-about-title').innerText = t.aboutTitle;
             document.getElementById('t-about-desc').innerText = t.aboutDesc;
@@ -922,11 +898,8 @@
             document.getElementById('t-about-box2-desc').innerText = t.aboutBox2Desc;
             document.getElementById('t-about-quote').innerText = t.aboutQuote;
             document.getElementById('t-about-btn').innerText = t.aboutExploreBtn;
-
-            // Footer
+            
             document.getElementById('t-footer-text').innerText = t.footerText;
-
-            // Modals
             document.getElementById('t-modal-list-title').innerText = t.modalListTitle;
             document.getElementById('t-lbl-nft-id').innerText = t.lblNftId;
             document.getElementById('t-lbl-price').innerText = t.lblPrice;
@@ -938,8 +911,7 @@
             document.getElementById('btn-cancel-xaman').innerText = t.btnCancel;
             document.getElementById('deep-link-btn').innerText = t.btnOpenApp;
             document.getElementById('t-detail-price-lbl').innerText = t.detailsPriceLbl;
-
-            // Select Option translations
+            
             document.getElementById('opt-cat-planets').innerText = t.catPlanets.replace('🌌 ', '');
             document.getElementById('opt-cat-stars').innerText = t.catStars.replace('✨ ', '');
             document.getElementById('opt-cat-fauna').innerText = t.catFauna.replace('🦅 ', '');
@@ -948,7 +920,7 @@
             document.getElementById('opt-cat-geo').innerText = t.catGeo.replace('🌊 ', '');
             document.getElementById('opt-cat-concepts').innerText = t.catConcepts.replace('💡 ', '');
             document.getElementById('opt-cat-symbols').innerText = t.catSymbols.replace('🏛️ ', '');
-
+            
             renderStore();
             renderMarketplace();
             if (connectedAccount) renderMyHoldings();
@@ -958,7 +930,6 @@
             const parent = btnEl.parentElement;
             parent.querySelectorAll('.cat-chip').forEach(btn => btn.classList.remove('active'));
             btnEl.classList.add('active');
-
             if (targetSection === 'store') {
                 activeFilterStore = catName;
                 renderStore();
@@ -968,7 +939,6 @@
             }
         }
 
-        // RENDER TIENDA GÉNESIS
         function renderStore() {
             const container = document.getElementById('store-grid');
             if (!container) return;
@@ -979,18 +949,15 @@
             if (activeFilterStore !== 'ALL') {
                 items = items.filter(nft => nft.category === activeFilterStore);
             }
-
             const sortVal = document.getElementById('sort-select-store').value;
             if (sortVal === 'price-asc') items.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
             else if (sortVal === 'price-desc') items.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
             else if (sortVal === 'name-asc') items.sort((a, b) => a.title.localeCompare(b.title));
             else items.sort((a, b) => b.id - a.id);
-
             if (items.length === 0) {
                 container.innerHTML = `<div class="col-span-full text-center py-10 border border-dashed border-obsidian-border rounded-xl"><p class="text-slate-400 text-xs font-mono">No registered store assets match your filter.</p></div>`;
                 return;
             }
-
             items.forEach(nft => {
                 const card = document.createElement('div');
                 card.className = "bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden hover:border-obsidian-gold/50 transition duration-300 group flex flex-col justify-between";
@@ -1023,7 +990,6 @@
             });
         }
 
-        // RENDER SECONDARY MARKETPLACE
         function renderMarketplace() {
             const container = document.getElementById('market-grid');
             if (!container) return;
@@ -1031,22 +997,18 @@
             const t = translations[getCurrentLang()] || translations.en;
             
             let items = [...genesisStoreNFTs, ...secondaryMarketListings];
-
             if (activeFilterMarket !== 'ALL') {
                 items = items.filter(nft => nft.category === activeFilterMarket);
             }
-
             const sortVal = document.getElementById('sort-select-market').value;
             if (sortVal === 'price-asc') items.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
             else if (sortVal === 'price-desc') items.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
             else if (sortVal === 'name-asc') items.sort((a, b) => a.title.localeCompare(b.title));
             else items.sort((a, b) => b.id - a.id);
-
             if (items.length === 0) {
                 container.innerHTML = `<div class="col-span-full text-center py-10 border border-dashed border-obsidian-border rounded-xl"><p class="text-slate-400 text-xs font-mono">No secondary listings active for this category.</p></div>`;
                 return;
             }
-
             items.forEach(nft => {
                 const isMine = connectedAccount && connectedAccount === nft.owner;
                 const card = document.createElement('div');
@@ -1080,12 +1042,10 @@
             });
         }
 
-        // RENDER HOLDINGS
         function renderMyHoldings() {
             const container = document.getElementById('my-nfts-grid');
             if (!container) return;
             const t = translations[getCurrentLang()] || translations.en;
-
             if (!connectedAccount) {
                 container.innerHTML = `
                     <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
@@ -1093,19 +1053,15 @@
                     </div>`;
                 return;
             }
-
             const myStoreNFTs = genesisStoreNFTs.filter(nft => nft.owner === connectedAccount);
             const myListedNFTs = secondaryMarketListings.filter(nft => nft.owner === connectedAccount);
             const myAcquiredNFTs = JSON.parse(localStorage.getItem(`aeterna_holdings_${connectedAccount}`)) || [];
-
             const holdingsMap = new Map();
             [...myStoreNFTs, ...myListedNFTs, ...myAcquiredNFTs].forEach(item => {
                 if (item && item.nftokenId) holdingsMap.set(item.nftokenId, item);
             });
-
             const allMyNFTs = Array.from(holdingsMap.values());
             container.innerHTML = '';
-
             if (allMyNFTs.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
@@ -1113,7 +1069,6 @@
                     </div>`;
                 return;
             }
-
             allMyNFTs.forEach(nft => {
                 const isListed = secondaryMarketListings.some(item => item.nftokenId === nft.nftokenId);
                 const div = document.createElement('div');
@@ -1137,7 +1092,6 @@
             });
         }
 
-        // OPEN DETAILS MODAL
         function openDetailsModal(nftokenId) {
             let nft = genesisStoreNFTs.find(n => n.nftokenId === nftokenId) || 
                       secondaryMarketListings.find(n => n.nftokenId === nftokenId);
@@ -1146,12 +1100,10 @@
                 const holdings = JSON.parse(localStorage.getItem(`aeterna_holdings_${connectedAccount}`)) || [];
                 nft = holdings.find(n => n.nftokenId === nftokenId);
             }
-
             if (!nft) {
                 showToast('NFT metadata not found.', 'warning');
                 return;
             }
-
             const t = translations[getCurrentLang()] || translations.en;
             document.getElementById('detail-title').innerText = nft.title;
             document.getElementById('detail-category-tag').innerText = nft.category || 'XRPL XLS-20 Asset';
@@ -1160,13 +1112,11 @@
             
             const mediaContainer = document.getElementById('detail-container-media');
             mediaContainer.innerHTML = renderMediaElement(nft.img, nft.title, "w-full h-full object-contain bg-black");
-
             document.getElementById('detail-nftokenid').innerText = nft.nftokenId || '000800001234567890ABCDEF1111111111111111111111111111111111111111';
             document.getElementById('detail-issuer').innerText = nft.issuer || 'rEmisorOficialAeternaAddress...';
             document.getElementById('detail-owner').innerText = nft.owner || 'rEmisorOficialAeternaAddress...';
             document.getElementById('detail-royalty').innerText = (nft.royalty || '0.25') + '%';
             document.getElementById('detail-license').innerText = 'CC0 Public Domain';
-
             const flagsContainer = document.getElementById('detail-flags-container');
             flagsContainer.innerHTML = '';
             const flagsList = nft.flags || ['Transferable', 'Burnable'];
@@ -1176,7 +1126,6 @@
                 badge.innerText = flag;
                 flagsContainer.appendChild(badge);
             });
-
             const historyContainer = document.getElementById('detail-history-list');
             historyContainer.innerHTML = `
                 <div class="flex justify-between border-b border-obsidian-border/40 pb-1">
@@ -1192,13 +1141,10 @@
                     <span>Passed</span>
                 </div>
             `;
-
             const actionsContainer = document.getElementById('detail-actions-container');
             actionsContainer.innerHTML = '';
-
             const isMine = connectedAccount && connectedAccount === nft.owner;
             const isListed = secondaryMarketListings.some(item => item.nftokenId === nft.nftokenId);
-
             if (isMine) {
                 if (!isListed) {
                     actionsContainer.innerHTML = `
@@ -1216,7 +1162,6 @@
                     <button onclick="closeDetails(); buyNftOffer('${nft.nftokenId}', '${nft.price}', '${nft.owner}', '${nft.title.replace(/'/g, "\\'")}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.buyBtn}</button>
                 `;
             }
-
             const modal = document.getElementById('details-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -1224,14 +1169,12 @@
 
         function closeDetails() { document.getElementById('details-modal').classList.add('hidden'); document.getElementById('details-modal').classList.remove('flex'); }
 
-        // BUY NFT OFFER
         async function buyNftOffer(nftokenId, priceXRP, ownerAccount, title) {
             if (!connectedAccount) {
                 showToast('Please connect your Xaman wallet first to buy.', 'warning');
                 connectXaman();
                 return;
             }
-
             try {
                 const response = await fetch(`${BACKEND_URL}/api/buy-nft-offer`, {
                     method: 'POST',
@@ -1239,7 +1182,6 @@
                     body: JSON.stringify({ buyerAccount: connectedAccount, nftokenId, priceXRP, ownerAccount })
                 });
                 const data = await response.json();
-
                 if (response.ok && data.uuid && data.qr_code) {
                     showXamanModal(data.qr_code, data.deep_link, `Scan to confirm buy offer of ${priceXRP} XRP for "${title}"`);
                     pollPayloadStatus(data.uuid, (signerAccount) => {
@@ -1255,15 +1197,13 @@
             }
         }
 
-        // CANCEL SALE OFFER VIA ON-PAGE QR MODAL & XRPL SIGNATURE
+        /* CORRECCIÓN PROFESIONAL: CANCELACIÓN CON SONDEO REAL EN BLOCKCHAIN XRPL (NFTokenCancelOffer) */
         async function cancelSaleOffer(nftokenId, title) {
             if (!connectedAccount) {
                 showToast('Please connect your wallet first.', 'warning');
                 return;
             }
-
-            showToast(`Preparing cancellation payload on XRPL...`, 'info');
-
+            showToast(`Preparing NFTokenCancelOffer payload on XRPL...`, 'info');
             try {
                 const response = await fetch(`${BACKEND_URL}/api/cancel-nft-offer`, {
                     method: 'POST',
@@ -1271,13 +1211,13 @@
                     body: JSON.stringify({ sellerAccount: connectedAccount, nftokenId })
                 });
                 const data = await response.json();
-
                 if (response.ok && data.uuid && data.qr_code) {
-                    // Display QR on site modal instead of redirecting externally
+                    // Muestra el código QR persistente en la web y sondea hasta que el usuario firme en la blockchain
                     showXamanModal(data.qr_code, data.deep_link, `Scan QR with Xaman to authorize NFTokenCancelOffer for "${title}"`);
-                    pollPayloadStatus(data.uuid, () => {
+                    
+                    pollPayloadStatus(data.uuid, (signerAccount, isAdmin, txHash) => {
                         closeModal();
-                        showToast(`Sale offer cancelled on XRPL blockchain for "${title}"!`, 'success');
+                        showToast(`NFTokenCancelOffer registered on XRPL blockchain for "${title}"! (Tx: ${txHash ? txHash.substring(0, 8) + '...' : 'Confirmed'})`, 'success');
                         
                         secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
                         localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
@@ -1286,53 +1226,30 @@
                         renderMyHoldings();
                     });
                 } else {
-                    // Fallback local removal and QR modal presentation
-                    const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/cancel-${nftokenId}`;
-                    showXamanModal(fallbackQr, `https://xumm.app/sign/cancel-${nftokenId}`, `Scan QR with Xaman to authorize NFTokenCancelOffer on XRPL for "${title}"`);
-                    
-                    setTimeout(() => {
-                        closeModal();
-                        secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
-                        localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
-                        renderMarketplace();
-                        renderMyHoldings();
-                        showToast(`Sale offer removed from XRPL Marketplace. Asset preserved in Holdings.`, 'success');
-                    }, 4000);
+                    showToast('Error generating cancel offer payload: ' + (data.error || 'Unknown'), 'error');
                 }
             } catch (err) {
-                const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/cancel-${nftokenId}`;
-                showXamanModal(fallbackQr, `https://xumm.app/sign/cancel-${nftokenId}`, `Scan QR with Xaman to authorize NFTokenCancelOffer on XRPL for "${title}"`);
-                
-                setTimeout(() => {
-                    closeModal();
-                    secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
-                    localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
-                    renderMarketplace();
-                    renderMyHoldings();
-                    showToast(`Sale offer cancelled on XRPL Marketplace. Asset preserved in Holdings.`, 'success');
-                }, 4000);
+                showToast('Connection failed during cancel offer creation.', 'error');
             }
         }
 
-        // TRANSFER NFT
         function openTransferModal(nftokenId) {
             document.getElementById('transfer-nft-id').value = nftokenId;
             const modal = document.getElementById('transfer-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
+
         function closeTransferModal() { document.getElementById('transfer-modal').classList.add('hidden'); document.getElementById('transfer-modal').classList.remove('flex'); }
 
         async function handleTransferSubmit(event) {
             event.preventDefault();
             const nftokenId = document.getElementById('transfer-nft-id').value;
             const recipient = document.getElementById('transfer-recipient').value.trim();
-
             if (!recipient.startsWith('r')) {
                 showToast('Invalid XRPL destination address.', 'warning');
                 return;
             }
-
             closeTransferModal();
             showToast(`Generating transfer payload for ${recipient.substring(0,8)}...`, 'info');
             
@@ -1353,23 +1270,19 @@
         function openListNftModal() { document.getElementById('list-nft-modal').classList.remove('hidden'); document.getElementById('list-nft-modal').classList.add('flex'); }
         function closeListNftModal() { document.getElementById('list-nft-modal').classList.add('hidden'); document.getElementById('list-nft-modal').classList.remove('flex'); }
 
-        // SUBMIT LISTING -> SHOW QR MODAL ON SITE
         async function handleListNftSubmit(event) {
             event.preventDefault();
             if (!connectedAccount) {
                 showToast('Please connect your wallet first.', 'warning');
                 return;
             }
-
             const nftokenId = document.getElementById('list-nft-id').value.trim();
             const priceXRP = document.getElementById('list-nft-price').value;
             const title = document.getElementById('list-nft-title').value;
             const category = document.getElementById('list-nft-category').value;
             const img = document.getElementById('list-nft-img').value;
-
             closeListNftModal();
             showToast(`Generating listing payload...`, 'info');
-
             try {
                 const response = await fetch(`${BACKEND_URL}/api/list-nft-offer`, {
                     method: 'POST',
@@ -1377,21 +1290,16 @@
                     body: JSON.stringify({ sellerAccount: connectedAccount, nftokenId, priceXRP })
                 });
                 const data = await response.json();
-
                 if (response.ok && data.uuid && data.qr_code) {
-                    // Show QR Code directly on web page modal
                     showXamanModal(data.qr_code, data.deep_link, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP for "${title}"`);
                     
                     pollPayloadStatus(data.uuid, (signerAccount) => {
                         closeModal();
-
                         if (signerAccount !== connectedAccount) {
                             showToast('Transaction rejected: Signed account does not match connected wallet.', 'error');
                             return;
                         }
-
                         showToast(`NFT "${title}" successfully listed on Marketplace!`, 'success');
-
                         const listedItem = { 
                             id: Date.now(), 
                             nftokenId, 
@@ -1402,7 +1310,6 @@
                             issuer: signerAccount,
                             img 
                         };
-
                         secondaryMarketListings.unshift(listedItem);
                         localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
                         
@@ -1412,53 +1319,10 @@
                         renderMyHoldings();
                     });
                 } else {
-                    // Fallback QR code display inside site modal
-                    const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/list-${nftokenId}`;
-                    showXamanModal(fallbackQr, `https://xumm.app/sign/list-${nftokenId}`, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP for "${title}"`);
-                    
-                    setTimeout(() => {
-                        closeModal();
-                        const listedItem = { 
-                            id: Date.now(), 
-                            nftokenId, 
-                            title, 
-                            price: priceXRP, 
-                            category: category,
-                            owner: connectedAccount, 
-                            issuer: connectedAccount,
-                            img 
-                        };
-                        secondaryMarketListings.unshift(listedItem);
-                        localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
-                        addNftToHoldings(title, priceXRP, nftokenId, img);
-                        renderMarketplace();
-                        renderMyHoldings();
-                        showToast(`NFT "${title}" listed for sale!`, 'success');
-                    }, 4000);
+                    showToast('Error creating sell offer: ' + (data.error || 'Unknown'), 'error');
                 }
             } catch (err) {
-                const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://xumm.app/sign/list-${nftokenId}`;
-                showXamanModal(fallbackQr, `https://xumm.app/sign/list-${nftokenId}`, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP for "${title}"`);
-                
-                setTimeout(() => {
-                    closeModal();
-                    const listedItem = { 
-                        id: Date.now(), 
-                        nftokenId, 
-                        title, 
-                        price: priceXRP, 
-                        category: category,
-                        owner: connectedAccount, 
-                        issuer: connectedAccount,
-                        img 
-                    };
-                    secondaryMarketListings.unshift(listedItem);
-                    localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
-                    addNftToHoldings(title, priceXRP, nftokenId, img);
-                    renderMarketplace();
-                    renderMyHoldings();
-                    showToast(`NFT "${title}" listed for sale!`, 'success');
-                }, 4000);
+                showToast('Connection failed during sell offer creation.', 'error');
             }
         }
 
@@ -1476,7 +1340,6 @@
                     owner: connectedAccount,
                     img: imgUrl || "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80"
                 });
-
                 localStorage.setItem(holdingsKey, JSON.stringify(currentHoldings));
             }
             renderMyHoldings();
@@ -1554,7 +1417,6 @@
             document.getElementById('connect-btn').classList.add('hidden');
             
             document.getElementById('tab-mynfts').classList.remove('hidden');
-
             if (currentUserIsAdmin) document.getElementById('tab-admin').classList.remove('hidden');
         }
 
@@ -1572,7 +1434,6 @@
             if (!document.getElementById('view-mynfts').classList.contains('hidden')) {
                 switchTab('store');
             }
-
             showToast('Wallet disconnected.', 'info');
         }
 

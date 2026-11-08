@@ -1085,12 +1085,12 @@
             if (!connectedAccount) {
                 container.innerHTML = `
                     <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
-                        <p class="text-slate-400 text-xs font-mono">${t.holdingsConnectMsg}</p>
+                        <p class="text-slate-400 text-sm font-mono">${t.holdingsConnectMsg}</p>
                     </div>`;
                 return;
             }
 
-            // Sincronizar dinámicamente según el owner actual exacto
+            // Sincronizar estrictamente los holdings filtrando por el propietario actual exacto
             const holdingsMap = new Map();
             
             // Revisar Store y Market globales
@@ -1162,7 +1162,6 @@
                       genesisStoreNFTs.find(n => n.nftokenId === nftokenId);
             
             if (!nft) {
-                // Buscar en holdings de cualquier usuario almacenados
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
                     if (key && key.startsWith('aeterna_holdings_')) {
@@ -1248,7 +1247,7 @@
             if (isMine) {
                 if (!isListed) {
                     actionsContainer.innerHTML = `
-                        <button onclick="closeDetails(); openListNftModalWithId('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}', '${nft.price || 10}', '${nft.img}', '${nft.video || ''}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.listBtn}</button>
+                        <button onclick="closeDetails(); openListNftModalWithId('${nft.nftokenId}', '${nft.price || 10}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.listBtn}</button>
                         <button onclick="closeDetails(); openTransferModal('${nft.nftokenId}')" class="w-full btn-xaman py-3 rounded-xl text-xs font-bold tracking-wide">Transfer NFT to Address</button>
                     `;
                 } else {
@@ -1279,7 +1278,7 @@
             currentActiveDetailNft = null;
         }
 
-        /* COMPRA ROBUSTA DE NFT CON ACTUALIZACIÓN DE PROPIEDAD Y ELIMINACIÓN DE MARKETPLACE */
+        /* COMPRA Y TRANSFERENCIA DE PROPIEDAD REAL SINCRONIZADA */
         async function buyNftOffer(nftokenId, priceXRP, ownerAccount, title) {
             if (!connectedAccount) {
                 showToast('Please connect your Xaman wallet first to buy.', 'warning');
@@ -1300,29 +1299,44 @@
                         closeModal();
                         showToast(`Purchase completed for "${title}"!`, 'success');
                         
-                        // Encontrar el NFT comprado en el marketplace o store
+                        // Localizar el NFT comprado en market, store o holdings previos
                         let purchasedNft = secondaryMarketListings.find(n => n.nftokenId === nftokenId) ||
                                            genesisStoreNFTs.find(n => n.nftokenId === nftokenId);
 
-                        // Remover estrictamente del marketplace para que no pueda volver a comprarse
+                        if (!purchasedNft) {
+                            for (let i = 0; i < localStorage.length; i++) {
+                                const key = localStorage.key(i);
+                                if (key && key.startsWith('aeterna_holdings_')) {
+                                    const arr = JSON.parse(localStorage.getItem(key)) || [];
+                                    const found = arr.find(n => n.nftokenId === nftokenId);
+                                    if (found) { purchasedNft = found; break; }
+                                }
+                            }
+                        }
+
+                        // Eliminar estrictamente de la lista activa del Marketplace
                         secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
                         localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
 
                         if (purchasedNft) {
-                            // Actualizar propietario anterior (remover de holdings del vendedor si aplica)
-                            const sellerHoldingsKey = `aeterna_holdings_${purchasedNft.owner}`;
-                            let sellerHoldings = JSON.parse(localStorage.getItem(sellerHoldingsKey)) || [];
-                            sellerHoldings = sellerHoldings.filter(n => n.nftokenId !== nftokenId);
-                            localStorage.setItem(sellerHoldingsKey, JSON.stringify(sellerHoldings));
+                            const previousOwner = purchasedNft.owner;
 
-                            // Actualizar datos del NFT al nuevo comprador
+                            // Remover el NFT de los holdings del vendedor anterior
+                            if (previousOwner) {
+                                const sellerHoldingsKey = `aeterna_holdings_${previousOwner}`;
+                                let sellerHoldings = JSON.parse(localStorage.getItem(sellerHoldingsKey)) || [];
+                                sellerHoldings = sellerHoldings.filter(n => n.nftokenId !== nftokenId);
+                                localStorage.setItem(sellerHoldingsKey, JSON.stringify(sellerHoldings));
+                            }
+
+                            // Actualizar la propiedad al nuevo comprador
                             purchasedNft.owner = connectedAccount;
                             if (!purchasedNft.history) purchasedNft.history = [purchasedNft.issuer || 'rEmisorOficialAeternaAddress...'];
                             if (!purchasedNft.history.includes(connectedAccount)) {
                                 purchasedNft.history.push(connectedAccount);
                             }
 
-                            // Agregar a los holdings personales del comprador
+                            // Registrar el NFT en los holdings del comprador conectado
                             const buyerHoldingsKey = `aeterna_holdings_${connectedAccount}`;
                             let buyerHoldings = JSON.parse(localStorage.getItem(buyerHoldingsKey)) || [];
                             if (!buyerHoldings.some(n => n.nftokenId === nftokenId)) {
@@ -1410,7 +1424,7 @@
             }, 2000);
         }
 
-        function openListNftModalWithId(nftokenId, title, price, img, video = '') {
+        function openListNftModalWithId(nftokenId, price) {
             document.getElementById('list-nft-id').value = nftokenId;
             document.getElementById('list-nft-price').value = price;
             openListNftModal();
@@ -1447,7 +1461,7 @@
                         }
                         showToast(`NFT successfully listed on Marketplace!`, 'success');
                         
-                        // Buscar el ítem en los holdings del usuario para conservar sus metadatos (imagen, video, título)
+                        // Buscar el activo en los holdings del usuario para conservar sus metadatos exactos (imagen, video, título)
                         const userHoldingsKey = `aeterna_holdings_${connectedAccount}`;
                         let userHoldings = JSON.parse(localStorage.getItem(userHoldingsKey)) || [];
                         let baseNft = userHoldings.find(n => n.nftokenId === nftokenId) || 

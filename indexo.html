@@ -277,42 +277,10 @@
                 <button onclick="closeListNftModal()" class="text-slate-400 hover:text-white text-xl font-bold">&times;</button>
             </div>
             <form onsubmit="handleListNftSubmit(event)" class="space-y-4">
-                <div class="space-y-1">
-                    <label id="t-lbl-nft-id" class="text-slate-300 block">NFTokenID (XRPL Token Identifier) *</label>
-                    <input type="text" id="list-nft-id" required placeholder="00080000..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
-                </div>
+                <input type="hidden" id="list-nft-id">
                 <div class="space-y-1">
                     <label id="t-lbl-price" class="text-slate-300 block">Selling Price in XRP *</label>
                     <input type="number" id="list-nft-price" step="0.1" min="0.1" required placeholder="50" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
-                </div>
-                <div class="space-y-1">
-                    <label id="t-lbl-title" class="text-slate-300 block">Asset Title / Name *</label>
-                    <input type="text" id="list-nft-title" required placeholder="e.g. Constellation Lyra Star" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
-                </div>
-                <div class="space-y-1">
-                    <label id="t-lbl-category" class="text-slate-300 block">Asset Category *</label>
-                    <select id="list-nft-category" required class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
-                        <option value="Planets & Moons" id="opt-cat-planets">Planets & Moons</option>
-                        <option value="Stars & Stellar Systems" id="opt-cat-stars">Stars & Stellar Systems</option>
-                        <option value="Fauna & Wild Species" id="opt-cat-fauna">Fauna & Wild Species</option>
-                        <option value="Botany & Master Flora" id="opt-cat-botany">Botany & Master Flora</option>
-                        <option value="Minerals & Pure Elements" id="opt-cat-minerals">Minerals & Pure Elements</option>
-                        <option value="Global Geography & Waters" id="opt-cat-geo">Global Geography & Waters</option>
-                        <option value="Concepts, Ideas & Knowledge" id="opt-cat-concepts">Concepts, Ideas & Knowledge</option>
-                        <option value="Symbols, Archetypes & Culture" id="opt-cat-symbols">Symbols, Archetypes & Culture</option>
-                    </select>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-slate-300 block">Asset Description (Optional)</label>
-                    <textarea id="list-nft-desc" rows="2" placeholder="Custom description of the asset..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none text-xs"></textarea>
-                </div>
-                <div class="space-y-1">
-                    <label id="t-lbl-img" class="text-slate-300 block">Image URL *</label>
-                    <input type="url" id="list-nft-img" required placeholder="https://... (jpg, png, webp)" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-slate-300 block">Video / IPFS URL (Optional)</label>
-                    <input type="url" id="list-nft-video" placeholder="https://cdn.bithomp.com/image/... or https://... (mp4, webm)" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg p-3 text-white focus:border-obsidian-gold outline-none">
                 </div>
                 <button type="submit" id="btn-submit-list" class="w-full btn-buy py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs mt-2">
                     Create Sell Offer on Xaman
@@ -384,7 +352,7 @@
                             </div>
                             <div>
                                 <span class="text-slate-400 block text-[9px] uppercase">Owner Address</span>
-                                <span id="detail-owner" class="text-slate-300 truncate block"></span>
+                                <span id="detail-owner" class="text-obsidian-gold font-bold truncate block"></span>
                             </div>
                         </div>
                     </div>
@@ -399,8 +367,8 @@
                         <div id="detail-flags-container" class="flex flex-wrap gap-1.5 pt-1"></div>
                     </div>
                     <div class="space-y-2 pt-1">
-                        <span class="text-slate-400 text-[10px] uppercase block tracking-wider">Asset History & Traceability</span>
-                        <div id="detail-history-list" class="space-y-1.5 text-[10px] text-slate-400 max-h-24 overflow-y-auto bg-obsidian-dark/40 p-2.5 rounded border border-obsidian-border"></div>
+                        <span class="text-slate-400 text-[10px] uppercase block tracking-wider">Asset Ownership History & Traceability</span>
+                        <div id="detail-history-list" class="space-y-1.5 text-[10px] text-slate-400 max-h-32 overflow-y-auto bg-obsidian-dark/40 p-2.5 rounded border border-obsidian-border"></div>
                     </div>
                 </div>
                 <div class="space-y-3 pt-3 border-t border-obsidian-border">
@@ -444,7 +412,6 @@
             return (/\.(mp4|webm|ogg|mov)$/i).test(url) || url.includes('ipfs') || url.includes('video') || url.includes('bithomp');
         }
 
-        /* RENDER PORTADA PRINCIPAL CON FOTO FIJA E INDICADOR DE VIDEO */
         function renderCardMedia(nft, additionalClasses = "w-full h-full object-contain") {
             if (nft.img) {
                 return `<img src="${nft.img}" alt="${nft.title}" class="${additionalClasses} bg-black">`;
@@ -455,7 +422,6 @@
             return `<div class="w-full h-full bg-slate-900 flex items-center justify-center text-slate-600 text-xs font-mono">No Media</div>`;
         }
 
-        /* TRADUCCIONES COMPLETAS CON LOS 6 IDIOMAS DE TU SCRIPT */
         const translations = {
             en: {
                 subtitle: "Universal Unclaimed Asset Ledger",
@@ -890,25 +856,12 @@
             
             document.getElementById('t-footer-text').innerText = t.footerText;
             document.getElementById('t-modal-list-title').innerText = t.modalListTitle;
-            document.getElementById('t-lbl-nft-id').innerText = t.lblNftId;
             document.getElementById('t-lbl-price').innerText = t.lblPrice;
-            document.getElementById('t-lbl-title').innerText = t.lblTitle;
-            document.getElementById('t-lbl-category').innerText = t.lblCategory;
-            document.getElementById('t-lbl-img').innerText = t.lblImg;
             document.getElementById('btn-submit-list').innerText = t.btnSubmitList;
             document.getElementById('t-xaman-qr-title').innerText = t.xamanQrTitle;
             document.getElementById('btn-cancel-xaman').innerText = t.btnCancel;
             document.getElementById('deep-link-btn').innerText = t.btnOpenApp;
             document.getElementById('t-detail-price-lbl').innerText = t.detailsPriceLbl;
-            
-            document.getElementById('opt-cat-planets').innerText = t.catPlanets.replace('🌌 ', '');
-            document.getElementById('opt-cat-stars').innerText = t.catStars.replace('✨ ', '');
-            document.getElementById('opt-cat-fauna').innerText = t.catFauna.replace('🦅 ', '');
-            document.getElementById('opt-cat-botany').innerText = t.catBotany.replace('🌿 ', '');
-            document.getElementById('opt-cat-minerals').innerText = t.catMinerals.replace('💎 ', '');
-            document.getElementById('opt-cat-geo').innerText = t.catGeo.replace('🌊 ', '');
-            document.getElementById('opt-cat-concepts').innerText = t.catConcepts.replace('💡 ', '');
-            document.getElementById('opt-cat-symbols').innerText = t.catSymbols.replace('🏛️ ', '');
             
             renderStore();
             renderMarketplace();
@@ -953,7 +906,8 @@
                 royalty: '0.25', 
                 flags: ['Burnable', 'OnlyXRP', 'Transferable', 'Mutable'], 
                 img: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80',
-                video: ''
+                video: '',
+                history: ['rEmisorOficialAeternaAddress...']
             },
             { 
                 id: 2, 
@@ -967,7 +921,8 @@
                 royalty: '0.25', 
                 flags: ['Burnable', 'Transferable', 'Mutable'], 
                 img: 'https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&w=800&q=80',
-                video: ''
+                video: '',
+                history: ['rEmisorOficialAeternaAddress...']
             },
             { 
                 id: 3, 
@@ -981,7 +936,8 @@
                 royalty: '0.25', 
                 flags: ['Burnable', 'OnlyXRP', 'Transferable'], 
                 img: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80',
-                video: ''
+                video: '',
+                history: ['rEmisorOficialAeternaAddress...']
             },
             { 
                 id: 4, 
@@ -995,7 +951,8 @@
                 royalty: '0.25', 
                 flags: ['Burnable', 'OnlyXRP', 'Transferable', 'Mutable', 'TrustLine'], 
                 img: 'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?auto=format&fit=crop&w=800&q=80',
-                video: ''
+                video: '',
+                history: ['rEmisorOficialAeternaAddress...']
             }
         ];
 
@@ -1042,7 +999,7 @@
                         <div class="h-44 sm:h-48 bg-black relative overflow-hidden cursor-pointer flex items-center justify-center" onclick="openDetailsModal('${nft.nftokenId}')">
                             ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
                             <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${nft.category || 'Asset'}</span>
-                            ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video en Detalles</span>' : ''}
+                            ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video</span>' : ''}
                         </div>
                         <div class="p-4 space-y-2">
                             <h4 class="text-sm font-medium text-white line-clamp-1">${nft.title}</h4>
@@ -1096,7 +1053,7 @@
                         <div class="h-44 sm:h-48 bg-black relative overflow-hidden cursor-pointer flex items-center justify-center" onclick="openDetailsModal('${nft.nftokenId}')">
                             ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
                             <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${nft.category || 'Asset'}</span>
-                            ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video en Detalles</span>' : ''}
+                            ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video</span>' : ''}
                         </div>
                         <div class="p-4 space-y-1.5">
                             <h4 class="text-sm font-medium text-white line-clamp-1">${nft.title}</h4>
@@ -1132,20 +1089,22 @@
                     </div>`;
                 return;
             }
-            const myStoreNFTs = genesisStoreNFTs.filter(nft => nft.owner === connectedAccount);
-            const myListedNFTs = secondaryMarketListings.filter(nft => nft.owner === connectedAccount);
-            const myAcquiredNFTs = JSON.parse(localStorage.getItem(`aeterna_holdings_${connectedAccount}`)) || [];
-            
+
+            // Sincronizar dinámicamente según el owner actual exacto
             const holdingsMap = new Map();
-            [...myStoreNFTs, ...myAcquiredNFTs, ...myListedNFTs].forEach(item => {
-                if (item && item.nftokenId) {
-                    const existing = holdingsMap.get(item.nftokenId) || {};
-                    holdingsMap.set(item.nftokenId, {
-                        ...existing,
-                        ...item,
-                        video: item.video || existing.video || '',
-                        img: item.img || existing.img || ''
-                    });
+            
+            // Revisar Store y Market globales
+            [...genesisStoreNFTs, ...secondaryMarketListings].forEach(item => {
+                if (item && item.nftokenId && item.owner === connectedAccount) {
+                    holdingsMap.set(item.nftokenId, item);
+                }
+            });
+
+            // Revisar localStorage de holdings personales del usuario conectado
+            const personalHoldings = JSON.parse(localStorage.getItem(`aeterna_holdings_${connectedAccount}`)) || [];
+            personalHoldings.forEach(item => {
+                if (item && item.nftokenId && item.owner === connectedAccount) {
+                    holdingsMap.set(item.nftokenId, item);
                 }
             });
             
@@ -1159,19 +1118,19 @@
                 return;
             }
             allMyNFTs.forEach(nft => {
-                const isListed = secondaryMarketListings.some(item => item.nftokenId === nft.nftokenId);
+                const isListed = secondaryMarketListings.some(item => item.nftokenId === nft.nftokenId && item.owner === connectedAccount);
                 const div = document.createElement('div');
                 div.className = "bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden p-4 space-y-3 flex flex-col justify-between hover:border-obsidian-gold/60 transition cursor-pointer";
                 div.setAttribute('onclick', `openDetailsModal('${nft.nftokenId}')`);
                 div.innerHTML = `
-                    <div class="h-44 sm:h-48 bg-black relative overflow-hidden cursor-pointer flex items-center justify-center" onclick="openDetailsModal('${nft.nftokenId}')">
-                        ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
+                    <div class="h-44 sm:h-48 bg-black relative overflow-hidden flex items-center justify-center">
+                        ${renderCardMedia(nft, "w-full h-full object-contain")}
                         <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${nft.category || 'Asset'}</span>
-                        ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video en Detalles</span>' : ''}
+                        ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video</span>' : ''}
                     </div>
                     <div>
                         <h4 class="text-sm font-medium text-white line-clamp-1">${nft.title}</h4>
-                        <p class="text-xs text-obsidian-gold font-mono mt-1">${nft.price} XRP</p>
+                        <p class="text-xs text-obsidian-gold font-mono mt-1">${nft.price || '0'} XRP</p>
                     </div>
                     <div class="pt-2 border-t border-obsidian-border/60 flex justify-between items-center text-[10px] font-mono">
                         <span class="text-slate-400">${isListed ? '🟡 Listed on Market' : '🟢 In Vault (Not on Sale)'}</span>
@@ -1199,13 +1158,21 @@
         }
 
         function openDetailsModal(nftokenId) {
-            let nft = genesisStoreNFTs.find(n => n.nftokenId === nftokenId) || 
-                      secondaryMarketListings.find(n => n.nftokenId === nftokenId);
+            let nft = secondaryMarketListings.find(n => n.nftokenId === nftokenId) || 
+                      genesisStoreNFTs.find(n => n.nftokenId === nftokenId);
             
-            if (!nft && connectedAccount) {
-                const holdings = JSON.parse(localStorage.getItem(`aeterna_holdings_${connectedAccount}`)) || [];
-                nft = holdings.find(n => n.nftokenId === nftokenId);
+            if (!nft) {
+                // Buscar en holdings de cualquier usuario almacenados
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('aeterna_holdings_')) {
+                        const arr = JSON.parse(localStorage.getItem(key)) || [];
+                        const found = arr.find(n => n.nftokenId === nftokenId);
+                        if (found) { nft = found; break; }
+                    }
+                }
             }
+
             if (!nft) {
                 showToast('NFT metadata not found.', 'warning');
                 return;
@@ -1215,7 +1182,7 @@
             const t = translations[getCurrentLang()] || translations.en;
             document.getElementById('detail-title').innerText = nft.title;
             document.getElementById('detail-category-tag').innerText = nft.category || 'XRPL XLS-20 Asset';
-            document.getElementById('detail-price').innerText = nft.price + ' XRP';
+            document.getElementById('detail-price').innerText = (nft.price || '0') + ' XRP';
             
             const descEl = document.getElementById('detail-desc');
             const descBox = document.getElementById('detail-desc-box');
@@ -1237,7 +1204,7 @@
             
             document.getElementById('detail-nftokenid').innerText = nft.nftokenId || '000800001234567890ABCDEF1111111111111111111111111111111111111111';
             document.getElementById('detail-issuer').innerText = nft.issuer || 'rEmisorOficialAeternaAddress...';
-            document.getElementById('detail-owner').innerText = nft.owner || 'rEmisorOficialAeternaAddress...';
+            document.getElementById('detail-owner').innerText = nft.owner || nft.issuer || 'rEmisorOficialAeternaAddress...';
             document.getElementById('detail-royalty').innerText = (nft.royalty || '0.25') + '%';
             document.getElementById('detail-license').innerText = 'CC0 Public Domain';
 
@@ -1260,21 +1227,18 @@
                 flagsContainer.appendChild(badge);
             });
 
+            // Historial de direcciones (r...) de usuarios que han tenido el NFT
             const historyContainer = document.getElementById('detail-history-list');
-            historyContainer.innerHTML = `
-                <div class="flex justify-between border-b border-obsidian-border/40 pb-1">
-                    <span>⚡ Minted on Ledger</span>
-                    <span>2026-04-12</span>
-                </div>
-                <div class="flex justify-between border-b border-obsidian-border/40 pb-1">
-                    <span>🏷️ NFTokenCreateOffer</span>
-                    <span>${nft.price} XRP</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>🛡️ Verified Issuer Signature</span>
-                    <span>Passed</span>
-                </div>
-            `;
+            historyContainer.innerHTML = '';
+            const historyArr = nft.history && nft.history.length > 0 ? nft.history : [nft.issuer || 'rEmisorOficialAeternaAddress...', nft.owner];
+            const uniqueHistory = [...new Set(historyArr.filter(Boolean))];
+
+            uniqueHistory.forEach((addr, idx) => {
+                const row = document.createElement('div');
+                row.className = "flex justify-between border-b border-obsidian-border/40 pb-1 text-[10px]";
+                row.innerHTML = `<span class="text-slate-300">#${idx + 1} Holder: <code class="text-obsidian-gold select-all">${addr}</code></span><span class="text-slate-500">${idx === 0 ? 'Mint / Genesis' : 'Acquired / Transferred'}</span>`;
+                historyContainer.appendChild(row);
+            });
             
             const actionsContainer = document.getElementById('detail-actions-container');
             actionsContainer.innerHTML = '';
@@ -1284,7 +1248,7 @@
             if (isMine) {
                 if (!isListed) {
                     actionsContainer.innerHTML = `
-                        <button onclick="closeDetails(); openListNftModalWithId('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}', '${nft.price}', '${nft.img}', '${nft.video || ''}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.listBtn}</button>
+                        <button onclick="closeDetails(); openListNftModalWithId('${nft.nftokenId}', '${nft.title.replace(/'/g, "\\'")}', '${nft.price || 10}', '${nft.img}', '${nft.video || ''}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.listBtn}</button>
                         <button onclick="closeDetails(); openTransferModal('${nft.nftokenId}')" class="w-full btn-xaman py-3 rounded-xl text-xs font-bold tracking-wide">Transfer NFT to Address</button>
                     `;
                 } else {
@@ -1294,9 +1258,15 @@
                     `;
                 }
             } else {
-                actionsContainer.innerHTML = `
-                    <button onclick="closeDetails(); buyNftOffer('${nft.nftokenId}', '${nft.price}', '${nft.owner}', '${nft.title.replace(/'/g, "\\'")}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.buyBtn}</button>
-                `;
+                if (isListed) {
+                    actionsContainer.innerHTML = `
+                        <button onclick="closeDetails(); buyNftOffer('${nft.nftokenId}', '${nft.price}', '${nft.owner}', '${nft.title.replace(/'/g, "\\'")}')" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${t.buyBtn}</button>
+                    `;
+                } else {
+                    actionsContainer.innerHTML = `
+                        <div class="text-center text-slate-400 text-xs py-2 font-mono">This asset is currently not listed for sale.</div>
+                    `;
+                }
             }
             const modal = document.getElementById('details-modal');
             modal.classList.remove('hidden');
@@ -1309,7 +1279,7 @@
             currentActiveDetailNft = null;
         }
 
-        /* COMPRA ROBUSTA DE NFT CON CORRECCIÓN DE RESERVA Y ESTADO */
+        /* COMPRA ROBUSTA DE NFT CON ACTUALIZACIÓN DE PROPIEDAD Y ELIMINACIÓN DE MARKETPLACE */
         async function buyNftOffer(nftokenId, priceXRP, ownerAccount, title) {
             if (!connectedAccount) {
                 showToast('Please connect your Xaman wallet first to buy.', 'warning');
@@ -1330,12 +1300,42 @@
                         closeModal();
                         showToast(`Purchase completed for "${title}"!`, 'success');
                         
+                        // Encontrar el NFT comprado en el marketplace o store
+                        let purchasedNft = secondaryMarketListings.find(n => n.nftokenId === nftokenId) ||
+                                           genesisStoreNFTs.find(n => n.nftokenId === nftokenId);
+
+                        // Remover estrictamente del marketplace para que no pueda volver a comprarse
                         secondaryMarketListings = secondaryMarketListings.filter(n => n.nftokenId !== nftokenId);
                         localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
 
-                        addNftToHoldings(title, priceXRP, nftokenId);
+                        if (purchasedNft) {
+                            // Actualizar propietario anterior (remover de holdings del vendedor si aplica)
+                            const sellerHoldingsKey = `aeterna_holdings_${purchasedNft.owner}`;
+                            let sellerHoldings = JSON.parse(localStorage.getItem(sellerHoldingsKey)) || [];
+                            sellerHoldings = sellerHoldings.filter(n => n.nftokenId !== nftokenId);
+                            localStorage.setItem(sellerHoldingsKey, JSON.stringify(sellerHoldings));
+
+                            // Actualizar datos del NFT al nuevo comprador
+                            purchasedNft.owner = connectedAccount;
+                            if (!purchasedNft.history) purchasedNft.history = [purchasedNft.issuer || 'rEmisorOficialAeternaAddress...'];
+                            if (!purchasedNft.history.includes(connectedAccount)) {
+                                purchasedNft.history.push(connectedAccount);
+                            }
+
+                            // Agregar a los holdings personales del comprador
+                            const buyerHoldingsKey = `aeterna_holdings_${connectedAccount}`;
+                            let buyerHoldings = JSON.parse(localStorage.getItem(buyerHoldingsKey)) || [];
+                            if (!buyerHoldings.some(n => n.nftokenId === nftokenId)) {
+                                buyerHoldings.unshift(purchasedNft);
+                            } else {
+                                buyerHoldings = buyerHoldings.map(n => n.nftokenId === nftokenId ? purchasedNft : n);
+                            }
+                            localStorage.setItem(buyerHoldingsKey, JSON.stringify(buyerHoldings));
+                        }
+
                         renderMarketplace();
                         renderStore();
+                        renderMyHoldings();
                     });
                 } else {
                     showToast('Error generating buy offer: ' + (data.error || 'Unknown'), 'error');
@@ -1345,7 +1345,6 @@
             }
         }
 
-        /* CANCELACIÓN SEGURA USANDO EL ÍNDICE DE OFERTA O TOKEN ID */
         async function cancelSaleOffer(nftokenId, title) {
             if (!connectedAccount) {
                 showToast('Please connect your wallet first.', 'warning');
@@ -1413,10 +1412,7 @@
 
         function openListNftModalWithId(nftokenId, title, price, img, video = '') {
             document.getElementById('list-nft-id').value = nftokenId;
-            document.getElementById('list-nft-title').value = title;
             document.getElementById('list-nft-price').value = price;
-            document.getElementById('list-nft-img').value = img;
-            document.getElementById('list-nft-video').value = video;
             openListNftModal();
         }
 
@@ -1431,11 +1427,6 @@
             }
             const nftokenId = document.getElementById('list-nft-id').value.trim();
             const priceXRP = document.getElementById('list-nft-price').value;
-            const title = document.getElementById('list-nft-title').value;
-            const category = document.getElementById('list-nft-category').value;
-            const desc = document.getElementById('list-nft-desc').value.trim();
-            const img = document.getElementById('list-nft-img').value;
-            const video = document.getElementById('list-nft-video').value.trim();
             closeListNftModal();
             showToast(`Generating listing payload...`, 'info');
             try {
@@ -1446,7 +1437,7 @@
                 });
                 const data = await response.json();
                 if (response.ok && data.uuid && data.qr_code) {
-                    showXamanModal(data.qr_code, data.deep_link, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP for "${title}"`);
+                    showXamanModal(data.qr_code, data.deep_link, `Scan QR with Xaman to authorize sell offer of ${priceXRP} XRP`);
                     
                     pollPayloadStatus(data.uuid, (signerAccount, isAdmin, txHash, responseData) => {
                         closeModal();
@@ -1454,26 +1445,32 @@
                             showToast('Transaction rejected: Signed account does not match connected wallet.', 'error');
                             return;
                         }
-                        showToast(`NFT "${title}" successfully listed on Marketplace!`, 'success');
+                        showToast(`NFT successfully listed on Marketplace!`, 'success');
                         
+                        // Buscar el ítem en los holdings del usuario para conservar sus metadatos (imagen, video, título)
+                        const userHoldingsKey = `aeterna_holdings_${connectedAccount}`;
+                        let userHoldings = JSON.parse(localStorage.getItem(userHoldingsKey)) || [];
+                        let baseNft = userHoldings.find(n => n.nftokenId === nftokenId) || 
+                                      genesisStoreNFTs.find(n => n.nftokenId === nftokenId);
+
                         const listedItem = { 
                             id: Date.now(), 
                             nftokenId, 
                             offerIndex: responseData?.offerIndex || nftokenId,
-                            title, 
-                            desc,
+                            title: baseNft ? baseNft.title : 'Asset NFT', 
+                            desc: baseNft ? baseNft.desc : '',
                             price: priceXRP, 
-                            category: category,
+                            category: baseNft ? baseNft.category : 'Planets & Moons',
                             owner: signerAccount, 
-                            issuer: signerAccount,
-                            img,
-                            video,
+                            issuer: baseNft ? baseNft.issuer : signerAccount,
+                            img: baseNft ? baseNft.img : 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80',
+                            video: baseNft ? baseNft.video : '',
+                            history: baseNft && baseNft.history ? baseNft.history : [signerAccount],
                             flags: ['Burnable', 'OnlyXRP', 'Transferable', 'Mutable']
                         };
                         secondaryMarketListings.unshift(listedItem);
                         localStorage.setItem('aeterna_market_listings', JSON.stringify(secondaryMarketListings));
                         
-                        addNftToHoldings(title, priceXRP, nftokenId, img, video);
                         renderMarketplace();
                         renderMyHoldings();
                     });
@@ -1483,27 +1480,6 @@
             } catch (err) {
                 showToast('Connection failed during sell offer creation.', 'error');
             }
-        }
-
-        function addNftToHoldings(itemName, price, nftokenId, imgUrl = null, videoUrl = null) {
-            if (!connectedAccount) return;
-            const holdingsKey = `aeterna_holdings_${connectedAccount}`;
-            const currentHoldings = JSON.parse(localStorage.getItem(holdingsKey)) || [];
-            
-            if (!currentHoldings.some(item => item.nftokenId === nftokenId)) {
-                currentHoldings.unshift({
-                    id: Date.now(),
-                    nftokenId: nftokenId,
-                    title: itemName,
-                    price: price,
-                    owner: connectedAccount,
-                    img: imgUrl || "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80",
-                    video: videoUrl || "",
-                    flags: ['Burnable', 'OnlyXRP', 'Transferable', 'Mutable']
-                });
-                localStorage.setItem(holdingsKey, JSON.stringify(currentHoldings));
-            }
-            renderMyHoldings();
         }
 
         async function connectXaman() {

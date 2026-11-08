@@ -448,12 +448,13 @@
         }
 
         /* DUAL COVER MEDIA DISPLAY: Prioritizes Video for Card Cover if present */
+        /* RENDER PORTADA PRINCIPAL CON FOTO FIJA E INDICADOR DE VIDEO */
         function renderCardMedia(nft, additionalClasses = "w-full h-full object-contain") {
-            if (nft.video) {
-                return `<video src="${nft.video}" autoplay loop muted playsinline class="${additionalClasses} bg-black"></video>`;
-            }
             if (nft.img) {
                 return `<img src="${nft.img}" alt="${nft.title}" class="${additionalClasses} bg-black">`;
+            }
+            if (nft.video) {
+                return `<video src="${nft.video}" autoplay loop muted playsinline class="${additionalClasses} bg-black"></video>`;
             }
             return `<div class="w-full h-full bg-slate-900 flex items-center justify-center text-slate-600 text-xs font-mono">No Media</div>`;
         }
@@ -1042,10 +1043,10 @@
                 card.innerHTML = `
                     <div>
                         <div class="h-44 sm:h-48 bg-black relative overflow-hidden cursor-pointer flex items-center justify-center" onclick="openDetailsModal('${nft.nftokenId}')">
-                            ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
-                            <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${nft.category}</span>
-                            ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">▶ IPFS Video</span>' : ''}
-                        </div>
+    ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
+    <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${nft.category || 'Asset'}</span>
+    ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video en Detalles</span>' : ''}
+</div>
                         <div class="p-4 space-y-2">
                             <h4 class="text-sm font-medium text-white line-clamp-1">${nft.title}</h4>
                             <p class="text-[11px] text-slate-400 line-clamp-2">${nft.desc || ''}</p>
@@ -1095,10 +1096,10 @@
                 card.innerHTML = `
                     <div>
                         <div class="h-44 sm:h-48 bg-black relative overflow-hidden cursor-pointer flex items-center justify-center" onclick="openDetailsModal('${nft.nftokenId}')">
-                            ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
-                            <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-emerald-400 text-[10px] font-mono px-2 py-0.5 rounded border border-emerald-500/30">${nft.category}</span>
-                            ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">▶ IPFS Video</span>' : ''}
-                        </div>
+    ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
+    <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${nft.category || 'Asset'}</span>
+    ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video en Detalles</span>' : ''}
+</div>
                         <div class="p-4 space-y-1.5">
                             <h4 class="text-sm font-medium text-white line-clamp-1">${nft.title}</h4>
                             <p class="text-[10px] text-slate-500 font-mono truncate">Seller: ${nft.owner ? nft.owner.substring(0, 8) + '...' : 'Genesis'}</p>
@@ -1167,11 +1168,11 @@
                 div.className = "bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden p-4 space-y-3 flex flex-col justify-between hover:border-obsidian-gold/60 transition cursor-pointer";
                 div.setAttribute('onclick', `openDetailsModal('${nft.nftokenId}')`);
                 div.innerHTML = `
-                    <div class="h-40 bg-black rounded-lg overflow-hidden relative flex items-center justify-center">
-                        ${renderCardMedia(nft, "w-full h-full object-contain")}
-                        <span class="absolute top-2 right-2 bg-obsidian-dark/85 text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">Owner</span>
-                        ${nft.video ? '<span class="absolute bottom-2 left-2 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">▶ IPFS Video</span>' : ''}
-                    </div>
+                    <div class="h-44 sm:h-48 bg-black relative overflow-hidden cursor-pointer flex items-center justify-center" onclick="openDetailsModal('${nft.nftokenId}')">
+    ${renderCardMedia(nft, "w-full h-full object-contain group-hover:scale-105 transition duration-500")}
+    <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${nft.category || 'Asset'}</span>
+    ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">🎬 Video en Detalles</span>' : ''}
+</div>
                     <div>
                         <h4 class="text-sm font-medium text-white line-clamp-1">${nft.title}</h4>
                         <p class="text-xs text-obsidian-gold font-mono mt-1">${nft.price} XRP</p>

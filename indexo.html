@@ -1136,10 +1136,22 @@
             const myStoreNFTs = genesisStoreNFTs.filter(nft => nft.owner === connectedAccount);
             const myListedNFTs = secondaryMarketListings.filter(nft => nft.owner === connectedAccount);
             const myAcquiredNFTs = JSON.parse(localStorage.getItem(`aeterna_holdings_${connectedAccount}`)) || [];
+            
             const holdingsMap = new Map();
-            [...myStoreNFTs, ...myListedNFTs, ...myAcquiredNFTs].forEach(item => {
-                if (item && item.nftokenId) holdingsMap.set(item.nftokenId, item);
+            
+            // Unificar objetos priorizando las fuentes que contengan la propiedad de video e imagen completas
+            [...myStoreNFTs, ...myAcquiredNFTs, ...myListedNFTs].forEach(item => {
+                if (item && item.nftokenId) {
+                    const existing = holdingsMap.get(item.nftokenId) || {};
+                    holdingsMap.set(item.nftokenId, {
+                        ...existing,
+                        ...item,
+                        video: item.video || existing.video || '',
+                        img: item.img || existing.img || ''
+                    });
+                }
             });
+            
             const allMyNFTs = Array.from(holdingsMap.values());
             container.innerHTML = '';
             if (allMyNFTs.length === 0) {
@@ -1158,6 +1170,7 @@
                     <div class="h-40 bg-black rounded-lg overflow-hidden relative flex items-center justify-center">
                         ${renderCardMedia(nft, "w-full h-full object-contain")}
                         <span class="absolute top-2 right-2 bg-obsidian-dark/85 text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">Owner</span>
+                        ${nft.video ? '<span class="absolute bottom-2 left-2 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border flex items-center gap-1">▶ IPFS Video</span>' : ''}
                     </div>
                     <div>
                         <h4 class="text-sm font-medium text-white line-clamp-1">${nft.title}</h4>

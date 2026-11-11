@@ -7,6 +7,10 @@
    Opcionales:
      ALLOWED_ORIGINS  → dominios permitidos por CORS, separados por coma (ej. https://tudominio.com)
      ADMIN_API_KEY    → habilita /api/mint-nft (deshabilitado si no existe)
+     PLATFORM_FEE_BPS → comisión de la plataforma en puntos básicos sobre cada compra del Marketplace (150 = 1.5 %, valor por defecto). 0 la desactiva. Máx. 2000
+     PLATFORM_FEE_STORE_BPS → comisión para compras de la Store (por defecto 150 = 1.5 %; 0 para no cobrar en la Store)
+     PLATFORM_FEE_BIFROST   → 'off' para no cobrar comisión a usuarios de Bifrost (por defecto 'on')
+     STORE_ADDRESSES  → cuentas cuyas ventas son de la Store, separadas por coma (por defecto MINTING_ADDRESS)
      REGISTRY_FILE    → ruta del registro del Marketplace (por defecto ./data/registry.json; en Render usa un Disk, ej. /var/data/registry.json)
    ===================================================================== */
 require('dotenv').config();
@@ -22,7 +26,12 @@ const PORT = process.env.PORT || 3000;
 const XUMM_API_KEY = process.env.XUMM_API_KEY || process.env.XUMM_APIKEY;
 const XUMM_API_SECRET = process.env.XUMM_API_SECRET || process.env.XUMM_APISECRET;
 const TREASURY_ADDRESS = process.env.TREASURY_ADDRESS;
+const MINTING_ADDRESS = process.env.MINTING_ADDRESS;
 const MINTING_SECRET = process.env.MINTING_SECRET;
+const bpsEnv = (name, def) => { const n = parseInt(process.env[name] ?? String(def), 10); return Number.isFinite(n) ? Math.min(2000, Math.max(0, n)) : def; };
+const FEE_BPS = bpsEnv('PLATFORM_FEE_BPS', 150);
+const FEE_STORE_BPS = bpsEnv('PLATFORM_FEE_STORE_BPS', 150);
+const FEE_BIFROST = String(process.env.PLATFORM_FEE_BIFROST || 'on').toLowerCase() !== 'off';
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
 const XRPL_WS = 'wss://xrplcluster.com';
 const RIPPLE_EPOCH = 946684800;
@@ -39,6 +48,14 @@ app.use(express.json({ limit: '100kb' }));
 const HEX64 = /^[0-9A-Fa-f]{64}$/;
 class HttpError extends Error { constructor(status, msg) { super(msg); this.status = status; } }
 const isAddr = a => typeof a === 'string' && xrpl.isValidClassicAddress(a);
+const STORE_ADDRESSES = (process.env.STORE_ADDRESSES || MINTING_ADDRESS || '').split(',').map(x => x.trim()).filter(isAddr);
+// comisión redondeada hacia arriba (mínimo 1 drop si el precio > 0)
+function calcFee(amountDrops, bps) {
+    const amt = BigInt(amountDrops);
+    if (!bps || amt <= 0n) return 0n;
+    const fee = (amt * BigInt(bps) + 9999n) / 10000n;
+    return fee < 1n ? 1n : fee;
+}
 
 // Convierte el precio a drops sin errores de coma flotante. Prioriza amountDrops (lo envía el front).
 function readDrops(body, { allowZero = false } = {}) {
@@ -60,10 +77,10 @@ async function withClient(fn) {
 }
 const rippledError = e => (e && e.data && e.data.error) || (e && e.error) || null;
 
-async function createPayload(txjson, instruction) {
+async function createPayload(txjson, instruction, extraOptions) {
     const created = await xumm.payload.create({
         txjson,
-        options: { expire: 5 },                       // el QR vence en 5 minutos
+        options: { expire: 5, ...(extraOptions || {}) },   // el QR vence en 5 minutos
         custom_meta: instruction ? { instruction: String(instruction).slice(0, 200) } : undefined
     });
     if (!created || !created.uuid) throw new HttpError(502, 'Xaman no pudo crear el payload.');
@@ -71,9 +88,9 @@ async function createPayload(txjson, instruction) {
 }
 // Xaman (por defecto): crea el payload y devuelve el QR.  Bifrost (wallet:'bifrost'): devuelve la transacción sin firmar
 // para que la web la envíe a la billetera por WalletConnect (xrpl_signTransaction).
-async function respondTx(req, res, txjson, instruction) {
-    if (req.body && req.body.wallet === 'bifrost') return res.json({ success: true, wallet: 'bifrost', txjson });
-    res.json({ success: true, ...(await createPayload(txjson, instruction)) });
+async function respondTx(req, res, txjson, instruction, { options, extra } = {}) {
+    if (req.body && req.body.wallet === 'bifrost') return res.json({ success: true, wallet: 'bifrost', txjson, ...(extra || {}) });
+    res.json({ success: true, ...(await createPayload(txjson, instruction, options)), ...(extra || {}) });
 }
 const wrap = handler => async (req, res) => {
     try { await handler(req, res); }
@@ -139,18 +156,20 @@ function saveRegistry() {
     }, 500);
 }
 // ¿Tiene una oferta de venta pública en XRP, vigente y hecha por su dueño actual?
+// Devuelve { seller } si hay oferta pública vigente de su dueño actual; null si no.
 async function hasPublicListing(client, id) {
     const offers = (await getSellOffers(client, id)).filter(o => (o.flags & 1) && typeof o.amount === 'string' && !o.destination && !isExpired(o.expiration));
-    if (!offers.length) return false;
+    if (!offers.length) return null;
     try {
         const info = await client.request({ command: 'nft_info', nft_id: id });
-        if (info.result.is_burned) return false;
-        return offers.some(o => o.owner === info.result.owner);
-    } catch (e) { return true; }   // si el servidor no soporta nft_info, confiar en la oferta
+        if (info.result.is_burned) return null;
+        const mine = offers.find(o => o.owner === info.result.owner);
+        return mine ? { seller: mine.owner } : null;
+    } catch (e) { return { seller: offers[0].owner }; }   // si el servidor no soporta nft_info, confiar en la oferta
 }
 app.get('/api/market-registry', (req, res) => {
     const ids = Object.entries(registry).sort((a, b) => b[1].ts - a[1].ts).slice(0, 2000)
-        .map(([nftokenId, v]) => ({ nftokenId, category: v.category || null, ts: v.ts }));
+        .map(([nftokenId, v]) => ({ nftokenId, category: v.category || null, seller: v.seller || null, ts: v.ts }));
     res.json({ success: true, ids });
 });
 app.post('/api/market-registry', rateLimit(30), wrap(async (req, res) => {
@@ -158,9 +177,14 @@ app.post('/api/market-registry', rateLimit(30), wrap(async (req, res) => {
     if (!HEX64.test(nftokenId || '')) throw new HttpError(400, 'NFTokenID inválido.');
     const id = nftokenId.toUpperCase();
     if (!registry[id] && Object.keys(registry).length >= REGISTRY_MAX) throw new HttpError(503, 'Registro lleno.');
-    const ok = await withClient(client => hasPublicListing(client, id));
+    // Los nodos públicos pueden ir 1-2 ledgers atrás: reintentar unos segundos antes de rechazar
+    let ok = null;
+    for (let i = 0; i < 4 && !ok; i++) {
+        if (i) await new Promise(r => setTimeout(r, 3000));
+        ok = await withClient(client => hasPublicListing(client, id));
+    }
     if (!ok) throw new HttpError(404, 'Este NFT no tiene una oferta de venta pública activa en XRPL.');
-    registry[id] = { category: CATEGORIES.includes(category) ? category : (registry[id] && registry[id].category) || null, ts: Date.now() };
+    registry[id] = { category: CATEGORIES.includes(category) ? category : (registry[id] && registry[id].category) || null, seller: ok.seller, ts: Date.now() };
     saveRegistry();
     res.json({ success: true });
 }));
@@ -171,7 +195,7 @@ async function pruneRegistry() {
     try {
         await withClient(async client => {
             for (const id of stale) {
-                try { if (!(await hasPublicListing(client, id))) { delete registry[id]; } else registry[id].ts = Date.now(); }
+                try { const l = await hasPublicListing(client, id); if (!l) { delete registry[id]; } else { registry[id].ts = Date.now(); registry[id].seller = l.seller; } }
                 catch (e) { /* conservar ante errores de red */ }
             }
         });
@@ -180,12 +204,16 @@ async function pruneRegistry() {
 }
 setInterval(pruneRegistry, 30 * 60 * 1000).unref();
 
+app.get('/api/fee-info', (req, res) => {
+    res.json({ success: true, bps: FEE_BPS, storeBps: FEE_STORE_BPS, bifrostApplies: FEE_BIFROST, treasury: TREASURY_ADDRESS || null, storeAddresses: STORE_ADDRESSES });
+});
 app.get('/api/wallet-info/:address', wrap(async (req, res) => {
     if (!isAddr(req.params.address)) throw new HttpError(400, 'Dirección inválida.');
     res.json({ success: true, isAdmin: !!TREASURY_ADDRESS && req.params.address === TREASURY_ADDRESS });
 }));
 
 /* ---------- Salud ---------- */
+app.get('/', (req, res) => res.json({ ok: true, service: 'aeterna-ledger-backend' }));
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 /* ---------- 1. Conectar billetera (SignIn) ---------- */
@@ -264,10 +292,41 @@ app.post('/api/buy-nft-offer', wrap(async (req, res) => {
     if (offer.Owner === buyerAccount) throw new HttpError(400, 'No puedes comprar tu propio NFT.');
     if (expectedDrops !== null && expectedDrops !== offer.Amount) throw new HttpError(409, 'El precio cambió. Actualiza la lista e inténtalo de nuevo.');
 
-    await respondTx(req, res, {
-        TransactionType: 'NFTokenAcceptOffer', Account: buyerAccount, NFTokenSellOffer: offerIndex
-    }, `Aeterna Ledger: buy NFT for ${xrpl.dropsToXrp(offer.Amount)} XRP`);
+    // Comisión de la plataforma: se cobra EN LA MISMA transacción atómica (Batch / XLS-56) que la compra.
+    const isStoreSale = STORE_ADDRESSES.includes(offer.Owner);
+    let feeDrops = calcFee(offer.Amount, isStoreSale ? FEE_STORE_BPS : FEE_BPS);
+    if (req.body.wallet === 'bifrost' && !FEE_BIFROST) feeDrops = 0n;
+    if (!isAddr(TREASURY_ADDRESS) || buyerAccount === TREASURY_ADDRESS) feeDrops = 0n;
+    const maxFee = req.body.maxFeeDrops;
+    if (feeDrops > 0n && maxFee !== undefined && /^\d+$/.test(String(maxFee)) && feeDrops > BigInt(maxFee)) throw new HttpError(409, 'La comisión cambió. Actualiza la página e inténtalo de nuevo.');
+
+    const priceXrp = xrpl.dropsToXrp(offer.Amount);
+    if (feeDrops === 0n) {
+        return respondTx(req, res, { TransactionType: 'NFTokenAcceptOffer', Account: buyerAccount, NFTokenSellOffer: offerIndex },
+            `Aeterna Ledger: buy NFT for ${priceXrp} XRP`, { extra: { feeDrops: '0', totalDrops: offer.Amount } });
+    }
+    const batch = await withClient(client => buildBuyBatch(client, buyerAccount, offerIndex, feeDrops));
+    const total = (BigInt(offer.Amount) + feeDrops).toString();
+    return respondTx(req, res, batch, `Aeterna Ledger: buy NFT ${priceXrp} XRP + ${xrpl.dropsToXrp(feeDrops.toString())} XRP fee`,
+        { options: { signer: buyerAccount }, extra: { feeDrops: feeDrops.toString(), totalDrops: total } });
 }));
+
+// Batch atómico (XLS-56, BatchV1_1): [aceptar la oferta de venta, pagar la comisión a la tesorería]. Si una falla, ninguna se aplica.
+async function buildBuyBatch(client, buyer, offerIndex, feeDrops) {
+    const acc = await client.request({ command: 'account_info', account: buyer, ledger_index: 'current' });
+    const seq = acc.result.account_data.Sequence;
+    const f = await client.request({ command: 'fee' });
+    const unit = Math.max(Number(f.result.drops.base_fee), Number(f.result.drops.open_ledger_fee || 0));
+    const INNER = 1073741824;                                  // tfInnerBatchTxn
+    return {
+        TransactionType: 'Batch', Account: buyer, Sequence: seq, Flags: 65536,   // tfAllOrNothing
+        Fee: String(Math.ceil(unit * 4 * 1.3)),                // 2×base + 2 transacciones internas (+30 % de margen)
+        RawTransactions: [
+            { RawTransaction: { TransactionType: 'NFTokenAcceptOffer', Account: buyer, NFTokenSellOffer: offerIndex, Sequence: seq + 1, Fee: '0', Flags: INNER, SigningPubKey: '' } },
+            { RawTransaction: { TransactionType: 'Payment', Account: buyer, Destination: TREASURY_ADDRESS, Amount: feeDrops.toString(), Sequence: seq + 2, Fee: '0', Flags: INNER, SigningPubKey: '' } }
+        ]
+    };
+}
 
 /* ---------- 6. PUBLICAR EN VENTA (NFTokenCreateOffer, tfSellNFToken) ---------- */
 app.post('/api/list-nft-offer', wrap(async (req, res) => {

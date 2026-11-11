@@ -135,7 +135,7 @@
             <div class="space-y-4">
                 <div class="flex items-center justify-between font-mono text-xs">
                     <span id="t-filter-store-lbl" class="text-slate-400 uppercase tracking-wider text-[11px]">Filter Category:</span>
-                    <select id="sort-select-store" onchange="renderStore()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none hover:border-obsidian-gold/40 transition">
+                    <select id="sort-select-store" onchange="state.store.page=1;renderStore()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none hover:border-obsidian-gold/40 transition">
                         <option value="newest" id="opt-store-newest">Sort: Newest First</option>
                         <option value="price-asc" id="opt-store-p-asc">Price: Low to High</option>
                         <option value="price-desc" id="opt-store-p-desc">Price: High to Low</option>
@@ -155,7 +155,8 @@
                 </div>
             </div>
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 -mb-2"><span id="status-store-text"></span><button data-action="refresh" data-target="store" class="underline hover:text-white">↻ Refresh</button></div>
-            <div id="store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
+            <div id="store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 scroll-mt-28"></div>
+            <nav id="pager-store" aria-label="Pagination"></nav>
         </section>
         <!-- VISTA 2: MARKETPLACE -->
         <section id="view-market" class="hidden space-y-6">
@@ -174,7 +175,7 @@
             <div class="space-y-4">
                 <div class="flex items-center justify-between font-mono text-xs">
                     <span id="t-filter-market-lbl" class="text-slate-400 uppercase tracking-wider text-[11px]">Market Category:</span>
-                    <select id="sort-select-market" onchange="renderMarketplace()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none hover:border-obsidian-gold/40 transition">
+                    <select id="sort-select-market" onchange="state.market.page=1;renderMarketplace()" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-3 rounded-lg outline-none hover:border-obsidian-gold/40 transition">
                         <option value="newest" id="opt-market-newest">Sort: Newest First</option>
                         <option value="price-asc" id="opt-market-p-asc">Price: Low to High</option>
                         <option value="price-desc" id="opt-market-p-desc">Price: High to Low</option>
@@ -194,7 +195,8 @@
                 </div>
             </div>
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 -mb-2"><span id="status-market-text"></span><button data-action="refresh" data-target="market" class="underline hover:text-white">↻ Refresh</button></div>
-            <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5"></div>
+            <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 scroll-mt-28"></div>
+            <nav id="pager-market" aria-label="Pagination"></nav>
         </section>
         <!-- VISTA 3: HOLDINGS -->
         <section id="view-mynfts" class="hidden space-y-6">
@@ -203,11 +205,12 @@
                 <p id="t-holdings-desc" class="text-slate-400 text-xs mt-1">Digital NFT assets on the XRP Ledger linked to your connected wallet.</p>
             </div>
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 -mb-2"><span id="status-holdings-text"></span><button data-action="refresh" data-target="holdings" class="underline hover:text-white">↻ Refresh</button></div>
-            <div id="my-nfts-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div id="my-nfts-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 scroll-mt-28">
                 <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
                     <p id="t-holdings-connect-msg" class="text-slate-400 text-sm font-mono">Connect your wallet to synchronize your acquired digital NFTs.</p>
                 </div>
             </div>
+            <nav id="pager-holdings" aria-label="Pagination"></nav>
         </section>
         <!-- VISTA 4: ABOUT -->
         <section id="view-about" class="hidden space-y-8 max-w-4xl mx-auto">
@@ -369,6 +372,11 @@
                         <span id="t-detail-price-lbl" class="text-xs text-slate-400">Price:</span>
                         <span id="detail-price" class="text-obsidian-gold font-bold text-base"></span>
                     </div>
+                    <div id="detail-fee-box" class="hidden space-y-1 text-[11px] font-mono text-slate-400 border-t border-obsidian-border/60 pt-2">
+                        <div class="flex justify-between gap-2"><span id="detail-fee-label"></span><span id="detail-fee-value"></span></div>
+                        <div class="flex justify-between gap-2 text-slate-200"><span id="t-total-lbl">Total</span><span id="detail-total" class="text-obsidian-gold font-bold"></span></div>
+                        <p id="detail-fee-note" class="text-[10px] text-slate-500 leading-snug"></p>
+                    </div>
                     <div id="detail-actions-container" class="space-y-2"></div>
                 </div>
             </div>
@@ -391,7 +399,7 @@
 
     <!-- WALLET SELECTION MODAL -->
     <div id="wallet-modal" role="dialog" aria-modal="true" aria-labelledby="t-wallet-title" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="relative w-full max-w-md bg-gradient-to-b from-obsidian-card to-obsidian-dark border border-obsidian-border rounded-2xl shadow-2xl overflow-hidden">
+        <div class="relative w-full max-w-md max-h-[92vh] overflow-y-auto bg-gradient-to-b from-obsidian-card to-obsidian-dark border border-obsidian-border rounded-2xl shadow-2xl">
             <div class="h-[3px] bg-gradient-to-r from-transparent via-obsidian-gold to-transparent"></div>
             <button onclick="closeWalletModal()" aria-label="Close" class="absolute top-4 right-4 text-slate-500 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-lg hover:bg-obsidian-border/60 transition">&times;</button>
             <div id="wallet-view-choose" class="p-6 sm:p-8 space-y-6">
@@ -401,7 +409,7 @@
                 </div>
                 <div class="space-y-3">
                     <button id="wallet-opt-xaman" data-action="wallet-choose" data-target="xaman" class="group w-full flex items-center gap-4 text-left p-4 rounded-xl border border-obsidian-border bg-obsidian-dark/60 hover:border-obsidian-gold/60 hover:bg-obsidian-gold/5 transition">
-                        <span class="w-11 h-11 rounded-xl flex items-center justify-center bg-[#087bff] text-white font-bold text-lg shadow-inner flex-shrink-0" aria-hidden="true">X</span>
+                        <img src="data:image/png;base64,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eDtNJGO8CH4qvP11p3nTy07iXNiic+fF2Maorc88JWwSeGsdw+/83K0859kd/NCjtcJ7wbY19356wkte/UkevTAhsYYQDtYu6HwMed971wY/8OMXWcmbGBUYTEeMptesbAm0shZNmwKeftGtS6rqGkhODlkBhF1NXKuA1oHu0PED33Zsa+UvSu2dB2s0f/iRAS9+/f10B75e2bsoYdny2z97C095amOrHuC8prM04lN//SDf/qqPcfHKBHsAJWzSHB/88wHf/qYHaNsWWQKlq+hO+nOiPctKthSZVjehX/SvgSchNSmdTudwFRBEFlpAbNXzFEXFU29JeOvLTyCymFiLL6350McHvPSNn+e3f/syL3rdObr9Te5I5iqhrDwnjqS89ftOxiUhhqas06gusNyq+OM/X+f5r7qPy12HtZoQ9hZ+khg+8akxL3zNOXAZnYbBBcdGMYi0y45atWK12SHRmiCejUmPELYXpgStNSuNzn77svangNgUEfALurG1ErQKTMuKW29MOb6WxHBRLX7puz424PmvPMfFSxXpiYT339njBa85x3rPL1zBsR4gfPFTckwjIXfnaYcHwI+YlB46p/mTj0x5wWvuq++jFiohkmuGex8o+OZX3Ud3A453MpxzjMoJw3Iys7LbaU4ryREiPE3KYuaaTt4mtxmTyaFuUaqQEBYmUKp2wHkGH/nkmL/6XIHReiY0dJvC/2iXF/zQ57iy4dC5oqwibXHnH/X5ltd8lvVeibVmJr4PIZJ27/vQEN+7j+VwH+JHVCL09I0UPsN2FB/6cJ8Xv/4c3WHkoPy8eVjNwxdLvvmH7uOBBypOr+U45ylDxca1whPBGstK3gICpS/pFoOZsDSzGct5K3Z5JIfuhMPuFELwWB24cNnxyp94mOHYkyaaysXy5Car+eGPXOClr/oEG31B51dX6CZtcdeHNnjpD/wuG90RSWJwLhCC4HwgTS0f/nifn/83d7LCZwl+gAuavn0KTrUBH33LsuEPP9jnO950H+NJIElMbK6qj49IE8N6t+JbXnuOe+6ZcPpohvIBEcfGpKgTSbWD51prNLEagnjWJ4MaenZS8quNpVi0Ek9VVYftA/yiPjBMHQE572k0NR/84z4vecM5Lqw7stRgrSZNDL931yN856v/J71+ic7MDDx477ErLf7HB+/jpS//NR453ydNLdYa0sTyR//rYb7jFb/J5PKnsWpEKTmD9Bk4tQRc7XhwXpF2FB+46yFe9rq/4m/uHWKMwlqN1oqPfXLEN77yHP/rowOOHEkxISDi6ZUlhfMzsLKUZTSsQcTTn44pqnIWerIWuUkQFRiWIybj/XVF7KsekFAxFRbyLooAeAIaF0C3Nf/t/T2+6sF7ecPLjvOkm3Le+4EN3vWbfwHVmDRrMl6AZ84bWivH+MM7/4Sve9Ev8ao7XshTzrb5wzvv5hf/3Z8wHo9oZJqJvplx/ncQlREbwdW2VRXo0Cdve37/Qxf5wCdKvuSL1zh11PLQhYo/vXtEOfC0ly0NYhIyDsKgDDt9nAiZtSynKYhQuIpeMesbsiRhOc8RFZiUBYNiDMkhN+fKrs2oAVWTdJtnS+m25lP3Frzshz8PmYaxZyWvaCaeqQ/bTnqc3bhX6NMstS2f/sxn+d47foFmbhgPB7QaijRpM0y+iCJ/Bpv7DHY2iMGy7pIwxTuFZG0ujxI+cFcPvIBVkGnytqZjA4pAFRQb0zklS61Zy1M0ARcCG0VRy2GbsrVmLW/G4lJwbEwm+6bcD6CA8moWPC8KIhAkblwIdZNtCKAbsYU7BLBLBu08wZfx4EW1+MwIn5xikn0JzfBRkHVCpei0m5T2DOPG7fjkFEjFtRvrFNBR6+QM464bWaInLZSJCyKWJkGJsGI8BsELbJQGL7MbDVdzS6qi/+sWJaWfhafVRoPUaAiebjGi8uFAW5f2eV5QhWSL17/CgzjCNS5lE+MV4ENAQoVIheg9AnRxTJtfgbensO48olJcchpvT8asVDZb3nfuTVjiEg3px5Z32vRZiTGaREHHAwVhLSlJ6gJ8r0qYhlnhL6WaholVwKELjOb4hlaa0koSRALjsmI4nYJKD5SF7xuC/NW62KwKxEcmlFC/4iwRpmp4keBA7++cBpc9CZc9eQuaELegvVDTlgs0WEdEqFSbnjqKzOkFXbYluXZxV763jLyemWxuFctJ7AIpgtCd+plrEmNYyaJvqCSwMS12JGSHqoCKvTbmxyhC9roq1ELcb9eMlHNy7lnht+RRWiGe61OpFl11isC1PUCKtp7S0kU8YlMS+i6dm3GvJqAk4AQ2pnX+szMhZi1PsUpiRlxMY+j6GDZN7t8Ji94dggh76F3XiiohuNh+vL9K9K73bIUHacnF2Ayl2nT1TQSubUFUNPSUjhlDEKZYNlw+b+s4q6lgtCCi2CihutbgRFjJEnIdfV2vrCgq95iPV9i3AsJua1uiD0AJohZ3HweJ+K6k5LHvMt/8nqbt76fhz0euX7fp6bME0hnhZ5QsqwEi4ESz4Zu1v9opsJXEk2sBUfQrzcRf058o0EwM7ST2SE2cMCjdTEacGkM7aR7e/oAS6qMzF6tHah+wWGgmbo+WEiUFj22HeTyDTiG0qs+Qh4uAUOkOfXsbgWxG+JaKZd2t6RJNL7RxzB600TaetvEgwiQYBm7e8QuKlTRacimwPnU77yKR4V21yb6piAPkAWoXoPB10T4sNkWlCMpGJ+yL2mnrAwrfoKWiXd1D6q+AEkqzxiD5grnCNzhW9BU0MYvvhTWmks74hlw7OjYeg1kFw0ZpZt5AK1hLFJZ4LnB3WtPzSl0DYQmJaPr7PC3lgAqQxYXU4PY4KlkRiI2rOoxR4hCV7wpuO4SvEowf0C7/kiTEzdRTc4Jh8kXIHMzXeFbVJRLiXra+X2VCY+YdrPKs2GmsXwdYryx+zi7JlRRSIwhCrxQKz0y8384sTatxVThcH1DtARgisRgvKux6ZVANhICSEVrGBNXYwxds9ockJO4RWtO/woQJgqZIzzBOv7C2ou2eUqEIrHABKwUiMGSVEZ2ZuWmENTvBEgii2HA5lcx2ULet0DRxoY08DKpZ35BZxbLVcQeR94zHh2kBJUhT7RKpSBTCbqeNiMebJUQ0KkzQbgOyo7voS+rpeRrTe8jLz6DEEZShSJ/CJH1KverDTuGLsMx5EkYAjNUKQ2Z3xyhgxYxIiDlBPzQoQjJzXa4DnST+bhoU3XLWFxqtWM0MStWURen23Z6+TwhKdo1YRCQeW6MD8897qOkJ3cLrHOv6WHeRKrttzhEGEetRKcZfoTG5m8Q/Gg/BUU3G+ZdSJme27YTfvvKFDg+TyQCAiVphwNG5VtkxI3JdIiiGPmMY8pnrEiWsJR4dz1hno7Q11bLzzdZSVcdeQrf0VP6QEzGoFixU2SY3VztjWRwpqQbOHEGXD2OqB1F+iJhWzevoWvAWFSak00+SF59CS6R1q+QU48aX4c1afb26JhcRlsJDNOghCIVaoa9OzvFdiiU9oqXi3z8oJGMQmnPhaTWpMCpm9+tVQjWHL+qkilzHRTh0gbFTB4quD+FvwcTtqVLXBOJPi2dQpbeQTP4a5dZJJx9n2n4WolKQgA5DbPl50vIzGL+BwuNVTpVH9lNIdhH+A+RhA0Ex1cv01Q1zhd/UY9oqknUVCV3fnrlOAatJSao8IoqesxRhNmJrJLCURKstvKJXHjy32bcT3itAjDxNdY1fuJbprHDJjVTpzSTF35BM/hrtLhPMKjqM0P4yxg8jruuUKr2RonE73p7eRmFcK/zAkr+fXGLaU6hV+urMHB5Ik6sxHRUtxJOw4TtzEjLFkp2S6whxw2AZ+GTmmlQJK0kk9CqB9fKxHdZuD8EAEKVQEuoMN+xSaIurZdp6FtoPMdUD2Oln2TzMRpQl6AbenqLKn0GV3RrPhl7Afkbhf448ROFP9Rp9c8sc4StSJnTUldi/iqUblvEzCZmipUuW9BQlUIilV6Wz8KRCpCxq9mujNPjHeNTdPhVgdjmbRSFiYtOuxA66xX+4I579E/QS4+XnkUzvwZYPo8IU0RneHsEnN+GSU5HWlWoO5NQJGY52dS+ZrCNAqY/S17ciMyScJqFgRV3CiCdg6Moq1ZzELddV5IuASsxCvmgt8aQqCr9XGaYzwlebMjscBSiGBcIUpfL569oi+KgAHPGPQ8kuYatDVErZ+DLK/EuvWo2qV6RUC1Z9DE21TFlynyIN3XrlH2dgnzx35RumrHARLRWCpscaJc1ZykI5lvUITdwpue4beJnlizqJo1HT6SNnGDo9836JcmUrXKmPBHxcRXklgC7X33VR8A+j7NwzWrxOYrIqVQ1DezGD9f/LdJsgQvx5i4JWc+ArwciQTnk3ib+CiGNijjNInrJA+BWrnMcwjRksaxS06hr29us8q2aIUbH9vuubVDLLFzWNZ8nEM+uKoOhWdqZua7WWjh6cr8bvPV+vqsfZFXH7yw2DR3pUj9yJTtUM4yaCkMWCjVSoUBygJKf2wfdfFX4S1ulMP0ESNkA8E3sjQ/vUrY3SO6kIx4o8gpUJSGDAGhM619DmCk1gRfdJKBEJ9HyDQmZxP9OeFVuCBMoA61UyB550WE1F6eL+u0aj0Qa3/8qeB2Dvzco/equCjYzqwYdoPPl5JCeWkcqhNut4SqE8WfUAKhQ4cwRvj2zV0B7fkC2kTN0jtKd3o2WMAOPkSYyTJ9eC3x5+6Cj88BAJ8SSukTrCSK0x79zSFd0nV5EeH4YGI2nN4YsCa7bAqtgduO5S3NX6SDwMCe1X89wmxV+cX3/wV18Xpvoyj1YO7nmcCuAeoJUyvXtCmP4l6elnkR5biTultdrE7rR6CCsjgl6lSs7UArH1Ix7LRwMWhaZRfZZ2dQ9KKoLOGKXPoEievFUXiM/RQIImsCwPkjJGlGasjjNUpzYdY/2J1y/rIU0VS4ljadOX1R3PBoNWiiO2JFMgGDZci2nIriaOWIVKVTsV3Szufrj30G/cUXY/dDc0PHy0fLwlp23Our0Cwwatp9+mjn/Ht5Pe8mz00gnRsQGmOfkIafV5KnuGUfMrOIzTbxWBxvTTpNXnQWkCGUX2dEp7ak5ZMzKgbR+pCEFT6BWG+tTcnKTJiLbux2O2JaUnqzN+RAEdM6WhIxMwDikDn21nABTiS0v/Qsd9+k9Gj7zr16ejz9wL7QkMu/upvR4ErFM4vgIXW4Cx1h6R9jOPi1rJlQpifA9DD0+K59jef4dxP8Gv72H8OpjYdliyhjfLGIZzjdf4CSlDPClgmJj2AhP3NJjg6/8tfWMuFhg8DTz1YWZMvNnxWiJaKekW6fDPLk4cVyLuNscw3tisYx2WAtiycZbaZHqJaW/T7p+ok7b/XxmxKyFbdkzDAAajWvhhvyv7gHkvNloDKbRt/Curm2MEtJ6AdxzV/7b+L5S/CjB0tdDLGnbkIAJ9jAQEepe48f83C5Bt4dj1cX1cH9fH9XF9XB/Xx/Wx5/jf1knDaHc6i7UAAAAASUVORK5CYII=" alt="Xaman" width="44" height="44" class="w-11 h-11 rounded-xl flex-shrink-0 object-cover shadow-md">
                         <span class="flex-1 min-w-0">
                             <span class="flex items-center gap-2"><span class="text-sm font-semibold text-white">Xaman</span><span id="t-wallet-rec" class="text-[9px] uppercase tracking-wider text-obsidian-gold border border-obsidian-gold/40 rounded px-1.5 py-0.5 font-mono">Recommended</span></span>
                             <span id="t-wallet-xaman-desc" class="block text-[11px] text-slate-400 mt-0.5 leading-snug">Scan a QR code with the Xaman app on your phone.</span>
@@ -409,7 +417,7 @@
                         <span class="text-slate-600 group-hover:text-obsidian-gold transition text-lg" aria-hidden="true">&rsaquo;</span>
                     </button>
                     <button id="wallet-opt-bifrost" data-action="wallet-choose" data-target="bifrost" class="group w-full flex items-center gap-4 text-left p-4 rounded-xl border border-obsidian-border bg-obsidian-dark/60 hover:border-obsidian-gold/60 hover:bg-obsidian-gold/5 transition">
-                        <span class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-teal-400 to-indigo-600 text-white font-bold text-lg shadow-inner flex-shrink-0" aria-hidden="true">B</span>
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgIDxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF8xNjE4XzEyNTgzKSI+CiAgIDxwYXRoIGQ9Ik01MTIgMEgwVjUxMkg1MTJWMFoiIGZpbGw9InVybCgjcGFpbnQwX3JhZGlhbF8xNjE4XzEyNTgzKSIvPgogICA8cGF0aCBkPSJNMTI1LjkxOCA4Ny4wMjA5QzEyMi4wMTEgODYuNzAyNiAxMTkgOTAuMDU0MSAxMTkgOTQuMjI4OFYxNTJDMTE5IDE2MS4zNTMgMTIzLjEzNyAxNzEuNTU1IDEzMi44NTIgMTc0Ljc1N0wzNjAuNzk4IDI1MS40NzlDMzY4LjA5IDI1My45MzIgMzc3LjcwOCAyNjAuNzgzIDM2OC4wNzQgMjcwLjIxNEMzNzYuNTQ3IDI2NS40OTMgMzkyIDI2MS43NTkgMzkyIDI0NS40MDZWMjAzLjE4NEMzOTIgMTgzLjE4MiAzODIuNjE3IDE3NS41NTUgMzY3LjY4NSAxNzAuMzkyTDEyNy42NDQgODcuMzkzN0MxMjcuMDU1IDg3LjE4MjggMTI2LjQ3NyA4Ny4wNjY4IDEyNS45MTcgODcuMDIwNkwxMjUuOTE4IDg3LjAyMDlaTTI1OS42MiAyMjIuNjMzTDIwMC4xMjIgMjQzLjJDMTg1LjE5MSAyNDguMzYzIDE3NS44MDcgMjU2LjAwNSAxNzUuODA3IDI3Ni4wMDhWMzE4LjIyOUMxNzUuODA3IDMzNS45ODQgMTkwLjEzNiAzNDAuNDY1IDE5OS43MzQgMzQzLjAzN0MxOTAuMSAzMzMuNjA2IDE5OS43MjIgMzI2Ljc1NyAyMDcuMDEgMzI0LjMwM0wzNjAuNTkgMjcyLjYxNUMzNjUuNDU4IDI3MC45NzYgMzY3LjQwOSAyNjcuMDQgMzY2Ljg5MyAyNjMuNTY4QzM2Ni4zIDI1OS41NzggMzYxLjU4MyAyNTYuOTU1IDM1NS45MzIgMjU1LjA1MkMzMjMuODI4IDI0NC4yNDYgMjU5LjYyIDIyMi42MzMgMjU5LjYyIDIyMi42MzNaTTMwOC4wNjMgMjk1LjkzOEMzMDguMDYzIDI5NS45MzggMjQ1LjUxNCAzMTYuOTkyIDIxNC4yMzkgMzI3LjUxOUMyMDkuODc2IDMyOC45ODYgMjA0LjEwOSAzMzEuODg3IDIwMy4zODcgMzM2LjI3NUMyMDIuOTE0IDMzOS4xNTIgMjA0LjI3OCAzNDQuNTg1IDIwOS41ODQgMzQ2LjM3MUMyNDUuNTM1IDM1OC40NjkgMzE3LjQzOCAzODIuNjY0IDMxNy40MzggMzgyLjY2NEMzMjQuNzMgMzg1LjExNyAzMzMuMDg5IDM5Mi44ODUgMzIzLjQ1NSA0MDIuMzE1QzMzMy4wNTMgMzk5Ljc0MiAzNDguNjU2IDM5NC4zNDQgMzQ4LjY1NiAzNzYuNTlWMzM0LjM1M0MzNDguNjU2IDMxNC4zNTEgMzM5LjI1NyAzMDYuNzI0IDMyNC4zMjUgMzAxLjU2MUwzMDguMDYzIDI5NS45MzhaTTIyNC4wNjQgMzU2LjYyOVY0MTIuMjQxQzIyNC4wNjQgNDE4Ljk4MiAyMzIuMzc4IDQyNS41NTMgMjM5LjczNiA0MjMuNjc0TDMxNS4zMjkgNDA0LjM2NkMzMjAuOTQ3IDQwMi45MzMgMzIxLjcyOCAzOTcuNjI1IDMyMS4yOTQgMzk1LjE1MUMzMjAuNTIzIDM5MC43NjUgMzE1LjYxNiAzODcuNDM3IDMxMS4zMTIgMzg1Ljk4OUwyMjQuMDY0IDM1Ni42MjlaIiBmaWxsPSJ3aGl0ZSIvPgogICA8L2c+CiAgIDxkZWZzPgogICA8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50MF9yYWRpYWxfMTYxOF8xMjU4MyIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSgxODAuNTQ0IDE4OC4wNzIpIHJvdGF0ZSg0My44OTcyKSBzY2FsZSgzNjYuNDMzIDM2Ni42MjIpIj4KICAgPHN0b3Agc3RvcC1jb2xvcj0iIzQzNUFFMSIgc3RvcC1vcGFjaXR5PSIwLjk5NjA3OCIvPgogICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMzMjQ3QzciLz4KICAgPC9yYWRpYWxHcmFkaWVudD4KICAgPGNsaXBQYXRoIGlkPSJjbGlwMF8xNjE4XzEyNTgzIj4KICAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIGZpbGw9IndoaXRlIi8+CiAgIDwvY2xpcFBhdGg+CiAgIDwvZGVmcz4KICAgPC9zdmc+Cg==" alt="Bifrost Wallet" width="44" height="44" class="w-11 h-11 rounded-xl flex-shrink-0 object-cover shadow-md">
                         <span class="flex-1 min-w-0">
                             <span class="flex items-center gap-2"><span class="text-sm font-semibold text-white">Bifrost Wallet</span><span class="text-[9px] uppercase tracking-wider text-slate-400 border border-obsidian-border rounded px-1.5 py-0.5 font-mono">WalletConnect</span></span>
                             <span id="t-wallet-bifrost-desc" class="block text-[11px] text-slate-400 mt-0.5 leading-snug">Connect through WalletConnect and approve in Bifrost Wallet.</span>
@@ -427,6 +435,10 @@
                 <h3 id="t-bifrost-title" class="text-base font-semibold text-white">Scan with Bifrost Wallet</h3>
                 <div id="bifrost-qr" class="bg-white p-3 rounded-xl border-2 border-obsidian-gold w-56 h-56 mx-auto flex items-center justify-center"></div>
                 <p id="bifrost-status" class="text-xs text-slate-300 font-mono min-h-[1rem]"></p>
+                <div id="bifrost-error" class="hidden text-left text-[11px] text-amber-200/90 bg-amber-950/30 border border-amber-500/25 rounded-lg p-3 space-y-3">
+                    <p id="bifrost-error-text" class="leading-relaxed"></p>
+                    <button id="bifrost-reset-btn" onclick="resetWalletConnect()" class="w-full bg-obsidian-border hover:bg-slate-800 text-slate-200 py-2 rounded-lg text-xs font-mono transition"></button>
+                </div>
                 <p id="t-bifrost-steps" class="text-[11px] text-slate-400 leading-relaxed"></p>
                 <button id="bifrost-copy-btn" onclick="copyBifrostLink()" class="hidden w-full justify-center bg-obsidian-border hover:bg-slate-800 text-slate-200 font-medium py-2.5 rounded-lg text-xs transition font-mono"></button>
             </div>
@@ -886,18 +898,21 @@
         const CONFIG = {
             BACKEND_URL: 'https://aeterna-ledger-backend.onrender.com',
             NETWORK: 'mainnet',               // 'mainnet' | 'testnet'
-            // ⚠️ Direcciones oficiales (emisor / tesorería) de Aeterna Ledger.
-            // Sus NFTs en venta aparecen en "Store"; los que ya pertenecen a otros usuarios aparecen en "Marketplace".
-            PLATFORM_ACCOUNTS: ['rGqRMMpvGvQcmPMpDZhHk2dokcUV1Tedxd', 'rati5nVaoTwSve956LREZB9r2Guq7NgqJe'],
-            // Emisores adicionales cuyos NFTs quieres descubrir automáticamente en el Marketplace.
-            TRACKED_ISSUERS: [],
+            // STORE = NFTs en venta que pertenecen a estas cuentas (tu cuenta emisora/minteo).
+            // MARKETPLACE = todos los demás NFTs en venta (de cualquier usuario y de cualquier emisor).
+            STORE_ACCOUNTS: ['rati5nVaoTwSve956LREZB9r2Guq7NgqJe'],
+            // Emisores cuyos NFTs se buscan automáticamente en el ledger para el Marketplace.
+            TRACKED_ISSUERS: ['rati5nVaoTwSve956LREZB9r2Guq7NgqJe'],
+            // Tesorería que recibe la comisión de la plataforma (solo informativo: el cobro lo define el backend).
+            TREASURY_ADDRESS: 'rGqRMMpvGvQcmPMpDZhHk2dokcUV1Tedxd',
+            ROWS_PER_PAGE: 4,                 // filas de NFTs por página (4 columnas en escritorio)
             MAX_NFTS_SCAN: 800,               // límite de NFTs revisados por lista
             CONCURRENCY: 6,                   // consultas simultáneas a XRPL
             STALE_MS: 60000,                  // tiempo antes de refrescar al cambiar de pestaña
             SIGN_TIMEOUT_MS: 5 * 60 * 1000,   // vigencia del QR en la web
             TX_TIMEOUT_MS: 60000,             // espera máxima de validación en el ledger
             BACKEND_REGISTRY: true,           // el backend nuevo guarda qué NFTs se publicaron en la web (de cualquier emisor)
-            // Bifrost usa WalletConnect. Crea un Project ID GRATIS en https://cloud.reown.com y pégalo aquí.
+            // Bifrost usa WalletConnect. Project ID de https://cloud.reown.com (no lo borres).
             WALLETCONNECT_PROJECT_ID: '11c0392b7d689794bb55c117a0475080',
             WALLETCONNECT_SDK: 'https://cdn.jsdelivr.net/npm/@walletconnect/sign-client@2.23.10/dist/index.umd.js',
             QR_LIB: 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js',
@@ -923,13 +938,14 @@
         let detailToken = 0;
         let historyShowAll = false;
         let currentTab = 'store';
-        const PLATFORM = () => new Set(CONFIG.PLATFORM_ACCOUNTS);
+        const PLATFORM = () => new Set(CONFIG.STORE_ACCOUNTS);
+        let FEE = null;                // { bps, storeBps, bifrostApplies, treasury } desde /api/fee-info
         const nftIndex = new Map();   // NFTokenID -> item (objeto compartido entre listas)
         const offerCache = new Map(); // NFTokenID -> { t, offers }
         const state = {
-            store:    { items: [], loading: false, loadedAt: 0, error: null, progress: 0, total: 0 },
-            market:   { items: [], loading: false, loadedAt: 0, error: null, progress: 0, total: 0 },
-            holdings: { items: [], loading: false, loadedAt: 0, error: null, progress: 0, total: 0 }
+            store:    { items: [], loading: false, loadedAt: 0, error: null, progress: 0, total: 0, page: 1 },
+            market:   { items: [], loading: false, loadedAt: 0, error: null, progress: 0, total: 0, page: 1 },
+            holdings: { items: [], loading: false, loadedAt: 0, error: null, progress: 0, total: 0, page: 1 }
         };
 
         /* =====================================================================
@@ -938,7 +954,7 @@
         const EXTRA_I18N = {
             en: {
                 loading: 'Reading the XRP Ledger…', updated: 'Updated', assets: 'assets', refresh: 'Refresh',
-                configMissing: 'Platform account not configured. Set CONFIG.PLATFORM_ACCOUNTS in the script.',
+                configMissing: 'Store account not configured. Set CONFIG.STORE_ACCOUNTS in the script.',
                 noStore: 'No official assets are currently for sale.', noMarket: 'No active listings for this category.',
                 noHoldings: 'No NFTs found in this wallet.', yourAsset: 'Your asset', seller: 'Seller',
                 listed: '🟡 Listed on Market', inVault: '🟢 In your wallet (not for sale)', viewSpecs: 'View details',
@@ -979,11 +995,20 @@
                 bifrostSignDesc: 'Review and approve the request in your Bifrost Wallet app.', bifrostSignWarn: 'If you cancel here, also reject the request inside the wallet.',
                 bifrostError: 'Bifrost error: {msg}', bifrostLibError: 'Could not load the WalletConnect library. Check your connection.',
                 bifrostNoXrpl: 'Your wallet did not provide an XRPL account.', connectedVia: 'Connected with {w}', waitingWallet: 'Waiting for your wallet…',
-                connectBtnLabel: 'Connect Wallet', disconnect: 'Disconnect', cancel: 'Cancel'
+                connectBtnLabel: 'Connect Wallet', disconnect: 'Disconnect', cancel: 'Cancel',
+                feeLabel: 'Platform fee ({pct}%)', totalLabel: 'Total', priceLabel: 'Price', feeNote: 'Charged atomically in the same transaction and sent to the platform treasury.',
+                feeBifrostHint: 'Your wallet may not support atomic Batch transactions yet. Try Xaman, or ask the site owner to waive the fee for Bifrost.',
+                registryFail: 'Your NFT is for sale on XRPL, but it could not be added to the public Marketplace index yet. It will retry when you reopen My NFTs.',
+                pageOf: 'Page {n} of {t}', showing: 'Showing {a}–{b} of {n}', prevPage: 'Previous page', nextPage: 'Next page', goPage: 'Go to page {n}',
+                scanToBuyFee: 'Scan to buy "{title}": {price} XRP + {fee} XRP fee = {total} XRP',
+                backendUnreachable: 'Could not reach the backend after several attempts. If it runs on a free Render plan it may still be waking up: try again in a minute.',
+                bifrostRelayError: 'WalletConnect could not publish the connection request. Check that: (1) this site address ({origin}) is listed in the allowed domains of your Reown project (cloud.reown.com), (2) the page is not opened as a local file, (3) your connection is stable. Then press the button below.',
+                bifrostFileProtocol: 'WalletConnect needs the site to be opened from http(s), not from a local file. Use your hosted address or a local server (for example Live Server).',
+                bifrostReset: 'Reset WalletConnect and retry', bifrostRelayRetry: 'The WalletConnect relay did not respond. Please try again in a few seconds.', connectionFailed: 'Connection failed'
             },
             es: {
                 loading: 'Leyendo XRP Ledger…', updated: 'Actualizado', assets: 'activos', refresh: 'Actualizar',
-                configMissing: 'Cuenta de la plataforma sin configurar. Define CONFIG.PLATFORM_ACCOUNTS en el script.',
+                configMissing: 'Cuenta de la Store sin configurar. Define CONFIG.STORE_ACCOUNTS en el script.',
                 noStore: 'No hay activos oficiales en venta por ahora.', noMarket: 'No hay publicaciones activas en esta categoría.',
                 noHoldings: 'No se encontraron NFTs en esta billetera.', yourAsset: 'Tu activo', seller: 'Vendedor',
                 listed: '🟡 En venta en el Mercado', inVault: '🟢 En tu billetera (no en venta)', viewSpecs: 'Ver detalles',
@@ -1024,7 +1049,16 @@
                 bifrostSignDesc: 'Revisa y aprueba la solicitud en tu app Bifrost Wallet.', bifrostSignWarn: 'Si cancelas aquí, rechaza también la solicitud dentro de la billetera.',
                 bifrostError: 'Error de Bifrost: {msg}', bifrostLibError: 'No se pudo cargar la librería WalletConnect. Revisa tu conexión.',
                 bifrostNoXrpl: 'Tu billetera no entregó una cuenta XRPL.', connectedVia: 'Conectado con {w}', waitingWallet: 'Esperando a tu billetera…',
-                connectBtnLabel: 'Conectar billetera', disconnect: 'Desconectar', cancel: 'Cancelar'
+                connectBtnLabel: 'Conectar billetera', disconnect: 'Desconectar', cancel: 'Cancelar',
+                feeLabel: 'Comisión de la plataforma ({pct}%)', totalLabel: 'Total', priceLabel: 'Precio', feeNote: 'Se cobra de forma atómica en la misma transacción y va a la tesorería de la plataforma.',
+                feeBifrostHint: 'Tu billetera quizá aún no soporte transacciones Batch atómicas. Prueba con Xaman o pide al dueño del sitio eximir la comisión a Bifrost.',
+                registryFail: 'Tu NFT está a la venta en XRPL, pero aún no se pudo añadir al índice público del Marketplace. Se reintentará al reabrir Mis NFTs.',
+                pageOf: 'Página {n} de {t}', showing: 'Mostrando {a}–{b} de {n}', prevPage: 'Página anterior', nextPage: 'Página siguiente', goPage: 'Ir a la página {n}',
+                scanToBuyFee: 'Escanea para comprar "{title}": {price} XRP + {fee} XRP de comisión = {total} XRP',
+                backendUnreachable: 'No se pudo contactar el backend tras varios intentos. Si está en el plan gratuito de Render puede estar despertando: inténtalo de nuevo en un minuto.',
+                bifrostRelayError: 'WalletConnect no pudo publicar la solicitud de conexión. Revisa que: (1) la dirección de este sitio ({origin}) esté en los dominios permitidos de tu proyecto Reown (cloud.reown.com), (2) la página no esté abierta como archivo local, (3) tu conexión sea estable. Luego pulsa el botón de abajo.',
+                bifrostFileProtocol: 'WalletConnect necesita que el sitio se abra desde http(s), no como archivo local. Usa tu dirección publicada o un servidor local (por ejemplo Live Server).',
+                bifrostReset: 'Reiniciar WalletConnect y reintentar', bifrostRelayRetry: 'El relay de WalletConnect no respondió. Inténtalo de nuevo en unos segundos.', connectionFailed: 'Conexión fallida'
             }
         };
         function T(key, params) {
@@ -1201,6 +1235,25 @@
             try { return normFromClio(await xrplRpc('nft_info', { nft_id: id })); }
             catch (e) { if (e.xrplError === 'objectNotFound' || e.xrplError === 'nftNotFound') return null; throw e; }
         }
+        // Resuelve un NFT SIN depender de comandos Clio: prueba nft_info y, si el servidor no lo ofrece,
+        // busca el NFT en las cuentas pista (dueño conocido, billetera conectada) y en los dueños de sus ofertas (account_nfts funciona en todo servidor).
+        async function resolveNft(id, hints = []) {
+            id = id.toUpperCase();
+            try { const info = await fetchNftInfo(id); if (info) return info; } catch (e) { /* Clio no disponible: usar alternativa */ }
+            const accounts = [...hints.filter(a => typeof a === 'string' && ADDRESS_RE.test(a))];
+            try { (await getSellOffers(id, { fresh: true })).filter(o => o.flags & 1).forEach(o => accounts.push(o.owner)); } catch (e) {}
+            for (const acct of [...new Set(accounts)]) {
+                const list = await fetchAccountNfts(acct).catch(() => []);
+                const f = list.find(n => String(n.nftokenId).toUpperCase() === id);
+                if (f) return f;
+            }
+            return null;
+        }
+        async function currentOwner(id) {
+            const prev = nftIndex.get(id.toUpperCase());
+            const info = await resolveNft(id, [connectedAccount, prev && prev.owner]);
+            return info && info.owner;
+        }
         async function getSellOffers(id, { fresh = false } = {}) {
             const c = offerCache.get(id);
             if (!fresh && c && Date.now() - c.t < 30000) return c.offers;
@@ -1338,13 +1391,26 @@
            ===================================================================== */
         class FlowError extends Error { constructor(code, msg) { super(msg || code); this.code = code; } }
 
-        async function backendFetch(path, { method = 'GET', body, timeout = 60000 } = {}) {
-            const wake = setTimeout(() => showToast(T('backendWaking'), 'info'), 6000);
-            try {
-                const res = await fetchT(BACKEND_URL + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }, timeout);
-                let data = {}; try { data = await res.json(); } catch (e) {}
-                return { res, data };
-            } finally { clearTimeout(wake); }
+        // Llamadas al backend con reintentos: un backend en plan gratuito de Render "duerme" y su primera respuesta
+        // llega sin cabeceras CORS (el navegador la reporta como "Failed to fetch"). Se reintenta mientras despierta.
+        const BACKEND_RETRY_MS = [3000, 5000, 8000, 12000];
+        async function backendFetch(path, { method = 'GET', body, timeout = 45000, retry = true } = {}) {
+            let lastErr = null, warned = false;
+            const tries = retry ? BACKEND_RETRY_MS.length : 0;
+            for (let attempt = 0; attempt <= tries; attempt++) {
+                try {
+                    const res = await fetchT(BACKEND_URL + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }, timeout);
+                    if ([502, 503, 504].includes(res.status) && attempt < tries) throw new Error('gateway ' + res.status);
+                    let data = {}; try { data = await res.json(); } catch (e) {}
+                    return { res, data };
+                } catch (e) {
+                    lastErr = e;
+                    if (attempt >= tries) break;
+                    if (!warned) { warned = true; showToast(T('backendWaking'), 'info'); }
+                    await sleep(BACKEND_RETRY_MS[attempt]);
+                }
+            }
+            throw lastErr;
         }
 
         function signWithXaman({ endpoint, body, description }) {
@@ -1379,7 +1445,7 @@
                         } catch (e) { if (++failures > 12) { closeModal(false); finish(reject, new FlowError('backend', 'status polling failed')); } }
                         finally { polling = false; }
                     }, 2500);
-                } catch (e) { finish(reject, new FlowError('backend', e.message === 'timeout' ? 'timeout (el backend tardó demasiado en responder)' : e.message)); }
+                } catch (e) { finish(reject, new FlowError('backend', (e instanceof TypeError || /fetch|timeout|gateway/i.test(e.message || '')) ? T('backendUnreachable') : e.message)); }
             });
         }
         function showXamanModal(qrCodeUrl, deepLinkUrl, descriptionText) {
@@ -1478,6 +1544,7 @@
         }
         function placeItem(it) {
             const isPlatform = PLATFORM().has(it.owner);
+            if (it.listing && !it.burned && connectedAccount && it.listing.owner === connectedAccount) registerListing(it.nftokenId, it.category && it.category !== UNCAT ? it.category : undefined);
             upsert(state.store.items, it, !it.burned && isPlatform && !!it.listing);
             upsert(state.market.items, it, !it.burned && !isPlatform && !!it.listing);
             upsert(state.holdings.items, it, !it.burned && !!connectedAccount && it.owner === connectedAccount);
@@ -1486,9 +1553,10 @@
         async function refreshNft(id) {
             id = id.toUpperCase();
             offerCache.delete(id);
+            const prev = nftIndex.get(id);
             let info = null;
-            try { info = await fetchNftInfo(id); } catch (e) { console.warn('[nft_info]', e); }
-            const it = makeItem(info || nftIndex.get(id) || { nftokenId: id });
+            try { info = await resolveNft(id, [prev && prev.owner, connectedAccount]); } catch (e) { console.warn('[resolve]', e); }
+            const it = makeItem(info || prev || { nftokenId: id });
             if (it.burned) { placeItem(it); return it; }
             await enrichOffers(it, { fresh: true });
             await loadMetadata(it);
@@ -1507,8 +1575,8 @@
             s.loading = true; s.error = null; s.items = []; s.progress = 0;
             renderStore();
             try {
-                if (!CONFIG.PLATFORM_ACCOUNTS.length) { s.error = 'config'; return; }
-                const lists = await Promise.all(CONFIG.PLATFORM_ACCOUNTS.map(fetchAccountNfts));
+                if (!CONFIG.STORE_ACCOUNTS.length) { s.error = 'config'; return; }
+                const lists = await Promise.all(CONFIG.STORE_ACCOUNTS.map(fetchAccountNfts));
                 const items = lists.flat().slice(0, CONFIG.MAX_NFTS_SCAN).map(makeItem);
                 s.total = items.length;
                 await pool(items, async it => {
@@ -1526,18 +1594,41 @@
             try {
                 const platform = PLATFORM();
                 const candidates = new Map();
-                const issuers = [...new Set([...CONFIG.PLATFORM_ACCOUNTS, ...CONFIG.TRACKED_ISSUERS])];
+                const issuers = [...new Set([...CONFIG.STORE_ACCOUNTS, ...CONFIG.TRACKED_ISSUERS])];
                 let issuerFailed = false;
                 for (const issuer of issuers) {
                     try { (await fetchNftsByIssuer(issuer)).forEach(n => candidates.set(n.nftokenId.toUpperCase(), n)); }
                     catch (e) { console.warn('[nfts_by_issuer]', e); issuerFailed = true; }
                 }
-                const regIds = Object.keys(Registry.all());
+                // Registro: NFTs publicados desde la web (este navegador + backend). Cada entrada puede traer el vendedor.
+                const reg = new Map();
+                for (const [id, v] of Object.entries(Registry.all())) reg.set(id.toUpperCase(), { seller: v && v.seller });
                 if (CONFIG.BACKEND_REGISTRY) {
-                    try { const { res, data } = await backendFetch('/api/market-registry'); if (res.ok && Array.isArray(data.ids)) data.ids.forEach(e => { if (e && NFTID_RE.test(e.nftokenId)) { regIds.push(e.nftokenId); if (e.category) Registry.add(e.nftokenId, { category: e.category }); } }); } catch (e) {}
+                    try {
+                        const { res, data } = await backendFetch('/api/market-registry');
+                        if (res.ok && Array.isArray(data.ids)) data.ids.forEach(e => {
+                            if (!e || !NFTID_RE.test(e.nftokenId)) return;
+                            const id = e.nftokenId.toUpperCase();
+                            reg.set(id, { seller: e.seller || (reg.get(id) && reg.get(id).seller) });
+                            if (e.category) Registry.add(id, { category: e.category });
+                        });
+                    } catch (e) { /* backend sin registro: se usan solo emisores y registro local */ }
                 }
-                const missing = [...new Set(regIds.map(x => x.toUpperCase()))].filter(id => !candidates.has(id));
-                await pool(missing, async id => { const info = await fetchNftInfo(id); if (info) candidates.set(id, info); });
+                const missing = [...reg.keys()].filter(id => !candidates.has(id));
+                // 1) con vendedor conocido: una sola consulta account_nfts por vendedor (funciona en cualquier servidor XRPL)
+                const bySeller = new Map(), unknown = [];
+                for (const id of missing) {
+                    const sl = reg.get(id).seller;
+                    if (sl && ADDRESS_RE.test(sl)) { if (!bySeller.has(sl)) bySeller.set(sl, new Set()); bySeller.get(sl).add(id); } else unknown.push(id);
+                }
+                await pool([...bySeller.keys()], async seller => {
+                    const wanted = bySeller.get(seller);
+                    const list = await fetchAccountNfts(seller).catch(() => []);
+                    for (const n of list) { const id = String(n.nftokenId).toUpperCase(); if (wanted.has(id)) { candidates.set(id, n); wanted.delete(id); } }
+                    wanted.forEach(id => unknown.push(id));   // ya no lo tiene ese vendedor (vendido/transferido): resolver por otro camino
+                });
+                // 2) el resto: nft_info si existe; si no, por los dueños de sus ofertas
+                await pool(unknown, async id => { const info = await resolveNft(id); if (info) candidates.set(id, info); });
                 const items = [...candidates.values()].filter(n => !n.burned && !platform.has(n.owner)).slice(0, CONFIG.MAX_NFTS_SCAN).map(makeItem);
                 s.total = items.length;
                 await pool(items, async it => {
@@ -1562,7 +1653,7 @@
                 await pool(items, async it => {
                     await enrichOffers(it, { fresh: force }); await loadMetadata(it);
                     // Autorreparación del registro del Marketplace: mis ofertas activas verificadas en el ledger
-                    if (it.listing && it.listing.owner === acct && !reportedListings.has(it.nftokenId)) { reportedListings.add(it.nftokenId); registerListing(it.nftokenId, it.category && it.category !== UNCAT ? it.category : undefined); }
+                    if (it.listing && it.listing.owner === acct) registerListing(it.nftokenId, it.category && it.category !== UNCAT ? it.category : undefined);
                 },
                     CONFIG.CONCURRENCY, () => { s.progress++; scheduleRender(); });
             } catch (e) { console.warn('[holdings]', e); s.error = 'rpc'; }
@@ -1584,6 +1675,28 @@
             return false;
         }
 
+        // Comisión de la plataforma (misma fórmula que el backend: hacia arriba, mínimo 1 drop)
+        function feeBpsFor(it) {
+            if (!FEE || !it) return 0;
+            let bps = CONFIG.STORE_ACCOUNTS.includes(it.owner) ? FEE.storeBps : FEE.bps;
+            if (walletType === 'bifrost' && FEE.bifrostApplies === false) bps = 0;
+            if (connectedAccount && FEE.treasury && connectedAccount === FEE.treasury) bps = 0;
+            return bps || 0;
+        }
+        function feeDropsFor(it) {
+            if (!it || !it.listing) return 0n;
+            const bps = feeBpsFor(it); const amt = BigInt(it.listing.drops);
+            if (!bps || amt <= 0n) return 0n;
+            const f = (amt * BigInt(bps) + 9999n) / 10000n;
+            return f < 1n ? 1n : f;
+        }
+        async function loadFeeInfo() {
+            try {
+                const { res, data } = await backendFetch('/api/fee-info');
+                if (res.ok && data.success) { FEE = data; if (currentActiveDetailNft) renderDetails(currentActiveDetailNft); renderAll(); }
+            } catch (e) { /* sin datos de comisión: el backend la aplica igualmente */ }
+        }
+
         // COMPRA — NFTokenAcceptOffer sobre la oferta REAL y vigente del ledger
         async function buyNft(id) {
             if (!requireWallet()) return;
@@ -1594,15 +1707,22 @@
                 const l = it.listing;
                 if (!l) { showToast(T('offerGone'), 'warning'); return; }
                 if (l.owner === connectedAccount) { showToast(T('ownOffer'), 'warning'); return; }
+                const feeDrops = feeDropsFor(it);
+                const description = feeDrops > 0n
+                    ? T('scanToBuyFee', { title: it.title, price: l.xrp, fee: dropsToXrp(feeDrops.toString()), total: dropsToXrp((BigInt(l.drops) + feeDrops).toString()) })
+                    : T('scanToBuy', { title: it.title, price: l.xrp });
                 const signed = await signTx({
                     endpoint: '/api/buy-nft-offer',
-                    body: { buyerAccount: connectedAccount, nftokenId: id, priceXRP: l.xrp, amountDrops: l.drops, ownerAccount: l.owner, offerIndex: l.index, sellOfferIndex: l.index },
-                    description: T('scanToBuy', { title: it.title, price: l.xrp })
+                    body: { buyerAccount: connectedAccount, nftokenId: id, priceXRP: l.xrp, amountDrops: l.drops, ownerAccount: l.owner, offerIndex: l.index, sellOfferIndex: l.index, ...(FEE ? { maxFeeDrops: feeDrops.toString() } : {}) },
+                    description
                 });
-                const out = await confirmOnLedger(signed, async () => { const i = await fetchNftInfo(id); return i && i.owner === connectedAccount; });
+                const out = await confirmOnLedger(signed, async () => (await currentOwner(id)) === connectedAccount);
                 outcomeToast(out, T('buyOk', { title: it.title }));
                 await refreshNft(id); refreshBalance();
-            } catch (e) { reportError(e); }
+            } catch (e) {
+                reportError(e);
+                if (walletType === 'bifrost' && e && e.code === 'bifrost' && feeBpsFor(nftIndex.get(id)) > 0) showToast(T('feeBifrostHint'), 'warning');
+            }
         }
 
         // CANCELACIÓN — NFTokenCancelOffer con el índice REAL de la oferta (nft_offer_index), nunca el NFTokenID
@@ -1675,7 +1795,7 @@
                 });
                 if (signed.account && signed.account !== connectedAccount) return showToast(T('wrongAccount'), 'error');
                 const out = await confirmOnLedger(signed, async () => (await getSellOffers(id, { fresh: true })).some(o => o.owner === connectedAccount && (o.flags & 1)));
-                if (out.ok) { Registry.add(id, { category }); registerListing(id, category); it.category = category; }
+                Registry.add(id, { category, seller: connectedAccount }); it.category = category;   // el registro público se envía desde placeItem (verdad = ledger)
                 outcomeToast(out, T('listOk', { title: it.title, price: priceXRP }));
                 await refreshNft(id);
             } catch (e) { reportError(e); }
@@ -1723,11 +1843,19 @@
         const WALLET_LABEL = { xaman: 'Xaman', bifrost: 'Bifrost' };
         const WC_CHAIN = CONFIG.NETWORK === 'mainnet' ? 'xrpl:0' : 'xrpl:1';
         const wc = { client: null, session: null, loading: null, cancelConnect: null, cancelSign: null, uri: '' };
-        const reportedListings = new Set();
 
-        function registerListing(id, category) {
-            if (!CONFIG.BACKEND_REGISTRY) return;
-            backendFetch('/api/market-registry', { method: 'POST', body: { nftokenId: id, category } }).catch(() => {});
+        // Registro público del Marketplace: se reintenta solo (los nodos públicos pueden ir 1-2 ledgers atrás)
+        const registeredIds = new Set(), pendingReg = new Set();
+        function registerListing(id, category, attempt = 0) {
+            if (!CONFIG.BACKEND_REGISTRY || registeredIds.has(id) || (attempt === 0 && pendingReg.has(id))) return;
+            pendingReg.add(id);
+            backendFetch('/api/market-registry', { method: 'POST', body: { nftokenId: id, category } })
+                .then(({ res }) => { if (!res.ok) throw new Error('http ' + res.status); registeredIds.add(id); pendingReg.delete(id); })
+                .catch(() => {
+                    const delays = [6000, 20000, 60000];
+                    if (attempt < delays.length) setTimeout(() => registerListing(id, category, attempt + 1), delays[attempt]);
+                    else { pendingReg.delete(id); showToast(T('registryFail'), 'warning'); }
+                });
         }
         function loadScript(src) {
             return new Promise((resolve, reject) => {
@@ -1810,15 +1938,37 @@
             const a = session && session.namespaces && session.namespaces.xrpl && session.namespaces.xrpl.accounts && session.namespaces.xrpl.accounts[0];
             return a ? a.split(':').slice(2).join(':') : null;
         }
+        const isRelayError = e => /publish|relay|origin|unauthori|not allowed|project id|pairing|expired/i.test((e && e.message) || '');
+        async function wcConnectWithRetry(client) {
+            let last;
+            for (let i = 0; i < 3; i++) {
+                try { return await client.connect({ requiredNamespaces: { xrpl: { chains: [WC_CHAIN], methods: ['xrpl_signTransaction'], events: [] } } }); }
+                catch (e) { last = e; if (!isRelayError(e)) throw e; await sleep(1500 * (i + 1)); }
+            }
+            throw last;
+        }
+        // Limpia sesiones/emparejamientos guardados por WalletConnect (evita errores por estado viejo) y recarga la página
+        function resetWalletConnect() {
+            try { Object.keys(localStorage).filter(k => k.startsWith('wc@2') || k.startsWith('WALLETCONNECT') || k === 'aeterna_wc_topic').forEach(k => localStorage.removeItem(k)); } catch (e) {}
+            try { indexedDB.deleteDatabase('WALLET_CONNECT_V2_INDEXED_DB'); } catch (e) {}
+            setTimeout(() => location.reload(), 300);
+        }
+        function showBifrostError(msg) {
+            document.getElementById('bifrost-qr').innerHTML = '';
+            document.getElementById('bifrost-status').textContent = T('connectionFailed');
+            document.getElementById('bifrost-error-text').textContent = msg;
+            show('bifrost-error', true, false);
+        }
         async function connectBifrost() {
             showWalletView('bifrost');
             const qrBox = document.getElementById('bifrost-qr'), status = document.getElementById('bifrost-status');
             qrBox.innerHTML = '<div class="spinner"></div>'; status.textContent = T('bifrostLoading');
-            show('bifrost-copy-btn', false, false);
+            show('bifrost-copy-btn', false, false); show('bifrost-error', false, false);
+            if (location.protocol === 'file:') return showBifrostError(T('bifrostFileProtocol'));
             try {
                 const client = await getWcClient();
                 await loadScript(CONFIG.QR_LIB);
-                const { uri, approval } = await client.connect({ requiredNamespaces: { xrpl: { chains: [WC_CHAIN], methods: ['xrpl_signTransaction'], events: [] } } });
+                const { uri, approval } = await wcConnectWithRetry(client);
                 wc.uri = uri;
                 const qr = window.qrcode(0, 'M'); qr.addData(uri); qr.make();
                 qrBox.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true });
@@ -1840,6 +1990,7 @@
             } catch (e) {
                 wc.cancelConnect = null;
                 if (e && e.code === 'cancelled') return;
+                if (isRelayError(e)) return showBifrostError(T('bifrostRelayError', { origin: location.origin }));
                 showWalletView('choose');
                 if (e && e.code === 'bifrost') showToast(T('bifrostError', { msg: e.message }), 'error');
                 else if (e && e.code === 5000) showToast(T('rejected'), 'warning');
@@ -1866,16 +2017,16 @@
             const cancelP = new Promise((_, rej) => { wc.cancelSign = () => rej(new FlowError('cancelled')); });
             const timeoutP = new Promise((_, rej) => setTimeout(() => rej(new FlowError('timeout')), CONFIG.SIGN_TIMEOUT_MS));
             try {
-                const result = await Promise.race([
-                    client.request({ topic: session.topic, chainId: WC_CHAIN, request: { method: 'xrpl_signTransaction', params: { tx_json: txjson, autofill: true, submit: true } } }),
-                    cancelP, timeoutP
-                ]);
+                const send = () => client.request({ topic: session.topic, chainId: WC_CHAIN, request: { method: 'xrpl_signTransaction', params: { tx_json: txjson, autofill: true, submit: true } } });
+                // Si el relay falla al PUBLICAR la solicitud, la billetera nunca la recibió: es seguro reintentar una vez
+                const sendRetry = send().catch(async e => { if (/publish/i.test((e && e.message) || '')) { await sleep(1500); return send(); } throw e; });
+                const result = await Promise.race([sendRetry, cancelP, timeoutP]);
                 const txj = (result && result.tx_json) || result || {};
                 return { account: connectedAccount, txHash: txj.hash || (result && result.hash) || null, response: result };
             } catch (e) {
                 if (e instanceof FlowError) throw e;
                 if (e && (e.code === 5000 || /reject|denied|cancel/i.test(e.message || ''))) throw new FlowError('rejected');
-                throw new FlowError('bifrost', (e && e.message) || String(e));
+                throw new FlowError('bifrost', isRelayError(e) ? T('bifrostRelayRetry') : ((e && e.message) || String(e)));
             } finally { wc.cancelSign = null; show('bifrost-sign-modal', false); }
         }
         function cancelBifrostSign() { if (wc.cancelSign) wc.cancelSign(); }
@@ -1966,6 +2117,7 @@
         function filterCategory(catName, targetSection, btnEl) {
             btnEl.parentElement.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
             btnEl.classList.add('active');
+            state[targetSection].page = 1;
             if (targetSection === 'store') { activeFilterStore = catName; renderStore(); }
             else { activeFilterMarket = catName; renderMarketplace(); }
         }
@@ -1977,6 +2129,49 @@
             else if (sortVal === 'name-asc') items.sort((a, b) => a.title.localeCompare(b.title));
             else items.sort((a, b) => (b.serial || 0) - (a.serial || 0));
             return items;
+        }
+        // ----- Paginación: filas por página × columnas visibles (1 / 2 / 3 / 4 según el ancho, igual que la cuadrícula) -----
+        function gridCols() { const w = window.innerWidth; return w >= 1024 ? 4 : w >= 768 ? 3 : w >= 640 ? 2 : 1; }
+        function pageSize() { return gridCols() * CONFIG.ROWS_PER_PAGE; }
+        const GRID_IDS = { store: 'store-grid', market: 'market-grid', holdings: 'my-nfts-grid' };
+        function paginate(sec, items) {
+            const size = pageSize(), s = state[sec];
+            const pages = Math.max(1, Math.ceil(items.length / size));
+            s.page = Math.min(Math.max(1, s.page), pages);
+            const start = (s.page - 1) * size;
+            return items.slice(start, start + size);
+        }
+        function renderPager(sec, total) {
+            const nav = document.getElementById(`pager-${sec}`);
+            if (!nav) return;
+            const size = pageSize(), pages = Math.ceil(total / size), cur = state[sec].page;
+            if (pages <= 1) { nav.innerHTML = ''; return; }
+            const btn = (label, page, { active = false, disabled = false, aria = '' } = {}) =>
+                `<button data-action="page" data-target="${sec}" data-id="${page}" ${disabled ? 'disabled' : ''} ${active ? 'aria-current="page"' : ''} aria-label="${esc(aria || label)}"
+                    class="min-w-[2.25rem] h-9 px-2.5 rounded-lg text-xs font-mono border transition ${active ? 'bg-obsidian-gold text-black border-obsidian-gold font-bold' : 'bg-obsidian-card text-slate-300 border-obsidian-border hover:border-obsidian-gold/50 hover:text-white'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}">${label}</button>`;
+            const set = new Set([1, pages, cur - 1, cur, cur + 1]);
+            if (pages <= 7) for (let i = 1; i <= pages; i++) set.add(i);
+            const list = [...set].filter(n => n >= 1 && n <= pages).sort((a, b) => a - b);
+            let html = btn('‹', cur - 1, { disabled: cur === 1, aria: T('prevPage') });
+            let prev = 0;
+            for (const n of list) {
+                if (n - prev > 1) html += `<span class="px-1 text-slate-600 select-none" aria-hidden="true">…</span>`;
+                html += btn(n, n, { active: n === cur, aria: T('goPage', { n }) });
+                prev = n;
+            }
+            html += btn('›', cur + 1, { disabled: cur === pages, aria: T('nextPage') });
+            const a = (cur - 1) * size + 1, b = Math.min(total, cur * size);
+            nav.innerHTML = `<div class="flex flex-col items-center gap-3 pt-8">
+                <p class="text-[11px] font-mono text-slate-500">${esc(T('showing', { a, b, n: total }))} · ${esc(T('pageOf', { n: cur, t: pages }))}</p>
+                <div class="flex items-center justify-center gap-1.5 flex-wrap">${html}</div></div>`;
+        }
+        function goToPage(sec, which) {
+            const s = state[sec];
+            s.page = which === 'prev' ? s.page - 1 : which === 'next' ? s.page + 1 : parseInt(which, 10) || 1;
+            if (sec === 'store') renderStore(); else if (sec === 'market') renderMarketplace(); else renderMyHoldings();
+            const g = document.getElementById(GRID_IDS[sec]);
+            const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (g && g.scrollIntoView) g.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
         }
         function updateStatus(sec) {
             const s = state[sec], el = document.getElementById(`status-${sec}-text`);
@@ -2012,7 +2207,8 @@
             div.innerHTML = `<div>${cardTop(nft)}<div class="p-4 space-y-1.5"><h4 class="text-sm font-medium text-white line-clamp-1">${esc(nft.title)}</h4>${sub}</div></div>
                 <div class="p-4 pt-0 flex justify-between items-center border-t border-obsidian-border/60 mt-2">
                     <div><span class="text-[9px] text-slate-500 uppercase block">${esc(t.detailsPriceLbl)}</span>
-                    <span class="text-obsidian-gold font-mono font-bold text-xs">${esc(nft.listing.xrp)} XRP</span></div>
+                    <span class="text-obsidian-gold font-mono font-bold text-xs">${esc(nft.listing.xrp)} XRP</span>
+                    ${!mine && feeBpsFor(nft) > 0 ? `<span class="block text-[9px] text-slate-500 font-mono">+ ${esc(String(feeBpsFor(nft) / 100))}% fee</span>` : ''}</div>
                     <div class="flex gap-1.5"><button data-action="details" data-id="${id}" class="bg-obsidian-border hover:bg-slate-800 text-slate-300 font-medium px-2.5 py-1.5 rounded-lg text-[11px] transition">${esc(t.detailsBtn)}</button>${action}</div>
                 </div>`;
             return div;
@@ -2028,9 +2224,11 @@
             if (!items.length) {
                 if (s.loading) container.innerHTML = `<div class="col-span-full flex justify-center py-12"><div class="spinner"></div></div>`;
                 else container.innerHTML = emptyBox(s.error === 'config' ? T('configMissing') : s.error === 'rpc' ? T('rpcDown') : T(emptyMsgKey));
+                renderPager(sec, 0);
                 return;
             }
-            items.forEach(n => container.appendChild(listingCard(n, sec)));
+            paginate(sec, items).forEach(n => container.appendChild(listingCard(n, sec)));
+            renderPager(sec, items.length);
         }
         function renderStore() { renderListSection('store', 'store-grid', activeFilterStore, 'sort-select-store', 'noStore'); }
         function renderMarketplace() { renderListSection('market', 'market-grid', activeFilterMarket, 'sort-select-market', 'noMarket'); }
@@ -2044,9 +2242,10 @@
             container.innerHTML = '';
             if (!s.items.length) {
                 container.innerHTML = s.loading ? `<div class="col-span-full flex justify-center py-12"><div class="spinner"></div></div>` : emptyBox(s.error === 'rpc' ? T('rpcDown') : T('noHoldings'));
+                renderPager('holdings', 0);
                 return;
             }
-            s.items.forEach(nft => {
+            paginate('holdings', s.items).forEach(nft => {
                 const id = esc(nft.nftokenId);
                 const listed = nft.myOffers && nft.myOffers.length;
                 const div = document.createElement('div');
@@ -2068,6 +2267,7 @@
                     </div>`;
                 container.appendChild(div);
             });
+            renderPager('holdings', s.items.length);
         }
 
         /* =====================================================================
@@ -2107,6 +2307,15 @@
             document.getElementById('detail-title').textContent = nft.title;
             document.getElementById('detail-category-tag').textContent = catLabel(nft);
             document.getElementById('detail-price').textContent = nft.listing ? `${nft.listing.xrp} XRP` : '—';
+            const feeBox = document.getElementById('detail-fee-box');
+            const fd = nft.listing && connectedAccount !== nft.owner ? feeDropsFor(nft) : 0n;
+            if (fd > 0n) {
+                document.getElementById('detail-fee-label').textContent = T('feeLabel', { pct: String(feeBpsFor(nft) / 100) });
+                document.getElementById('detail-fee-value').textContent = `${dropsToXrp(fd.toString())} XRP`;
+                document.getElementById('detail-total').textContent = `${dropsToXrp((BigInt(nft.listing.drops) + fd).toString())} XRP`;
+                document.getElementById('detail-fee-note').textContent = T('feeNote');
+                feeBox.classList.remove('hidden');
+            } else feeBox.classList.add('hidden');
             const descBox = document.getElementById('detail-desc-box');
             if (nft.desc && nft.desc.trim()) { document.getElementById('detail-desc').textContent = nft.desc; descBox.classList.remove('hidden'); } else descBox.classList.add('hidden');
             const key = `${nft.img}|${nft.video}|${nft.metaLoaded}`;
@@ -2234,7 +2443,7 @@
             // Datos frescos del ledger: emisor, propietario actual, oferta vigente
             (async () => {
                 try {
-                    const info = await fetchNftInfo(id);
+                    const info = await resolveNft(id, [nft.owner, connectedAccount]).catch(() => null);
                     if (info) makeItem(info);
                     await enrichOffers(nft, { fresh: true });
                     await loadMetadata(nft);
@@ -2289,12 +2498,12 @@
             const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
             set('t-list-select-lbl', T('selectNft')); set('t-list-cat-lbl', T('category'));
             set('t-transfer-title', '🔄 ' + T('transferTitle')); set('t-transfer-note', T('transferNote')); set('btn-submit-transfer', T('signTransfer'));
-            set('t-offer-id-lbl', T('offerId'));
+            set('t-offer-id-lbl', T('offerId')); set('t-total-lbl', T('totalLabel'));
             set('t-wallet-title', T('walletTitle')); set('t-wallet-sub', T('walletSubtitle')); set('t-wallet-xaman-desc', T('walletXamanDesc'));
             set('t-wallet-bifrost-desc', T('walletBifrostDesc')); set('t-wallet-rec', T('walletRecommended')); set('t-wallet-foot', T('walletNonCustodial'));
             set('wallet-bifrost-note', T('walletNotConfigured')); set('t-bifrost-title', T('bifrostScanTitle')); set('t-bifrost-steps', T('bifrostSteps'));
             set('bifrost-copy-btn', T('bifrostCopy')); set('t-bifrost-back', T('walletBack')); set('t-bsign-title', T('bifrostSignTitle'));
-            set('t-bsign-warn', T('bifrostSignWarn')); set('t-bsign-cancel', T('cancel'));
+            set('t-bsign-warn', T('bifrostSignWarn')); set('bifrost-reset-btn', T('bifrostReset')); set('t-bsign-cancel', T('cancel'));
             document.querySelectorAll('[data-action="refresh"]').forEach(b => b.textContent = '↻ ' + T('refresh'));
             const ti = document.getElementById('detail-history-toggle'); if (ti && lastHistory) renderHistory(lastHistory.events, lastHistory.ok);
         }
@@ -2317,6 +2526,7 @@
                 case 'copy': copyToClipboard(document.getElementById(target).textContent); break;
                 case 'toggle-history': toggleHistoryMode(); break;
                 case 'wallet-choose': chooseWallet(target); break;
+                case 'page': goToPage(target, id); break;
             }
         });
         document.addEventListener('keydown', e => {
@@ -2329,6 +2539,17 @@
             const map = { store: state.store, market: state.market, mynfts: state.holdings };
             const s = map[currentTab];
             if (s && s.loadedAt && Date.now() - s.loadedAt > 120000) refreshSection(currentTab === 'mynfts' ? 'holdings' : currentTab);
+        });
+        // Al cambiar el tamaño de la ventana cambia el nº de columnas: se conserva el primer NFT visible
+        let lastPageSize = pageSize(), resizeTimer = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const ns = pageSize();
+                if (ns === lastPageSize) return;
+                for (const sec of ['store', 'market', 'holdings']) { const first = (state[sec].page - 1) * lastPageSize; state[sec].page = Math.floor(first / ns) + 1; }
+                lastPageSize = ns; renderAll();
+            }, 150);
         });
         window.addEventListener('DOMContentLoaded', async () => {
             const savedLang = localStorage.getItem('aeterna_lang') || 'en';
@@ -2343,7 +2564,10 @@
                 updateWalletUI(savedAccount);
                 refreshBalance();
             }
+            // Despierta el backend (Render free) sin errores CORS visibles: modo no-cors, la respuesta se ignora
+            try { fetch(BACKEND_URL + '/health', { mode: 'no-cors' }).catch(() => {}); } catch (e) {}
             loadStore(true);
+            loadFeeInfo();
         });
 
     </script>

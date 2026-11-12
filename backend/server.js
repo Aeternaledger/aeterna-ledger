@@ -10,6 +10,8 @@
      PLATFORM_FEE_BPS → comisión de la plataforma en puntos básicos sobre cada compra del Marketplace (150 = 1.5 %, valor por defecto). 0 la desactiva. Máx. 2000
      PLATFORM_FEE_STORE_BPS → comisión para compras de la Store (por defecto 150 = 1.5 %; 0 para no cobrar en la Store)
      PLATFORM_FEE_BIFROST   → 'off' para no cobrar comisión a usuarios de Bifrost (por defecto 'on')
+     ADMIN_ADDRESSES  → cuentas con permisos de administrador en la web, separadas por coma (por defecto MINTING_ADDRESS y TREASURY_ADDRESS)
+     MEDIA_OVERRIDES_FILE / TRANSFERS_FILE → rutas de los archivos de datos (por defecto ./data/*.json; en Render usa un Disk)
      STORE_ADDRESSES  → cuentas cuyas ventas son de la Store, separadas por coma (por defecto MINTING_ADDRESS)
      REGISTRY_FILE    → ruta del registro del Marketplace (por defecto ./data/registry.json; en Render usa un Disk, ej. /var/data/registry.json)
    ===================================================================== */
@@ -48,6 +50,8 @@ app.use(express.json({ limit: '100kb' }));
 const HEX64 = /^[0-9A-Fa-f]{64}$/;
 class HttpError extends Error { constructor(status, msg) { super(msg); this.status = status; } }
 const isAddr = a => typeof a === 'string' && xrpl.isValidClassicAddress(a);
+const ADMIN_ADDRESSES = (process.env.ADMIN_ADDRESSES || [MINTING_ADDRESS, TREASURY_ADDRESS].filter(Boolean).join(',')).split(',').map(x => x.trim()).filter(isAddr);
+const isAdminAccount = a => ADMIN_ADDRESSES.includes(a);
 const STORE_ADDRESSES = (process.env.STORE_ADDRESSES || MINTING_ADDRESS || '').split(',').map(x => x.trim()).filter(isAddr);
 // comisión redondeada hacia arriba (mínimo 1 drop si el precio > 0)
 function calcFee(amountDrops, bps) {
@@ -204,12 +208,112 @@ async function pruneRegistry() {
 }
 setInterval(pruneRegistry, 30 * 60 * 1000).unref();
 
+
+/* ---------- Almacenes JSON simples (se guardan en disco con escritura atómica) ---------- */
+function jsonStore(file) {
+    let data = {};
+    try { data = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { data = {}; }
+    let timer = null;
+    const save = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            try { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(data)); fs.renameSync(tmp, file); }
+            catch (e) { console.error('[store] no se pudo guardar', file, e.message); }
+        }, 500);
+    };
+    return { get data() { return data; }, save };
+}
+
+/* ---------- Medios alternativos de IPFS (solo administradores) ----------
+   El NFT ya minteado no puede cambiar su URI, pero la web puede mostrar otra dirección IPFS (imagen y/o video),
+   servida por un gateway gratuito (Orbitor). Se exige una firma de Xaman de una cuenta administradora. */
+const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{40,}|k[a-z0-9]{40,}|z[1-9A-HJ-NP-Za-km-z]{40,})$/i;
+// null = no se envió (sin cambios) · '' = borrar · 'ipfs://CID[/ruta]' o 'https://…' = valor
+function normalizeMedia(v) {
+    if (v === undefined || v === null) return null;
+    let s = String(v).trim();
+    if (!s) return '';
+    if (s.length > 600 || /[\s<>"'`\\]/.test(s)) throw new HttpError(400, 'Dirección de medios inválida.');
+    let m = s.match(/^https?:\/\/[^/]+\/ipfs\/([^/?#]+)(\/[^?#]*)?/i) || s.match(/^https?:\/\/([a-z2-7]{40,})\.ipfs\.[^/]+(\/[^?#]*)?/i);
+    if (m) s = 'ipfs://' + m[1] + (m[2] || '');
+    s = s.replace(/^\/ipfs\//i, 'ipfs://').replace(/^ipfs:\/\/ipfs\//i, 'ipfs://');
+    if (!/^[a-z]+:/i.test(s) && CID_RE.test(s.split('/')[0])) s = 'ipfs://' + s;
+    if (/^ipfs:\/\//i.test(s)) {
+        const rest = s.slice(7);
+        if (!CID_RE.test(rest.split('/')[0])) throw new HttpError(400, 'CID de IPFS inválido.');
+        return 'ipfs://' + rest;
+    }
+    if (/^https:\/\//i.test(s)) return s;
+    throw new HttpError(400, 'Usa un CID, ipfs://CID[/ruta] o una URL https.');
+}
+const overridesStore = jsonStore(process.env.MEDIA_OVERRIDES_FILE || path.join(__dirname, 'data', 'media-overrides.json'));
+const pendingAdmin = new Map();   // uuid -> acción pendiente de firma
+setInterval(() => { for (const [k, v] of pendingAdmin) if (Date.now() - v.ts > 15 * 60 * 1000) pendingAdmin.delete(k); }, 5 * 60 * 1000).unref();
+function applyAdminAction(a) {
+    const all = overridesStore.data;
+    if (a.clear) delete all[a.nftokenId];
+    else {
+        const e = all[a.nftokenId] || {};
+        if (a.image !== null) { if (a.image) e.image = a.image; else delete e.image; }
+        if (a.video !== null) { if (a.video) e.video = a.video; else delete e.video; }
+        if (!e.image && !e.video) delete all[a.nftokenId]; else { e.ts = Date.now(); all[a.nftokenId] = e; }
+    }
+    overridesStore.save();
+}
+app.get('/api/media-overrides', (req, res) => res.json({ success: true, overrides: overridesStore.data }));
+app.post('/api/admin/media-override', rateLimit(20), wrap(async (req, res) => {
+    const { account, nftokenId, clear } = req.body;
+    if (!isAddr(account) || !isAdminAccount(account)) throw new HttpError(403, 'Esta cuenta no es administradora.');
+    if (!HEX64.test(nftokenId || '')) throw new HttpError(400, 'NFTokenID inválido.');
+    const image = normalizeMedia(req.body.image), video = normalizeMedia(req.body.video);
+    if (!clear && image === null && video === null) throw new HttpError(400, 'Indica una dirección para la imagen o el video.');
+    // SignIn restringido a la cuenta admin: la firma demuestra que quien pide el cambio controla esa cuenta
+    const created = await createPayload({ TransactionType: 'SignIn' }, 'Aeterna Ledger: update NFT media', { signer: account });
+    pendingAdmin.set(created.uuid, { account, nftokenId: nftokenId.toUpperCase(), image, video, clear: !!clear, ts: Date.now() });
+    res.json({ success: true, ...created });
+}));
+
+/* ---------- Transferencias pendientes (ofertas privadas de 0 XRP con Destination) ----------
+   Una transferencia en XRPL no es un "envío": el destinatario debe aceptar la oferta. Aquí se recuerdan las ofertas
+   creadas desde la web para que el destinatario las vea y acepte dentro del sitio. Todo se verifica contra el ledger. */
+const transfersStore = jsonStore(process.env.TRANSFERS_FILE || path.join(__dirname, 'data', 'transfers.json'));
+app.post('/api/transfers/report', rateLimit(30), wrap(async (req, res) => {
+    const { nftokenId } = req.body;
+    if (!HEX64.test(nftokenId || '')) throw new HttpError(400, 'NFTokenID inválido.');
+    const id = nftokenId.toUpperCase();
+    let found = 0;
+    await withClient(async client => {
+        for (const o of await getSellOffers(client, id)) {
+            if (!(o.flags & 1) || !o.destination || o.amount !== '0' || isExpired(o.expiration)) continue;
+            if (Object.keys(transfersStore.data).length >= 5000 && !transfersStore.data[o.nft_offer_index]) continue;
+            transfersStore.data[o.nft_offer_index] = { nftokenId: id, from: o.owner, to: o.destination, ts: Date.now() };
+            found++;
+        }
+    });
+    if (found) transfersStore.save();
+    res.json({ success: true, found });
+}));
+app.get('/api/transfers/:address', wrap(async (req, res) => {
+    if (!isAddr(req.params.address)) throw new HttpError(400, 'Dirección inválida.');
+    const mine = Object.entries(transfersStore.data).filter(([, v]) => v.to === req.params.address).slice(0, 50);
+    const out = []; let changed = false;
+    if (mine.length) await withClient(async client => {
+        for (const [offerIndex, v] of mine) {
+            const node = await getOffer(client, offerIndex);
+            if (node && (node.Flags & 1) && node.Destination === req.params.address && !isExpired(node.Expiration)) out.push({ nftokenId: v.nftokenId, offerIndex, from: node.Owner, ts: v.ts });
+            else { delete transfersStore.data[offerIndex]; changed = true; }   // aceptada, cancelada o expirada
+        }
+    });
+    if (changed) transfersStore.save();
+    res.json({ success: true, transfers: out });
+}));
+
 app.get('/api/fee-info', (req, res) => {
     res.json({ success: true, bps: FEE_BPS, storeBps: FEE_STORE_BPS, bifrostApplies: FEE_BIFROST, treasury: TREASURY_ADDRESS || null, storeAddresses: STORE_ADDRESSES });
 });
 app.get('/api/wallet-info/:address', wrap(async (req, res) => {
     if (!isAddr(req.params.address)) throw new HttpError(400, 'Dirección inválida.');
-    res.json({ success: true, isAdmin: !!TREASURY_ADDRESS && req.params.address === TREASURY_ADDRESS });
+    res.json({ success: true, isAdmin: isAdminAccount(req.params.address) });
 }));
 
 /* ---------- Salud ---------- */
@@ -388,7 +492,13 @@ app.get('/api/check-status/:uuid', wrap(async (req, res) => {
     const { signed, expired, cancelled, resolved } = info.meta;
     if (signed) {
         const account = info.response.account;
-        return res.json({ signed: true, expired: false, account, txHash: info.response.txid || null, isAdmin: !!TREASURY_ADDRESS && account === TREASURY_ADDRESS });
+        let adminApplied = false;
+        const pend = pendingAdmin.get(req.params.uuid);
+        if (pend) {
+            pendingAdmin.delete(req.params.uuid);
+            if (pend.account === account && isAdminAccount(account)) { applyAdminAction(pend); adminApplied = true; }
+        }
+        return res.json({ signed: true, expired: false, account, txHash: info.response.txid || null, isAdmin: isAdminAccount(account), adminApplied });
     }
     if (expired) return res.json({ signed: false, expired: true });
     if (cancelled || resolved) return res.json({ signed: false, expired: false, rejected: true });   // el usuario rechazó en Xaman

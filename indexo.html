@@ -204,6 +204,7 @@
                 <h2 id="t-holdings-title" class="text-xl sm:text-2xl font-light text-white tracking-tight">Personal Digital Holdings</h2>
                 <p id="t-holdings-desc" class="text-slate-400 text-xs mt-1">Digital NFT assets on the XRP Ledger linked to your connected wallet.</p>
             </div>
+            <div id="incoming-box" class="hidden"></div>
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 -mb-2"><span id="status-holdings-text"></span><button data-action="refresh" data-target="holdings" class="underline hover:text-white">↻ Refresh</button></div>
             <div id="my-nfts-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 scroll-mt-28">
                 <div class="col-span-full text-center py-12 border border-dashed border-obsidian-border rounded-xl">
@@ -218,9 +219,7 @@
                 <div class="space-y-3 text-center md:text-left">
                     <span id="t-about-badge" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Manifesto & Vision</span>
                     <h2 id="t-about-title" class="text-2xl sm:text-4xl font-light text-white tracking-tight">What is Aeterna Ledger?</h2>
-                    <p id="t-about-desc" class="text-slate-400 text-sm leading-relaxed max-w-2xl">
-                        A digital registry dedicated to unclaimed elements associated with nature and the cosmos, represented strictly as NFTs on the XRP Ledger.
-                    </p>
+                    <div id="t-about-desc" class="space-y-4 max-w-3xl"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                     <div class="bg-obsidian-dark/70 border border-obsidian-border p-6 rounded-xl space-y-3">
@@ -327,6 +326,26 @@
                     <div id="detail-desc-box">
                         <p id="detail-desc" class="text-xs text-slate-300 leading-relaxed font-sans"></p>
                     </div>
+                <div id="detail-meta-wrap" class="hidden space-y-2.5">
+                    <button id="detail-meta-toggle" data-action="toggle-meta" aria-expanded="false" aria-controls="detail-meta-panel" class="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border border-obsidian-border bg-obsidian-dark/60 hover:border-obsidian-gold/50 text-xs text-slate-200 font-mono transition">
+                        <span id="detail-meta-toggle-label">View full metadata</span>
+                        <span id="detail-meta-chevron" class="text-obsidian-gold transition-transform duration-200" aria-hidden="true">&#8964;</span>
+                    </button>
+                    <div id="detail-meta-panel" class="hidden space-y-2.5"></div>
+                </div>
+                <div id="detail-admin-wrap" class="hidden rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-3 space-y-3">
+                    <div class="space-y-1"><h4 id="t-admin-title" class="text-xs font-semibold text-emerald-200">Admin &middot; IPFS media</h4><p id="t-admin-desc" class="text-[10px] text-slate-400 leading-relaxed"></p></div>
+                    <p id="detail-admin-note" class="hidden text-[11px] text-amber-200/90"></p>
+                    <div id="detail-admin-form" class="space-y-2.5">
+                        <label class="block space-y-1"><span id="t-admin-image-lbl" class="text-[10px] text-slate-400"></span><input id="admin-media-image" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-[11px] font-mono text-white focus:border-emerald-400/60 outline-none"></label>
+                        <label class="block space-y-1"><span id="t-admin-video-lbl" class="text-[10px] text-slate-400"></span><input id="admin-media-video" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-[11px] font-mono text-white focus:border-emerald-400/60 outline-none"></label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button data-action="admin-save" id="admin-save-btn" class="flex-1 btn-buy py-2.5 rounded-lg text-[11px] font-bold"></button>
+                            <button data-action="admin-clear" id="admin-clear-btn" class="flex-1 bg-obsidian-border hover:bg-slate-800 text-slate-200 py-2.5 rounded-lg text-[11px] font-mono transition"></button>
+                        </div>
+                        <button data-action="admin-export" id="admin-export-btn" class="text-[10px] text-slate-400 hover:text-white underline font-mono"></button>
+                    </div>
+                </div>
                     <div class="space-y-2 bg-obsidian-dark/60 p-3 rounded-xl border border-obsidian-border text-[11px]">
                         <div>
                             <span class="text-slate-400 block text-[9px] uppercase">NFTokenID (64 Characters)</span>
@@ -916,7 +935,8 @@
             WALLETCONNECT_PROJECT_ID: '11c0392b7d689794bb55c117a0475080',
             WALLETCONNECT_SDK: 'https://cdn.jsdelivr.net/npm/@walletconnect/sign-client@2.23.10/dist/index.umd.js',
             QR_LIB: 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js',
-            IPFS_GATEWAYS: ['https://ipfs.io/ipfs/', 'https://dweb.link/ipfs/', 'https://gateway.pinata.cloud/ipfs/']
+            // Orbitor (ChainSafe) es un gateway público y gratuito de IPFS. El gateway de Pinata queda solo como último recurso.
+            IPFS_GATEWAYS: ['https://ipfs.orbitor.dev/ipfs/', 'https://ipfs.io/ipfs/', 'https://dweb.link/ipfs/', 'https://gateway.pinata.cloud/ipfs/']
         };
         const NETWORKS = {
             mainnet: { rpc: ['https://xrplcluster.com', 'https://s1.ripple.com:51234', 'https://s2.ripple.com:51234'], explorer: 'https://livenet.xrpl.org' },
@@ -939,6 +959,7 @@
         let historyShowAll = false;
         let currentTab = 'store';
         const PLATFORM = () => new Set(CONFIG.STORE_ACCOUNTS);
+        let MEDIA_OVERRIDES = {};      // { NFTokenID: { image, video } } definidos por el administrador
         let FEE = null;                // { bps, storeBps, bifrostApplies, treasury } desde /api/fee-info
         const nftIndex = new Map();   // NFTokenID -> item (objeto compartido entre listas)
         const offerCache = new Map(); // NFTokenID -> { t, offers }
@@ -970,7 +991,7 @@
                 scanToTransfer: 'Scan with Xaman to offer "{title}" to {to}', scanToConnect: 'Scan to connect your Xaman wallet',
                 waitingLedger: 'Signed. Waiting for XRPL validation…', buyOk: 'Purchase confirmed on XRPL: "{title}" is now in your Holdings.',
                 cancelOk: 'Sale cancelled on XRPL: "{title}".', cancelMore: 'You still have {n} other active offer(s) for this NFT. Cancel again to remove them.',
-                listOk: 'Listed on XRPL: "{title}" for {price} XRP.', transferOk: 'Transfer offer created. The recipient must accept it in Xaman.',
+                listOk: 'Listed on XRPL: "{title}" for {price} XRP.', transferOk: 'Transfer offer created. The recipient must accept it (in their wallet or in the “Incoming transfers” section of this site). The NFT stays yours until then.',
                 transferNoDest: '⚠️ The offer was created WITHOUT a destination. Cancel it immediately.',
                 noOwnOffer: 'No active offer of yours was found on XRPL (already cancelled or sold). List refreshed.',
                 txPending: 'Transaction signed but not validated yet. Refresh in a few seconds.', txFailed: 'Transaction failed on XRPL: {code}',
@@ -980,7 +1001,7 @@
                 notTransferable: 'This NFT is not transferable (tfTransferable is off) and you are not its issuer.',
                 alreadyListed: 'This NFT already has an active sale offer. Cancel it first.', invalidAddress: 'Invalid XRPL address.',
                 selfTransfer: 'You cannot transfer an NFT to yourself.', transferTitle: 'Transfer NFT to address',
-                transferNote: 'Creates a private 0 XRP offer that only the recipient can accept in Xaman.',
+                transferNote: 'Creates a private 0 XRP offer. On XRPL the NFT only moves when the recipient accepts it; until then it stays in your wallet.',
                 signTransfer: 'Sign transfer with Xaman', viewExplorer: 'View on explorer', offerId: 'Offer ID',
                 sold: 'Sold', transferred: 'Transferred', minted: 'Minted', listedEv: 'Listed for sale', cancelEv: 'Offer cancelled',
                 burnEv: 'Burned', bidEv: 'Buy offer', modEv: 'Metadata updated', you: 'you', walletDisc: 'Wallet disconnected.',
@@ -1004,7 +1025,20 @@
                 backendUnreachable: 'Could not reach the backend after several attempts. If it runs on a free Render plan it may still be waking up: try again in a minute.',
                 bifrostRelayError: 'WalletConnect could not publish the connection request. Check that: (1) this site address ({origin}) is listed in the allowed domains of your Reown project (cloud.reown.com), (2) the page is not opened as a local file, (3) your connection is stable. Then press the button below.',
                 bifrostFileProtocol: 'WalletConnect needs the site to be opened from http(s), not from a local file. Use your hosted address or a local server (for example Live Server).',
-                bifrostReset: 'Reset WalletConnect and retry', bifrostRelayRetry: 'The WalletConnect relay did not respond. Please try again in a few seconds.', connectionFailed: 'Connection failed'
+                bifrostReset: 'Reset WalletConnect and retry', bifrostRelayRetry: 'The WalletConnect relay did not respond. Please try again in a few seconds.', connectionFailed: 'Connection failed',
+                transferPending: 'Transfer pending → {to}', cancelTransfer: 'Cancel transfer',
+                transferPendingNote: 'Transfer offer created for {to}. The NFT stays in your wallet until the recipient accepts it. You can cancel the offer at any time.',
+                incomingTitle: 'Incoming transfers', incomingSub: 'NFTs sent to your wallet. Accept them to receive them.', incomingFrom: 'From {from}', acceptTransfer: 'Accept NFT',
+                acceptedOk: 'NFT received: "{title}" is now in your wallet.', scanToAccept: 'Scan to accept "{title}" from {from}',
+                metaShow: 'View full metadata', metaHide: 'Hide metadata', metaOverview: 'Overview', metaAttributes: 'Attributes', metaLinks: 'Links', metaIntegrity: 'Integrity',
+                metaOther: 'Other data', metaSources: 'Media sources', metaCreator: 'Creator', metaPublisher: 'Publisher', metaCollection: 'Collection', metaFamily: 'Family',
+                metaCategory: 'Category', metaSubcategories: 'Subcategories', metaChecksum: 'Media checksum', metaAlgorithm: 'Algorithm', metaImage: 'Image', metaVideo: 'Video / 3D',
+                metaCopyJson: 'Copy JSON', metaMediaOverride: 'Media served from a custom IPFS address',
+                adminMediaTitle: 'Admin · IPFS media', adminMediaDesc: 'Show a different IPFS address for this NFT image and video, served through the free Orbitor gateway (no Pinata bandwidth). Leave a field empty to keep the current one.',
+                adminMediaImage: 'Image (CID or ipfs://…)', adminMediaVideo: 'Video / 3D (CID or ipfs://…)', adminMediaSave: 'Save with Xaman signature', adminMediaClear: 'Remove override',
+                adminMediaExport: 'Copy all overrides (JSON)', adminMediaXamanOnly: 'To edit media, connect with Xaman (a signature is required).', adminMediaOk: 'Media address updated.',
+                adminMediaEmpty: 'Enter an image or video address.', scanToMedia: 'Sign to update the media of "{title}"', adminMediaNotApplied: 'The change was not applied: this account is not an administrator.',
+                adminMediaCleared: 'Media override removed.', adminMediaCopied: 'Overrides JSON copied.'
             },
             es: {
                 loading: 'Leyendo XRP Ledger…', updated: 'Actualizado', assets: 'activos', refresh: 'Actualizar',
@@ -1024,7 +1058,7 @@
                 scanToTransfer: 'Escanea con Xaman para ofrecer "{title}" a {to}', scanToConnect: 'Escanea para conectar tu billetera Xaman',
                 waitingLedger: 'Firmado. Esperando validación de XRPL…', buyOk: 'Compra confirmada en XRPL: "{title}" ya está en tus Mis Activos.',
                 cancelOk: 'Venta cancelada en XRPL: "{title}".', cancelMore: 'Aún tienes {n} oferta(s) activa(s) de este NFT. Cancela de nuevo para eliminarlas.',
-                listOk: 'Publicado en XRPL: "{title}" por {price} XRP.', transferOk: 'Oferta de transferencia creada. El destinatario debe aceptarla en Xaman.',
+                listOk: 'Publicado en XRPL: "{title}" por {price} XRP.', transferOk: 'Oferta de transferencia creada. El destinatario debe aceptarla (en su billetera o en la sección “Transferencias recibidas” de este sitio). El NFT sigue siendo tuyo hasta entonces.',
                 transferNoDest: '⚠️ La oferta se creó SIN destinatario. Cancélala de inmediato.',
                 noOwnOffer: 'No se encontró ninguna oferta activa tuya en XRPL (ya cancelada o vendida). Lista actualizada.',
                 txPending: 'Transacción firmada pero aún no validada. Actualiza en unos segundos.', txFailed: 'La transacción falló en XRPL: {code}',
@@ -1034,7 +1068,7 @@
                 notTransferable: 'Este NFT no es transferible (tfTransferable desactivado) y no eres su emisor.',
                 alreadyListed: 'Este NFT ya tiene una oferta de venta activa. Cancélala primero.', invalidAddress: 'Dirección XRPL inválida.',
                 selfTransfer: 'No puedes transferir un NFT a ti mismo.', transferTitle: 'Transferir NFT a una dirección',
-                transferNote: 'Crea una oferta privada de 0 XRP que solo el destinatario puede aceptar en Xaman.',
+                transferNote: 'Crea una oferta privada de 0 XRP. En XRPL el NFT solo se mueve cuando el destinatario la acepta; mientras tanto sigue en tu billetera.',
                 signTransfer: 'Firmar transferencia con Xaman', viewExplorer: 'Ver en el explorador', offerId: 'ID de oferta',
                 sold: 'Vendido', transferred: 'Transferido', minted: 'Creado (mint)', listedEv: 'Puesto en venta', cancelEv: 'Oferta cancelada',
                 burnEv: 'Quemado', bidEv: 'Oferta de compra', modEv: 'Metadatos actualizados', you: 'tú', walletDisc: 'Billetera desconectada.',
@@ -1058,8 +1092,78 @@
                 backendUnreachable: 'No se pudo contactar el backend tras varios intentos. Si está en el plan gratuito de Render puede estar despertando: inténtalo de nuevo en un minuto.',
                 bifrostRelayError: 'WalletConnect no pudo publicar la solicitud de conexión. Revisa que: (1) la dirección de este sitio ({origin}) esté en los dominios permitidos de tu proyecto Reown (cloud.reown.com), (2) la página no esté abierta como archivo local, (3) tu conexión sea estable. Luego pulsa el botón de abajo.',
                 bifrostFileProtocol: 'WalletConnect necesita que el sitio se abra desde http(s), no como archivo local. Usa tu dirección publicada o un servidor local (por ejemplo Live Server).',
-                bifrostReset: 'Reiniciar WalletConnect y reintentar', bifrostRelayRetry: 'El relay de WalletConnect no respondió. Inténtalo de nuevo en unos segundos.', connectionFailed: 'Conexión fallida'
+                bifrostReset: 'Reiniciar WalletConnect y reintentar', bifrostRelayRetry: 'El relay de WalletConnect no respondió. Inténtalo de nuevo en unos segundos.', connectionFailed: 'Conexión fallida',
+                transferPending: 'Transferencia pendiente → {to}', cancelTransfer: 'Cancelar transferencia',
+                transferPendingNote: 'Oferta de transferencia creada para {to}. El NFT sigue en tu billetera hasta que el destinatario la acepte. Puedes cancelarla cuando quieras.',
+                incomingTitle: 'Transferencias recibidas', incomingSub: 'NFTs enviados a tu billetera. Acéptalos para recibirlos.', incomingFrom: 'De {from}', acceptTransfer: 'Aceptar NFT',
+                acceptedOk: 'NFT recibido: "{title}" ya está en tu billetera.', scanToAccept: 'Escanea para aceptar "{title}" de {from}',
+                metaShow: 'Ver metadatos completos', metaHide: 'Ocultar metadatos', metaOverview: 'Resumen', metaAttributes: 'Atributos', metaLinks: 'Enlaces', metaIntegrity: 'Integridad',
+                metaOther: 'Otros datos', metaSources: 'Origen de los medios', metaCreator: 'Creador', metaPublisher: 'Editor', metaCollection: 'Colección', metaFamily: 'Familia',
+                metaCategory: 'Categoría', metaSubcategories: 'Subcategorías', metaChecksum: 'Checksum del medio', metaAlgorithm: 'Algoritmo', metaImage: 'Imagen', metaVideo: 'Video / 3D',
+                metaCopyJson: 'Copiar JSON', metaMediaOverride: 'Medios servidos desde una dirección IPFS personalizada',
+                adminMediaTitle: 'Admin · Medios IPFS', adminMediaDesc: 'Muestra otra dirección IPFS para la imagen y el video de este NFT, servida por el gateway gratuito Orbitor (sin consumir ancho de banda de Pinata). Deja un campo vacío para mantener el actual.',
+                adminMediaImage: 'Imagen (CID o ipfs://…)', adminMediaVideo: 'Video / 3D (CID o ipfs://…)', adminMediaSave: 'Guardar con firma de Xaman', adminMediaClear: 'Quitar cambio',
+                adminMediaExport: 'Copiar todos los cambios (JSON)', adminMediaXamanOnly: 'Para editar los medios, conéctate con Xaman (se requiere una firma).', adminMediaOk: 'Dirección de medios actualizada.',
+                adminMediaEmpty: 'Ingresa una dirección de imagen o de video.', scanToMedia: 'Firma para actualizar los medios de "{title}"', adminMediaNotApplied: 'El cambio no se aplicó: esta cuenta no es administradora.',
+                adminMediaCleared: 'Cambio de medios eliminado.', adminMediaCopied: 'JSON de cambios copiado.'
             }
+        };
+        // Texto de "What is Aeterna Ledger?" en los 6 idiomas (7 párrafos)
+        const ABOUT_BODY = {
+            en: [
+                'Aeterna Ledger is a digital registry of NFTs dedicated to the unclaimed, the intangible and the immeasurable.',
+                'From the elements of nature to the mysteries of the cosmos, from celestial phenomena to abstract concepts, Aeterna explores an immense universe of things that have no conventional owner, yet can be represented, tokenized and preserved as unique digital assets.',
+                'The possibilities are virtually limitless. Anything that can be imagined, represented and transformed into an NFT can find its place within this digital registry.',
+                'The world is full of things that belong to no one. Aeterna gives their representations a permanent digital existence on the XRP Ledger.',
+                'Beyond its registry, Aeterna opens its marketplace to everyone. Creators, collectors and visionaries are welcome to bring their own interpretations of the unclaimed universe, making their NFTs available for others to discover, collect and acquire. Every creation becomes another contribution to an ever-expanding digital universe.',
+                'Nothing is too abstract to be represented. Nothing is too distant to be registered.',
+                'A universe of unclaimed possibilities, imagined by many, preserved forever on XRPL.'
+            ],
+            es: [
+                'Aeterna Ledger es un registro digital de NFTs dedicado a lo que no tiene dueño, lo intangible y lo inconmensurable.',
+                'Desde los elementos de la naturaleza hasta los misterios del cosmos, desde los fenómenos celestes hasta los conceptos abstractos, Aeterna explora un universo inmenso de cosas que no tienen un propietario convencional, pero que pueden ser representadas, tokenizadas y preservadas como activos digitales únicos.',
+                'Las posibilidades son prácticamente ilimitadas. Todo lo que pueda imaginarse, representarse y transformarse en un NFT puede encontrar su lugar dentro de este registro digital.',
+                'El mundo está lleno de cosas que no pertenecen a nadie. Aeterna da a sus representaciones una existencia digital permanente en el XRP Ledger.',
+                'Más allá de su registro, Aeterna abre su marketplace a todos. Creadores, coleccionistas y visionarios son bienvenidos a aportar sus propias interpretaciones del universo sin dueño, poniendo sus NFTs a disposición de otros para que los descubran, coleccionen y adquieran. Cada creación se convierte en un aporte más a un universo digital en constante expansión.',
+                'Nada es demasiado abstracto para ser representado. Nada está demasiado lejos para ser registrado.',
+                'Un universo de posibilidades sin dueño, imaginado por muchos, preservado para siempre en XRPL.'
+            ],
+            ja: [
+                'Aeterna Ledgerは、誰のものでもないもの、形のないもの、測り知れないものに捧げられた、NFTのデジタル・レジストリです。',
+                '自然の要素から宇宙の神秘、天体現象から抽象的な概念に至るまで、Aeternaは、従来の意味での所有者を持たないものの広大な世界を探求します。それらは、唯一無二のデジタル資産として表現され、トークン化され、保存されることができます。',
+                '可能性はほぼ無限です。想像でき、表現でき、NFTへと変換できるものであれば、このデジタル・レジストリの中に居場所を見つけることができます。',
+                '世界には、誰のものでもないものが溢れています。Aeternaは、それらを表すものにXRP Ledger上での永続的なデジタルの存在を与えます。',
+                'レジストリにとどまらず、Aeternaはそのマーケットプレイスをすべての人に開放します。クリエイター、コレクター、そしてビジョナリーの皆さんは、持ち主のいない宇宙についてそれぞれの解釈を持ち寄り、NFTを他の人が発見し、収集し、取得できるように公開することを歓迎します。すべての創作は、拡大し続けるデジタル宇宙への新たな貢献となります。',
+                '抽象的すぎて表現できないものはありません。遠すぎて登録できないものはありません。',
+                '多くの人々によって想像された、持ち主のいない可能性の宇宙が、XRPL上に永遠に保存されます。'
+            ],
+            ko: [
+                'Aeterna Ledger는 주인 없는 것, 무형의 것, 헤아릴 수 없는 것에 헌정된 NFT 디지털 레지스트리입니다.',
+                '자연의 요소에서 우주의 신비까지, 천체 현상에서 추상적 개념에 이르기까지, Aeterna는 전통적인 의미의 소유자가 없지만 고유한 디지털 자산으로 표현되고, 토큰화되고, 보존될 수 있는 방대한 세계를 탐구합니다.',
+                '가능성은 사실상 무한합니다. 상상하고, 표현하고, NFT로 바꿀 수 있는 모든 것은 이 디지털 레지스트리 안에서 자리를 찾을 수 있습니다.',
+                '세상에는 누구의 것도 아닌 것들이 가득합니다. Aeterna는 그것들의 표현에 XRP Ledger 상의 영구적인 디지털 존재를 부여합니다.',
+                '레지스트리를 넘어, Aeterna는 마켓플레이스를 모두에게 개방합니다. 크리에이터, 컬렉터, 그리고 비저너리 여러분은 주인 없는 우주에 대한 자신만의 해석을 가져와 NFT를 다른 사람들이 발견하고, 수집하고, 구매할 수 있도록 공개하실 수 있습니다. 모든 창작물은 끊임없이 확장되는 디지털 우주에 더해지는 또 하나의 기여가 됩니다.',
+                '너무 추상적이어서 표현할 수 없는 것은 없습니다. 너무 멀어서 등록할 수 없는 것은 없습니다.',
+                '많은 이들이 상상한, 주인 없는 가능성의 우주가 XRPL에 영원히 보존됩니다.'
+            ],
+            zh: [
+                'Aeterna Ledger 是一个 NFT 数字登记册，致力于那些无主的、无形的、不可估量的事物。',
+                '从自然元素到宇宙奥秘，从天体现象到抽象概念，Aeterna 探索着一个由无数事物构成的浩瀚宇宙——它们没有传统意义上的所有者，却可以被表达、被代币化，并作为独一无二的数字资产得以保存。',
+                '可能性几乎没有边界。任何可以被想象、被表达并转化为 NFT 的事物，都能在这个数字登记册中找到自己的位置。',
+                '世界上充满了不属于任何人的事物。Aeterna 为它们的表现形式赋予在 XRP Ledger 上永久的数字存在。',
+                '除了登记册之外，Aeterna 还向所有人开放其市场。欢迎创作者、收藏者和远见者带来他们对这个无主宇宙的独特诠释，将自己的 NFT 提供给他人发现、收藏和获取。每一件作品，都将成为这个不断扩展的数字宇宙的又一份贡献。',
+                '没有什么过于抽象而无法被表达，没有什么过于遥远而无法被登记。',
+                '一个由众人想象的无主可能性的宇宙，永久保存于 XRPL。'
+            ],
+            ru: [
+                'Aeterna Ledger — это цифровой реестр NFT, посвящённый тому, что не имеет владельца, нематериальному и неизмеримому.',
+                'От стихий природы до тайн космоса, от небесных явлений до абстрактных понятий — Aeterna исследует огромную вселенную вещей, у которых нет привычного владельца, но которые можно представить, токенизировать и сохранить как уникальные цифровые активы.',
+                'Возможности практически безграничны. Всё, что можно вообразить, представить и превратить в NFT, может найти своё место в этом цифровом реестре.',
+                'Мир полон вещей, которые не принадлежат никому. Aeterna дарит их образам постоянное цифровое существование в XRP Ledger.',
+                'Помимо реестра, Aeterna открывает свой маркетплейс для всех. Создатели, коллекционеры и визионеры могут привнести собственные интерпретации вселенной, у которой нет владельца, сделав свои NFT доступными для других — чтобы их открывали, коллекционировали и приобретали. Каждое творение становится ещё одним вкладом в постоянно расширяющуюся цифровую вселенную.',
+                'Нет ничего слишком абстрактного, чтобы быть представленным. Нет ничего слишком далёкого, чтобы быть зарегистрированным.',
+                'Вселенная ничейных возможностей, воображаемая многими, сохранённая навсегда в XRPL.'
+            ]
         };
         function T(key, params) {
             const lang = getCurrentLang();
@@ -1286,6 +1390,8 @@
             it.offers = offers;
             it.listing = pickListing(offers, it.owner);
             it.myOffers = connectedAccount ? offers.filter(o => (o.flags & 1) && o.owner === connectedAccount && o.owner === it.owner) : [];
+            // Transferencia pendiente: oferta privada de 0 XRP del dueño hacia una cuenta concreta (el destinatario debe aceptarla)
+            it.transfer = offers.find(o => (o.flags & 1) && o.owner === it.owner && o.destination && o.amount === '0' && !(o.expiration && o.expiration + RIPPLE_EPOCH <= Date.now() / 1000)) || null;
             return it;
         }
         async function fetchXrpBalance(address) {
@@ -1344,8 +1450,17 @@
             let img = m.image || m.image_url || m.imageUrl || m.img || '';
             let vid = m.video || m.animation_url || m.video_url || '';
             if (img && isVideoUrl(img) && !vid) { vid = img; img = ''; }
-            it.img = img; it.video = vid;
+            it.metaImg = img; it.metaVideo = vid;
+            it.metaRaw = Object.keys(m).length ? m : null;
+            applyMediaOverride(it);
             it.rawCategory = m.category || attr('category') || (m.collection && (m.collection.family || m.collection.name)) || '';
+        }
+        // Medios alternativos fijados por el administrador (tienen prioridad sobre los del metadata)
+        function applyMediaOverride(it) {
+            const ov = MEDIA_OVERRIDES[it.nftokenId];
+            it.img = (ov && ov.image) || it.metaImg || '';
+            it.video = (ov && ov.video) || it.metaVideo || '';
+            it.mediaOverride = !!(ov && (ov.image || ov.video));
         }
         function finalizeCategory(it) { it.category = Registry.category(it.nftokenId) || normalizeCategory(it.rawCategory); }
         function loadMetadata(it) {
@@ -1646,6 +1761,7 @@
             if (s.loading || (!force && !isStale(s))) return;
             s.loading = true; s.error = null; s.progress = 0;
             renderMyHoldings();
+            loadIncoming();
             try {
                 const items = (await fetchAccountNfts(acct)).map(makeItem);
                 if (acct !== connectedAccount) return;
@@ -1654,6 +1770,7 @@
                     await enrichOffers(it, { fresh: force }); await loadMetadata(it);
                     // Autorreparación del registro del Marketplace: mis ofertas activas verificadas en el ledger
                     if (it.listing && it.listing.owner === acct) registerListing(it.nftokenId, it.category && it.category !== UNCAT ? it.category : undefined);
+                    if (it.transfer && it.transfer.owner === acct) reportTransfer(it.nftokenId);   // para que el destinatario la vea en la web
                 },
                     CONFIG.CONCURRENCY, () => { s.progress++; scheduleRender(); });
             } catch (e) { console.warn('[holdings]', e); s.error = 'rpc'; }
@@ -1743,6 +1860,7 @@
                     description: T('scanToCancel', { title })
                 });
                 const out = await confirmOnLedger(signed, async () => (await getSellOffers(id, { fresh: true })).every(o => o.nft_offer_index !== indexes[0]));
+                reportedTransfers.delete(id);
                 const after = await refreshNft(id);
                 outcomeToast(out, T('cancelOk', { title }));
                 if (out.ok && after.myOffers && after.myOffers.length) showToast(T('cancelMore', { n: after.myOffers.length }), 'warning');
@@ -1829,12 +1947,98 @@
                 if (out.ok) {
                     const created = createdOffer(out.meta);
                     if (created && created.fields.Destination !== to) showToast(T('transferNoDest'), 'error');
-                    else showToast(T('transferOk'), 'success');
+                    else { showToast(T('transferOk'), 'success'); reportTransfer(id); }
                 } else outcomeToast(out, '');
                 await refreshNft(id);
             } catch (e) { reportError(e); }
         }
 
+
+        /* =====================================================================
+           TRANSFERENCIAS RECIBIDAS  ·  MEDIOS IPFS ALTERNATIVOS (ADMIN)
+           ===================================================================== */
+        // En XRPL una "transferencia" no mueve el NFT: crea una oferta privada de 0 XRP y el DESTINATARIO debe aceptarla.
+        const incoming = { items: [], loading: false };
+        const reportedTransfers = new Set();
+        function reportTransfer(id, attempt = 0) {
+            if (reportedTransfers.has(id) && attempt === 0) return;
+            reportedTransfers.add(id);
+            backendFetch('/api/transfers/report', { method: 'POST', body: { nftokenId: id }, retry: false })
+                .then(({ res, data }) => { if (!res.ok || !data.found) throw new Error('retry'); })
+                .catch(() => { const d = [6000, 20000]; if (attempt < d.length) setTimeout(() => reportTransfer(id, attempt + 1), d[attempt]); });
+        }
+        async function loadIncoming() {
+            const acct = connectedAccount;
+            if (!acct) { incoming.items = []; renderIncoming(); return; }
+            incoming.loading = true; renderIncoming();
+            try {
+                const { res, data } = await backendFetch(`/api/transfers/${encodeURIComponent(acct)}`, { retry: false });
+                const list = res.ok && Array.isArray(data.transfers) ? data.transfers : [];
+                const items = [];
+                await pool(list, async t => {
+                    if (!NFTID_RE.test(t.nftokenId) || !NFTID_RE.test(t.offerIndex)) return;
+                    const info = await resolveNft(t.nftokenId, [t.from]);
+                    const it = makeItem(info || { nftokenId: t.nftokenId, owner: t.from });
+                    await loadMetadata(it);
+                    items.push({ it, offerIndex: t.offerIndex.toUpperCase(), from: t.from });
+                });
+                if (acct === connectedAccount) incoming.items = items;
+            } catch (e) { console.warn('[incoming]', e); }
+            finally { incoming.loading = false; renderIncoming(); }
+        }
+        async function acceptTransfer(id, offerIndex) {
+            if (!requireWallet()) return;
+            const entry = incoming.items.find(x => x.it.nftokenId === id && x.offerIndex === offerIndex);
+            if (!entry) return;
+            try {
+                const signed = await signTx({
+                    endpoint: '/api/buy-nft-offer',
+                    body: { buyerAccount: connectedAccount, nftokenId: id, offerIndex, sellOfferIndex: offerIndex, priceXRP: '0', amountDrops: '0', ownerAccount: entry.from },
+                    description: T('scanToAccept', { title: entry.it.title, from: short(entry.from) })
+                });
+                const out = await confirmOnLedger(signed, async () => (await currentOwner(id)) === connectedAccount);
+                outcomeToast(out, T('acceptedOk', { title: entry.it.title }));
+                await refreshNft(id); loadIncoming(); refreshBalance();
+            } catch (e) { reportError(e); }
+        }
+
+        // Medios alternativos: archivo estático opcional (media-overrides.json en tu repositorio) + los guardados en el backend
+        async function loadMediaOverrides() {
+            let merged = {};
+            try { const r = await fetchT('media-overrides.json?v=' + Date.now(), {}, 6000); if (r.ok) { const j = await r.json(); merged = (j && (j.overrides || j)) || {}; } } catch (e) {}
+            try { const { res, data } = await backendFetch('/api/media-overrides', { retry: false }); if (res.ok && data.overrides) Object.assign(merged, data.overrides); } catch (e) {}
+            const next = {};
+            for (const [k, v] of Object.entries(merged)) if (NFTID_RE.test(k) && v && typeof v === 'object') next[k.toUpperCase()] = { image: String(v.image || ''), video: String(v.video || '') };
+            MEDIA_OVERRIDES = next;
+            for (const it of nftIndex.values()) if (it.metaLoaded) applyMediaOverride(it);
+            renderAll();
+            if (currentActiveDetailNft) { detailMediaKey = ''; renderDetails(currentActiveDetailNft); }
+        }
+        async function saveMediaOverride(clear = false) {
+            const it = currentActiveDetailNft;
+            if (!it) return;
+            if (!(currentUserIsAdmin && walletType === 'xaman')) return showToast(T('adminMediaXamanOnly'), 'warning');
+            const image = document.getElementById('admin-media-image').value.trim();
+            const video = document.getElementById('admin-media-video').value.trim();
+            if (!clear && !image && !video) return showToast(T('adminMediaEmpty'), 'warning');
+            const id = it.nftokenId;
+            closeDetails();                                   // el QR de Xaman se muestra sobre la página
+            try {
+                const signed = await signWithXaman({
+                    endpoint: '/api/admin/media-override',
+                    body: { account: connectedAccount, nftokenId: id, clear, image: image || undefined, video: video || undefined },
+                    description: T('scanToMedia', { title: it.title })
+                });
+                if (!(signed.raw && signed.raw.adminApplied)) showToast(T('adminMediaNotApplied'), 'error');
+                else { showToast(T(clear ? 'adminMediaCleared' : 'adminMediaOk'), 'success'); await loadMediaOverrides(); }
+            } catch (e) { reportError(e); }
+            openDetailsModal(id);
+        }
+        async function exportMediaOverrides() {
+            let all = MEDIA_OVERRIDES;
+            try { const { res, data } = await backendFetch('/api/media-overrides', { retry: false }); if (res.ok && data.overrides) all = data.overrides; } catch (e) {}
+            copyToClipboard(JSON.stringify({ overrides: all }, null, 2));
+        }
 
         /* =====================================================================
            BILLETERAS: XAMAN (payload + QR) y BIFROST (WalletConnect v2)
@@ -2074,8 +2278,8 @@
             document.getElementById('connect-btn').classList.remove('hidden');
             document.getElementById('tab-admin').classList.add('hidden');
             document.getElementById('tab-mynfts').classList.add('hidden');
-            state.holdings.items = []; state.holdings.loadedAt = 0;
-            for (const it of nftIndex.values()) it.myOffers = [];
+            state.holdings.items = []; state.holdings.loadedAt = 0; incoming.items = [];
+            for (const it of nftIndex.values()) { it.myOffers = []; }
             if (!document.getElementById('view-mynfts').classList.contains('hidden')) switchTab('store');
             renderAll();
             showToast(T('walletDisc'), 'info');
@@ -2248,6 +2452,7 @@
             paginate('holdings', s.items).forEach(nft => {
                 const id = esc(nft.nftokenId);
                 const listed = nft.myOffers && nft.myOffers.length;
+                const pendingTr = nft.transfer && !nft.listing;
                 const div = document.createElement('div');
                 div.className = 'bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden p-4 space-y-3 flex flex-col justify-between hover:border-obsidian-gold/60 transition cursor-pointer';
                 div.dataset.action = 'details'; div.dataset.id = nft.nftokenId;
@@ -2260,9 +2465,9 @@
                     <div><h4 class="text-sm font-medium text-white line-clamp-1">${esc(nft.title)}</h4>
                         <p class="text-xs text-obsidian-gold font-mono mt-1">${esc(priceTxt)}</p></div>
                     <div class="pt-2 border-t border-obsidian-border/60 flex justify-between items-center gap-2 text-[10px] font-mono">
-                        <span class="text-slate-400">${esc(listed ? T('listed') : T('inVault'))}</span>
+                        <span class="text-slate-400 min-w-0 break-words">${esc(pendingTr ? T('transferPending', { to: short(nft.transfer.destination, 6, 4) }) : (listed ? T('listed') : T('inVault')))}</span>
                         ${listed
-                            ? `<button data-action="cancel" data-id="${id}" class="btn-cancel px-2.5 py-1 rounded-lg text-[10px]">${esc(t.cancelBtn)}</button>`
+                            ? `<button data-action="cancel" data-id="${id}" class="btn-cancel px-2.5 py-1 rounded-lg text-[10px] flex-shrink-0">${esc(pendingTr ? T('cancelTransfer') : t.cancelBtn)}</button>`
                             : `<button data-action="list" data-id="${id}" class="btn-buy px-2.5 py-1 rounded-lg text-[10px]">${esc(t.listBtn)}</button>`}
                     </div>`;
                 container.appendChild(div);
@@ -2318,6 +2523,7 @@
             } else feeBox.classList.add('hidden');
             const descBox = document.getElementById('detail-desc-box');
             if (nft.desc && nft.desc.trim()) { document.getElementById('detail-desc').textContent = nft.desc; descBox.classList.remove('hidden'); } else descBox.classList.add('hidden');
+            renderMetaSection(nft);
             const key = `${nft.img}|${nft.video}|${nft.metaLoaded}`;
             if (key !== detailMediaKey) {
                 detailMediaKey = key;
@@ -2342,13 +2548,139 @@
             const hasMine = nft.myOffers && nft.myOffers.length;
             if (!nft.owner) ac.innerHTML = `<div class="text-center text-slate-400 text-xs py-2 font-mono">${esc(T('loadingOwner'))}</div>`;
             else if (nft.burned) ac.innerHTML = '';
-            else if (isMine) {
+            else if (isMine && nft.transfer && !nft.listing) {
+                ac.innerHTML = `<div class="rounded-xl border border-amber-500/25 bg-amber-950/25 px-3 py-2.5 text-[11px] text-amber-200/90 leading-relaxed">${esc(T('transferPendingNote', { to: short(nft.transfer.destination, 8, 6) }))}</div>`
+                    + `<button data-action="cancel" data-id="${id}" data-close="1" class="w-full btn-cancel py-3 rounded-xl text-xs font-bold tracking-wide">${esc(T('cancelTransfer'))}</button>`;
+            } else if (isMine) {
                 ac.innerHTML = (hasMine
                     ? `<button data-action="cancel" data-id="${id}" data-close="1" class="w-full btn-cancel py-3 rounded-xl text-xs font-bold tracking-wide">${esc(t.cancelBtn)}</button>`
                     : `<button data-action="list" data-id="${id}" data-close="1" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${esc(t.listBtn)}</button>`)
                     + `<button data-action="transfer" data-id="${id}" data-close="1" class="w-full btn-xaman py-3 rounded-xl text-xs font-bold tracking-wide">${esc(T('transferBtn'))}</button>`;
             } else if (nft.listing) ac.innerHTML = `<button data-action="buy" data-id="${id}" data-close="1" class="w-full btn-buy py-3 rounded-xl text-xs font-bold tracking-wide">${esc(t.buyBtn)}</button>`;
             else ac.innerHTML = `<div class="text-center text-slate-400 text-xs py-2 font-mono">${esc(T('notListed'))}</div>`;
+            renderAdminPanel(nft);
+        }
+
+        /* ----- Metadatos completos del NFT (JSON) en un panel desplegable ----- */
+        let detailMetaOpen = false, adminFormFor = null;
+        const META_HANDLED = new Set(['name', 'title', 'description', 'image', 'image_url', 'imageUrl', 'img', 'animation_url', 'video', 'video_url', 'external_url', 'creator', 'publisher', 'socials', 'integrity_hash', 'celestial_data', 'category', 'subcategories', 'attributes', 'collection']);
+        const humanize = k => String(k).replace(/[_\-]+/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/\b\w/g, c => c.toUpperCase());
+        const isHttpUrl = u => typeof u === 'string' && /^https?:\/\/[^\s<>"']+$/i.test(u);
+        const chip = t => `<span class="inline-block px-2 py-0.5 rounded-md bg-obsidian-border/70 text-slate-200 text-[10px] font-mono break-words max-w-full">${esc(t)}</span>`;
+        const linkEl = (u, label) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer nofollow" class="text-obsidian-gold hover:underline break-all">${esc(label || u)}</a>`;
+        const metaKv = rows => `<dl class="grid grid-cols-[minmax(0,38%)_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-[11px]">${rows.map(([k, v]) => `<dt class="text-slate-500 break-words">${esc(k)}</dt><dd class="text-slate-200 min-w-0">${v}</dd>`).join('')}</dl>`;
+        const metaCard = (title, body) => `<section class="bg-obsidian-dark/50 border border-obsidian-border rounded-xl p-3 space-y-2.5"><h4 class="text-[9px] uppercase tracking-[0.18em] text-obsidian-gold font-mono">${esc(title)}</h4>${body}</section>`;
+        function metaVal(v, depth = 0) {
+            if (v === null || v === undefined || v === '') return '<span class="text-slate-600">—</span>';
+            if (typeof v === 'string') { const s = v.length > 500 ? v.slice(0, 500) + '…' : v; return isHttpUrl(s) ? linkEl(s) : `<span class="break-words">${esc(s)}</span>`; }
+            if (typeof v === 'number' || typeof v === 'boolean') return esc(String(v));
+            if (Array.isArray(v)) {
+                if (v.every(x => x === null || ['string', 'number', 'boolean'].includes(typeof x))) return `<div class="flex flex-wrap gap-1.5">${v.slice(0, 40).map(chip).join('')}</div>`;
+                return `<div class="space-y-1.5">${v.slice(0, 20).map(x => metaVal(x, depth + 1)).join('')}</div>`;
+            }
+            if (typeof v === 'object') {
+                if (depth >= 2) return `<span class="break-words text-slate-400">${esc(JSON.stringify(v).slice(0, 200))}</span>`;
+                return metaKv(Object.entries(v).slice(0, 30).map(([k, x]) => [humanize(k), metaVal(x, depth + 1)]));
+            }
+            return esc(String(v));
+        }
+        function buildMetaPanel(nft) {
+            const m = nft.metaRaw || {}, parts = [], ov = [];
+            if (m.creator) ov.push([T('metaCreator'), metaVal(m.creator)]);
+            if (m.publisher) ov.push([T('metaPublisher'), metaVal(m.publisher)]);
+            if (m.collection && typeof m.collection === 'object') { if (m.collection.name) ov.push([T('metaCollection'), metaVal(m.collection.name)]); if (m.collection.family) ov.push([T('metaFamily'), metaVal(m.collection.family)]); }
+            else if (typeof m.collection === 'string') ov.push([T('metaCollection'), metaVal(m.collection)]);
+            if (m.category) ov.push([T('metaCategory'), metaVal(m.category)]);
+            if (Array.isArray(m.subcategories) && m.subcategories.length) ov.push([T('metaSubcategories'), metaVal(m.subcategories)]);
+            if (m.external_url) ov.push(['URL', metaVal(m.external_url)]);
+            if (ov.length) parts.push(metaCard(T('metaOverview'), metaKv(ov)));
+            const attrs = Array.isArray(m.attributes) ? m.attributes.slice(0, 48) : [];
+            if (attrs.length) parts.push(metaCard(T('metaAttributes'), `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${attrs.map(a => { const o = a && typeof a === 'object'; return `<div class="rounded-lg border border-obsidian-border/70 bg-obsidian-card/60 px-2.5 py-2 min-w-0"><div class="text-[9px] uppercase tracking-wider text-slate-500 break-words">${esc(o ? (a.trait_type || a.name || '—') : '—')}</div><div class="text-[11px] text-slate-100 break-words mt-0.5">${metaVal(o ? a.value : a)}</div></div>`; }).join('')}</div>`));
+            if (m.celestial_data && typeof m.celestial_data === 'object') parts.push(metaCard(humanize('celestial_data'), metaVal(m.celestial_data, 1)));
+            const links = [];
+            if (m.socials && typeof m.socials === 'object') for (const [k, u] of Object.entries(m.socials).slice(0, 12)) if (isHttpUrl(u)) links.push(`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-obsidian-border bg-obsidian-card/60 hover:border-obsidian-gold/60 text-[10px] font-mono text-slate-200 transition">${esc(humanize(k))} ↗</a>`);
+            if (links.length) parts.push(metaCard(T('metaLinks'), `<div class="flex flex-wrap gap-2">${links.join('')}</div>`));
+            const ih = m.integrity_hash;
+            if (ih && typeof ih === 'object') {
+                const rows = [];
+                if (ih.algorithm) rows.push([T('metaAlgorithm'), metaVal(ih.algorithm)]);
+                if (ih.media_checksum) rows.push([T('metaChecksum'), `<div class="flex items-start gap-2"><span id="meta-checksum" class="font-mono text-[10px] break-all select-all text-slate-300">${esc(String(ih.media_checksum).slice(0, 200))}</span><button data-action="copy" data-target="meta-checksum" class="text-slate-400 hover:text-white text-[10px] underline flex-shrink-0">Copy</button></div>`]);
+                for (const [k, x] of Object.entries(ih)) if (k !== 'algorithm' && k !== 'media_checksum') rows.push([humanize(k), metaVal(x)]);
+                if (rows.length) parts.push(metaCard(T('metaIntegrity'), metaKv(rows)));
+            }
+            const src = [];
+            const imgRaw = m.image || m.image_url || m.imageUrl || m.img, vidRaw = m.animation_url || m.video || m.video_url;
+            if (imgRaw) src.push([T('metaImage'), `<span class="font-mono text-[10px] break-all text-slate-300">${esc(String(imgRaw).slice(0, 300))}</span>`]);
+            if (vidRaw) src.push([T('metaVideo'), `<span class="font-mono text-[10px] break-all text-slate-300">${esc(String(vidRaw).slice(0, 300))}</span>`]);
+            if (nft.mediaOverride) src.push(['Orbitor', `<span class="text-emerald-300 text-[10px]">${esc(T('metaMediaOverride'))}</span>`]);
+            if (src.length) parts.push(metaCard(T('metaSources'), metaKv(src)));
+            const rest = Object.entries(m).filter(([k]) => !META_HANDLED.has(k)).slice(0, 30);
+            if (rest.length) parts.push(metaCard(T('metaOther'), metaKv(rest.map(([k, v]) => [humanize(k), metaVal(v)]))));
+            parts.push(`<div class="flex justify-end"><button data-action="copy-meta" class="text-[10px] font-mono text-slate-400 hover:text-white underline">${esc(T('metaCopyJson'))}</button></div>`);
+            return parts.join('');
+        }
+        function updateMetaToggle() {
+            const t = document.getElementById('detail-meta-toggle'), panel = document.getElementById('detail-meta-panel');
+            if (!t || !panel) return;
+            t.setAttribute('aria-expanded', detailMetaOpen ? 'true' : 'false');
+            document.getElementById('detail-meta-toggle-label').textContent = detailMetaOpen ? T('metaHide') : T('metaShow');
+            document.getElementById('detail-meta-chevron').style.transform = detailMetaOpen ? 'rotate(180deg)' : '';
+            panel.classList.toggle('hidden', !detailMetaOpen);
+        }
+        function toggleMeta() {
+            detailMetaOpen = !detailMetaOpen;
+            if (detailMetaOpen && currentActiveDetailNft) document.getElementById('detail-meta-panel').innerHTML = buildMetaPanel(currentActiveDetailNft);
+            updateMetaToggle();
+        }
+        function renderMetaSection(nft) {
+            const wrap = document.getElementById('detail-meta-wrap');
+            if (!wrap) return;
+            if (nft.metaRaw) { wrap.classList.remove('hidden'); if (detailMetaOpen) document.getElementById('detail-meta-panel').innerHTML = buildMetaPanel(nft); }
+            else wrap.classList.add('hidden');
+            updateMetaToggle();
+        }
+        // Panel de administrador: otra dirección IPFS (imagen / video) servida por el gateway gratuito Orbitor
+        function renderAdminPanel(nft) {
+            const wrap = document.getElementById('detail-admin-wrap');
+            if (!wrap) return;
+            if (!(connectedAccount && currentUserIsAdmin)) { wrap.classList.add('hidden'); return; }
+            wrap.classList.remove('hidden');
+            const canEdit = walletType === 'xaman';
+            document.getElementById('detail-admin-form').classList.toggle('hidden', !canEdit);
+            document.getElementById('detail-admin-note').classList.toggle('hidden', canEdit);
+            if (canEdit && adminFormFor !== nft.nftokenId) {
+                adminFormFor = nft.nftokenId;
+                const ov = MEDIA_OVERRIDES[nft.nftokenId] || {};
+                document.getElementById('admin-media-image').value = ov.image || '';
+                document.getElementById('admin-media-video').value = ov.video || '';
+            }
+        }
+        // Transferencias recibidas (ofertas privadas dirigidas a la billetera conectada)
+        function renderIncoming() {
+            const box = document.getElementById('incoming-box');
+            if (!box) return;
+            if (!connectedAccount || (!incoming.items.length && !incoming.loading)) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+            box.classList.remove('hidden');
+            const cards = incoming.items.map(({ it, offerIndex, from }) => `
+                <div class="flex items-center gap-3 p-3 rounded-xl border border-obsidian-gold/25 bg-obsidian-card/80">
+                    <div class="w-16 h-16 rounded-lg overflow-hidden bg-black flex items-center justify-center flex-shrink-0 cursor-pointer" data-action="details" data-id="${esc(it.nftokenId)}">${renderCardMedia(it, 'w-full h-full object-cover')}</div>
+                    <div class="min-w-0 flex-1"><p class="text-xs text-white font-medium truncate">${esc(it.title)}</p><p class="text-[10px] text-slate-400 font-mono truncate">${esc(T('incomingFrom', { from: short(from, 8, 6) }))}</p></div>
+                    <button data-action="accept-transfer" data-id="${esc(it.nftokenId)}" data-offer="${esc(offerIndex)}" class="btn-buy px-3 py-2 rounded-lg text-[11px] flex-shrink-0">${esc(T('acceptTransfer'))}</button>
+                </div>`).join('');
+            box.innerHTML = `<div class="rounded-2xl border border-obsidian-gold/30 bg-gradient-to-b from-obsidian-gold/5 to-transparent p-4 sm:p-5 space-y-3">
+                <div><h3 class="text-sm font-semibold text-white flex items-center gap-2">📥 ${esc(T('incomingTitle'))}${incoming.loading ? ' <span class="spinner" style="width:14px;height:14px;border-width:2px"></span>' : ''}</h3><p class="text-[11px] text-slate-400">${esc(T('incomingSub'))}</p></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">${cards}</div></div>`;
+        }
+        // Texto de "What is Aeterna Ledger?" (7 párrafos, traducido)
+        function renderAboutBody() {
+            const box = document.getElementById('t-about-desc');
+            if (!box) return;
+            const p = (ABOUT_BODY[getCurrentLang()] || ABOUT_BODY.en).slice();
+            const lead = p.shift(), closing = p.pop(), pair = p.pop();
+            box.innerHTML = `<p class="text-base sm:text-lg text-slate-200 font-light leading-relaxed">${esc(lead)}</p>`
+                + p.map(x => `<p class="text-sm text-slate-400 leading-relaxed">${esc(x)}</p>`).join('')
+                + `<p class="text-sm sm:text-base text-slate-200 leading-relaxed border-l-2 border-obsidian-gold/60 pl-4 py-1">${esc(pair)}</p>`
+                + `<p class="text-xs sm:text-sm text-obsidian-gold/90 italic font-mono pt-1">${esc(closing)}</p>`;
         }
 
         // ----- Historial desde nft_history (Clio) -----
@@ -2435,7 +2767,7 @@
             const id = String(nftokenId).toUpperCase();
             const nft = nftIndex.get(id) || makeItem({ nftokenId: id });
             const token = ++detailToken;
-            lastHistory = null; detailMediaKey = '';
+            lastHistory = null; detailMediaKey = ''; detailMetaOpen = false; adminFormFor = null;
             renderDetails(nft);
             document.getElementById('detail-history-list').innerHTML = `<div class="text-slate-500">${esc(T('loadingHistory'))}</div>`;
             document.getElementById('detail-history-toggle').classList.add('hidden');
@@ -2503,7 +2835,10 @@
             set('t-wallet-bifrost-desc', T('walletBifrostDesc')); set('t-wallet-rec', T('walletRecommended')); set('t-wallet-foot', T('walletNonCustodial'));
             set('wallet-bifrost-note', T('walletNotConfigured')); set('t-bifrost-title', T('bifrostScanTitle')); set('t-bifrost-steps', T('bifrostSteps'));
             set('bifrost-copy-btn', T('bifrostCopy')); set('t-bifrost-back', T('walletBack')); set('t-bsign-title', T('bifrostSignTitle'));
-            set('t-bsign-warn', T('bifrostSignWarn')); set('bifrost-reset-btn', T('bifrostReset')); set('t-bsign-cancel', T('cancel'));
+            set('t-bsign-warn', T('bifrostSignWarn')); set('bifrost-reset-btn', T('bifrostReset'));
+            set('t-admin-title', '🛠 ' + T('adminMediaTitle')); set('t-admin-desc', T('adminMediaDesc')); set('t-admin-image-lbl', T('adminMediaImage')); set('t-admin-video-lbl', T('adminMediaVideo'));
+            set('admin-save-btn', T('adminMediaSave')); set('admin-clear-btn', T('adminMediaClear')); set('admin-export-btn', T('adminMediaExport')); set('detail-admin-note', T('adminMediaXamanOnly'));
+            renderAboutBody(); updateMetaToggle(); renderIncoming(); set('t-bsign-cancel', T('cancel'));
             document.querySelectorAll('[data-action="refresh"]').forEach(b => b.textContent = '↻ ' + T('refresh'));
             const ti = document.getElementById('detail-history-toggle'); if (ti && lastHistory) renderHistory(lastHistory.events, lastHistory.ok);
         }
@@ -2527,6 +2862,12 @@
                 case 'toggle-history': toggleHistoryMode(); break;
                 case 'wallet-choose': chooseWallet(target); break;
                 case 'page': goToPage(target, id); break;
+                case 'toggle-meta': toggleMeta(); break;
+                case 'copy-meta': if (currentActiveDetailNft && currentActiveDetailNft.metaRaw) copyToClipboard(JSON.stringify(currentActiveDetailNft.metaRaw, null, 2)); break;
+                case 'accept-transfer': acceptTransfer(id, el.dataset.offer); break;
+                case 'admin-save': saveMediaOverride(false); break;
+                case 'admin-clear': saveMediaOverride(true); break;
+                case 'admin-export': exportMediaOverrides(); break;
             }
         });
         document.addEventListener('keydown', e => {
@@ -2568,6 +2909,7 @@
             try { fetch(BACKEND_URL + '/health', { mode: 'no-cors' }).catch(() => {}); } catch (e) {}
             loadStore(true);
             loadFeeInfo();
+            loadMediaOverrides();
         });
 
     </script>

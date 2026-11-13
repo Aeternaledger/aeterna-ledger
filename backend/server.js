@@ -12,6 +12,8 @@
      PLATFORM_FEE_BIFROST   → 'off' para no cobrar comisión a usuarios de Bifrost (por defecto 'on')
      ADMIN_ADDRESSES  → cuentas con permisos de administrador en la web, separadas por coma (por defecto MINTING_ADDRESS y TREASURY_ADDRESS)
      MEDIA_OVERRIDES_FILE / TRANSFERS_FILE → rutas de los archivos de datos (por defecto ./data/*.json; en Render usa un Disk)
+     UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN → (opcional, gratis) guarda registro, medios, transferencias y conexiones de forma PERMANENTE
+     ANALYTICS_FILE   → (sin Upstash) archivo de conexiones de billeteras (por defecto ./data/connections.jsonl)
      STORE_ADDRESSES  → cuentas cuyas ventas son de la Store, separadas por coma (por defecto MINTING_ADDRESS)
      REGISTRY_FILE    → ruta del registro del Marketplace (por defecto ./data/registry.json; en Render usa un Disk, ej. /var/data/registry.json)
    ===================================================================== */
@@ -139,26 +141,62 @@ const rateLimit = max => (req, res, next) => {
 };
 app.use('/api/', rateLimit(90));
 
+/* ---------- Almacenamiento: archivo (temporal en Render gratis) o Upstash Redis (permanente y gratis) ----------
+   Con UPSTASH_REDIS_REST_URL y UPSTASH_REDIS_REST_TOKEN todo se guarda en Redis y sobrevive a reinicios y despliegues. */
+const UPSTASH_URL = (process.env.UPSTASH_REDIS_REST_URL || '').replace(/\/+$/, '');
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
+const USE_REDIS = !!(UPSTASH_URL && UPSTASH_TOKEN && typeof fetch === 'function');
+const sleepMs = ms => new Promise(r => setTimeout(r, ms));
+async function redisCall(path, body) {
+    const r = await fetch(UPSTASH_URL + path, { method: 'POST', headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.error) throw new Error(j.error || ('Upstash HTTP ' + r.status));
+    return j;
+}
+const redis = async cmd => (await redisCall('', cmd)).result;
+const redisPipeline = async cmds => (await redisCall('/pipeline', cmds)).map(x => { if (x.error) throw new Error(x.error); return x.result; });
+const storeReady = [];
+// Objeto persistente { data, save }. "data" nunca se reemplaza (solo se muta), así las rutas pueden guardar una referencia.
+function jsonStore(name, file) {
+    const data = {}, key = 'aeterna:' + name;
+    let loaded = !USE_REDIS, timer = null;
+    const loadRemote = async () => {
+        const raw = await redis(['GET', key]);
+        if (raw) { const remote = JSON.parse(raw); for (const k of Object.keys(remote)) if (!(k in data)) data[k] = remote[k]; }
+        loaded = true;
+    };
+    if (USE_REDIS) {
+        storeReady.push((async () => {
+            for (let i = 0; i < 3 && !loaded; i++) { try { await loadRemote(); } catch (e) { console.error('[redis] lectura de', name, 'falló:', e.message); await sleepMs(1500); } }
+            if (!loaded) { const t = setInterval(() => loadRemote().then(() => clearInterval(t)).catch(() => {}), 30000); t.unref(); }   // no se guarda hasta leer, para no pisar datos remotos
+        })());
+    } else {
+        try { Object.assign(data, JSON.parse(fs.readFileSync(file, 'utf8'))); } catch (e) { /* primera vez */ }
+    }
+    const save = () => {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+            if (!loaded) return;
+            const body = JSON.stringify(data);
+            if (USE_REDIS) { try { await redis(['SET', key, body]); } catch (e) { console.error('[redis] escritura de', name, 'falló:', e.message); } }
+            else {
+                try { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; fs.writeFileSync(tmp, body); fs.renameSync(tmp, file); }
+                catch (e) { console.error('[store] no se pudo guardar', file, e.message); }
+            }
+        }, 500);
+    }
+    return { data, save };
+}
+
 /* ---------- Registro del Marketplace ----------
    XRPL no permite listar "todas las ofertas activas". Aquí se guardan los NFTs publicados desde tu web
    (de CUALQUIER emisor). Cada entrada se verifica contra el ledger y las que dejan de estar a la venta se eliminan solas. */
 const REGISTRY_FILE = process.env.REGISTRY_FILE || path.join(__dirname, 'data', 'registry.json');
 const REGISTRY_MAX = 5000;
 const CATEGORIES = ['Planets & Moons', 'Stars & Stellar Systems', 'Fauna & Wild Species', 'Botany & Master Flora', 'Minerals & Pure Elements', 'Global Geography & Waters', 'Concepts, Ideas & Knowledge', 'Symbols, Archetypes & Culture'];
-let registry = {};
-try { registry = JSON.parse(fs.readFileSync(REGISTRY_FILE, 'utf8')); } catch (e) { registry = {}; }
-let saveTimer = null;
-function saveRegistry() {
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-        try {
-            fs.mkdirSync(path.dirname(REGISTRY_FILE), { recursive: true });
-            const tmp = REGISTRY_FILE + '.tmp';
-            fs.writeFileSync(tmp, JSON.stringify(registry));
-            fs.renameSync(tmp, REGISTRY_FILE);
-        } catch (e) { console.error('[registry] no se pudo guardar:', e.message); }
-    }, 500);
-}
+const registryStore = jsonStore('registry', REGISTRY_FILE);
+const registry = registryStore.data;
+const saveRegistry = registryStore.save;
 // ¿Tiene una oferta de venta pública en XRP, vigente y hecha por su dueño actual?
 // Devuelve { seller } si hay oferta pública vigente de su dueño actual; null si no.
 async function hasPublicListing(client, id) {
@@ -209,20 +247,76 @@ async function pruneRegistry() {
 setInterval(pruneRegistry, 30 * 60 * 1000).unref();
 
 
-/* ---------- Almacenes JSON simples (se guardan en disco con escritura atómica) ---------- */
-function jsonStore(file) {
-    let data = {};
-    try { data = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { data = {}; }
-    let timer = null;
-    const save = () => {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            try { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(data)); fs.renameSync(tmp, file); }
-            catch (e) { console.error('[store] no se pudo guardar', file, e.message); }
-        }, 500);
-    };
-    return { get data() { return data; }, save };
+/* ---------- Registro de conexiones de billeteras + sesión de administrador ----------
+   Solo se guarda: dirección pública, tipo de billetera y fecha/hora. Xaman se registra en el servidor (firma verificada);
+   Bifrost lo informa la web y se marca como "no verificado". La sesión de administrador se obtiene con una FIRMA de Xaman. */
+const CONN_MAX = 50000, CONN_KEY = 'aeterna:connections';
+const connections = [];
+const CONN_FILE = process.env.ANALYTICS_FILE || path.join(__dirname, 'data', 'connections.jsonl');
+storeReady.push((async () => {
+    try {
+        if (USE_REDIS) { for (const row of (await redis(['LRANGE', CONN_KEY, '0', '-1'])) || []) { try { connections.push(JSON.parse(row)); } catch (e) {} } }
+        else { for (const line of fs.readFileSync(CONN_FILE, 'utf8').split('\n').filter(Boolean).slice(-CONN_MAX)) { try { connections.push(JSON.parse(line)); } catch (e) {} } }
+    } catch (e) { if (USE_REDIS) console.error('[redis] lectura de conexiones falló:', e.message); }
+})());
+function recordConnection(account, wallet, verified) {
+    const now = Date.now();
+    for (let i = connections.length - 1; i >= 0 && now - connections[i].t < 60000; i--) if (connections[i].a === account && connections[i].w === wallet) return;   // evita duplicados inmediatos
+    const ev = { t: now, a: account, w: wallet, v: !!verified };
+    connections.push(ev);
+    if (connections.length > CONN_MAX) connections.splice(0, connections.length - CONN_MAX);
+    if (USE_REDIS) redisPipeline([['RPUSH', CONN_KEY, JSON.stringify(ev)], ['LTRIM', CONN_KEY, String(-CONN_MAX), '-1']]).catch(e => console.error('[redis] conexión no guardada:', e.message));
+    else { try { fs.mkdirSync(path.dirname(CONN_FILE), { recursive: true }); fs.appendFile(CONN_FILE, JSON.stringify(ev) + '\n', () => {}); } catch (e) {} }
 }
+const pendingAdmin = new Map();   // uuid -> acción de administrador pendiente de firma
+const adminSessions = new Map();   // token -> { account, exp }
+const pendingConnect = new Map();  // uuid de SignIn de conexión -> ts
+setInterval(() => {
+    const now = Date.now();
+    for (const [k, v] of adminSessions) if (v.exp < now) adminSessions.delete(k);
+    for (const [k, v] of pendingConnect) if (now - v > 15 * 60 * 1000) pendingConnect.delete(k);
+}, 5 * 60 * 1000).unref();
+function issueAdminSession(account) {
+    const token = crypto.randomBytes(32).toString('hex');
+    adminSessions.set(token, { account, exp: Date.now() + 12 * 60 * 60 * 1000 });
+    return token;
+}
+function adminFromReq(req) {
+    const m = (req.get('authorization') || '').match(/^Bearer ([a-f0-9]{64})$/);
+    const sess = m && adminSessions.get(m[1]);
+    if (!sess || sess.exp < Date.now()) throw new HttpError(401, 'Sesión de administrador no válida o vencida.');
+    return sess.account;
+}
+app.post('/api/analytics/connect', rateLimit(30), wrap(async (req, res) => {
+    const { account, wallet } = req.body;
+    if (!isAddr(account)) throw new HttpError(400, 'Cuenta inválida.');
+    if (wallet !== 'bifrost') throw new HttpError(400, 'Solo se informan conexiones de Bifrost (Xaman se registra en el servidor).');
+    recordConnection(account, 'bifrost', false);
+    res.json({ success: true });
+}));
+app.get('/api/admin/analytics', rateLimit(60), wrap(async (req, res) => {
+    adminFromReq(req);
+    const days = Math.min(365, Math.max(1, parseInt(req.query.days, 10) || 30));
+    const since = Date.now() - days * 86400000;
+    const seen = new Set();
+    const all = connections.map(e => { const n = !seen.has(e.a); seen.add(e.a); return { ...e, n }; });
+    if (req.query.format === 'csv') {
+        const rows = ['utc_time,wallet_address,wallet,verified,first_connection', ...all.map(e => `${new Date(e.t).toISOString()},${e.a},${e.w},${e.v ? 'yes' : 'no'},${e.n ? 'yes' : 'no'}`)];
+        res.set({ 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="aeterna-connections.csv"' });
+        return res.send(rows.join('\n') + '\n');
+    }
+    res.json({ success: true, storage: USE_REDIS ? 'redis' : 'file', now: Date.now(), days,
+        totals: { events: all.length, unique: seen.size, verified: all.filter(e => e.v).length },
+        events: all.filter(e => e.t >= since).slice(-20000) });
+}));
+// Verificación de sesión de administrador (firma de Xaman; no crea ningún evento de conexión)
+app.post('/api/admin/session', rateLimit(20), wrap(async (req, res) => {
+    const { account } = req.body;
+    if (!isAddr(account) || !isAdminAccount(account)) throw new HttpError(403, 'Esta cuenta no es administradora.');
+    const created = await createPayload({ TransactionType: 'SignIn' }, 'Aeterna Ledger: admin session', { signer: account });
+    pendingAdmin.set(created.uuid, { kind: 'session', account, ts: Date.now() });
+    res.json({ success: true, ...created });
+}));
 
 /* ---------- Medios alternativos de IPFS (solo administradores) ----------
    El NFT ya minteado no puede cambiar su URI, pero la web puede mostrar otra dirección IPFS (imagen y/o video),
@@ -246,8 +340,7 @@ function normalizeMedia(v) {
     if (/^https:\/\//i.test(s)) return s;
     throw new HttpError(400, 'Usa un CID, ipfs://CID[/ruta] o una URL https.');
 }
-const overridesStore = jsonStore(process.env.MEDIA_OVERRIDES_FILE || path.join(__dirname, 'data', 'media-overrides.json'));
-const pendingAdmin = new Map();   // uuid -> acción pendiente de firma
+const overridesStore = jsonStore('media-overrides', process.env.MEDIA_OVERRIDES_FILE || path.join(__dirname, 'data', 'media-overrides.json'));
 setInterval(() => { for (const [k, v] of pendingAdmin) if (Date.now() - v.ts > 15 * 60 * 1000) pendingAdmin.delete(k); }, 5 * 60 * 1000).unref();
 function applyAdminAction(a) {
     const all = overridesStore.data;
@@ -276,7 +369,7 @@ app.post('/api/admin/media-override', rateLimit(20), wrap(async (req, res) => {
 /* ---------- Transferencias pendientes (ofertas privadas de 0 XRP con Destination) ----------
    Una transferencia en XRPL no es un "envío": el destinatario debe aceptar la oferta. Aquí se recuerdan las ofertas
    creadas desde la web para que el destinatario las vea y acepte dentro del sitio. Todo se verifica contra el ledger. */
-const transfersStore = jsonStore(process.env.TRANSFERS_FILE || path.join(__dirname, 'data', 'transfers.json'));
+const transfersStore = jsonStore('transfers', process.env.TRANSFERS_FILE || path.join(__dirname, 'data', 'transfers.json'));
 app.post('/api/transfers/report', rateLimit(30), wrap(async (req, res) => {
     const { nftokenId } = req.body;
     if (!HEX64.test(nftokenId || '')) throw new HttpError(400, 'NFTokenID inválido.');
@@ -322,7 +415,9 @@ app.get('/health', (req, res) => res.json({ ok: true }));
 
 /* ---------- 1. Conectar billetera (SignIn) ---------- */
 app.post('/api/connect-wallet', wrap(async (req, res) => {
-    res.json(await createPayload({ TransactionType: 'SignIn' }, 'Aeterna Ledger: sign in'));
+    const created = await createPayload({ TransactionType: 'SignIn' }, 'Aeterna Ledger: sign in');
+    pendingConnect.set(created.uuid, Date.now());
+    res.json(created);
 }));
 
 /* ---------- 2. Balance XRP ---------- */
@@ -492,13 +587,21 @@ app.get('/api/check-status/:uuid', wrap(async (req, res) => {
     const { signed, expired, cancelled, resolved } = info.meta;
     if (signed) {
         const account = info.response.account;
-        let adminApplied = false;
+        let adminApplied = false, adminToken = null;
         const pend = pendingAdmin.get(req.params.uuid);
         if (pend) {
             pendingAdmin.delete(req.params.uuid);
-            if (pend.account === account && isAdminAccount(account)) { applyAdminAction(pend); adminApplied = true; }
+            if (pend.account === account && isAdminAccount(account)) {
+                if (pend.kind === 'session') adminToken = issueAdminSession(account);
+                else { applyAdminAction(pend); adminApplied = true; }
+            }
         }
-        return res.json({ signed: true, expired: false, account, txHash: info.response.txid || null, isAdmin: isAdminAccount(account), adminApplied });
+        if (pendingConnect.has(req.params.uuid)) {              // conexión de billetera con Xaman (firma verificada)
+            pendingConnect.delete(req.params.uuid);
+            recordConnection(account, 'xaman', true);
+            if (isAdminAccount(account)) adminToken = issueAdminSession(account);
+        }
+        return res.json({ signed: true, expired: false, account, txHash: info.response.txid || null, isAdmin: isAdminAccount(account), adminApplied, adminToken });
     }
     if (expired) return res.json({ signed: false, expired: true });
     if (cancelled || resolved) return res.json({ signed: false, expired: false, rejected: true });   // el usuario rechazó en Xaman
@@ -529,4 +632,4 @@ app.post('/api/mint-nft', wrap(async (req, res) => {
     res.json({ success: true, message: 'NFT minted successfully on XRPL', txHash: result.result.hash, issuer: wallet.classicAddress });
 }));
 
-app.listen(PORT, () => console.log(`Servidor de Aeterna Ledger escuchando en el puerto ${PORT}`));
+Promise.all(storeReady).catch(() => {}).then(() => app.listen(PORT, () => console.log(`Servidor de Aeterna Ledger escuchando en el puerto ${PORT} · almacenamiento: ${USE_REDIS ? 'Upstash Redis (permanente)' : 'archivos locales (temporales en Render gratis)'}`)));

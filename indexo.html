@@ -2273,7 +2273,7 @@
             return connectBifrost();
         }
         function onWalletConnected(address, type, isAdmin) {
-            connectedAccount = address; walletType = type; currentUserIsAdmin = !!isAdmin;
+            connectedAccount = address; walletType = type; currentUserIsAdmin = !!isAdmin; resetMintForm();
             localStorage.setItem('aeterna_wallet', address);
             localStorage.setItem('aeterna_wallet_type', type);
             localStorage.setItem('aeterna_is_admin', currentUserIsAdmin);
@@ -2466,6 +2466,7 @@
             setAdminToken(''); adminState.data = null;
             for (const it of nftIndex.values()) { it.myOffers = []; }
             if (!document.getElementById('view-mynfts').classList.contains('hidden')) switchTab('store');
+                        resetMintForm();
             renderAll();
             if (currentTab === 'mint') renderMintPage();
             showToast(T('walletDisc'), 'info');
@@ -3097,6 +3098,7 @@
             }, 150);
         });
         window.addEventListener('DOMContentLoaded', async () => {
+            resetMintForm();
             const savedLang = localStorage.getItem('aeterna_lang') || 'en';
             const langSelect = document.getElementById('language-select');
             if (langSelect) langSelect.value = savedLang;
@@ -3751,6 +3753,32 @@
             showVerify(missing.length ? 'warn' : 'ok', `<div class="flex items-center gap-3">${thumb}<div class="min-w-0 space-y-0.5">${lines}</div></div>`);
             if (collName && !mel('mint-collection-name').value) { mel('mint-collection-name').value = collName; mintRecalc(); }
         }
+       
+        function resetMintForm(keepSuccess) {
+    clearTimeout(probeTimer); mintState.probeToken++;
+    ['mint-image','mint-video','mint-name','mint-desc','mint-external','mint-creator','mint-collection-name','mint-uri']
+        .forEach(i => { const e = mel(i); if (e) e.value = ''; });
+    const set = (id, fn) => { const e = mel(id); if (e) fn(e); };
+    set('mint-royalty', e => e.value = '5');
+    set('mint-taxon', e => { e.value = ''; delete e.dataset.touched; });
+    set('mint-collection', e => e.innerHTML = '');
+    set('mint-category', e => e.innerHTML = '');
+    set('mint-f-transferable', e => { e.checked = true; e.disabled = false; });
+    set('mint-f-onlyxrp', e => e.checked = true);
+    set('mint-f-burnable', e => e.checked = false);
+    set('mint-f-mutable', e => e.checked = false);
+    set('mint-attrs', e => e.innerHTML = '');
+    set('mint-json', e => e.textContent = '');
+    set('mint-json-actions', e => e.classList.add('hidden'));
+    set('mint-image-status', e => e.innerHTML = '');
+    set('mint-verify-box', e => { e.innerHTML = ''; e.classList.add('hidden'); });
+    set('mint-preview-media', e => { e.innerHTML = ''; delete e.dataset.key; });
+    set('mint-preview-name', e => e.textContent = '—');
+    set('mint-sum', e => e.innerHTML = '');
+    mintState.attrs = [{ k: '', v: '' }]; mintState.doc = null; mintState.uriChecked = null;
+    mintState.issuerTaxons = new Map(); mintState.taxonFor = null; mintState.rendered = false;
+    if (!keepSuccess) { mintState.last = null; set('mint-success', e => { e.innerHTML = ''; e.classList.add('hidden'); }); }
+}
 
         // ----- Página -----
         function renderMintPage() {
@@ -3803,7 +3831,11 @@
                 if (!id) { try { const list = await fresh(); const hit = list.find(n => n.uri === v.uri) || list[0]; id = hit && String(hit.nftokenId).toUpperCase(); } catch (e) {} }
                 if (!out.ok && !id) return outcomeToast(out, '');
                 if (v.collName) { const names = mintTaxonNames(); names[acct + ':' + v.taxon] = v.collName; saveJson(MINT_TAXON_KEY, names); }
-                mintState.issuerTaxons.set(v.taxon, (mintState.issuerTaxons.get(v.taxon) || 0) + 1);
+                const keepTaxons = new Map(mintState.issuerTaxons);
+                keepTaxons.set(v.taxon, (keepTaxons.get(v.taxon) || 0) + 1);
+                resetMintForm(true);                       // limpia el formulario; la tarjeta de éxito se mantiene
+                mintState.issuerTaxons = keepTaxons; mintState.taxonFor = acct;
+                renderMintPage();
                 if (!id) { showToast(T('mintPending'), 'warning'); return; }
                 if (v.category) Registry.add(id, { category: v.category, seller: acct });
                 mintState.last = { id, name: v.name, tx: signed.txHash || null };
@@ -3832,11 +3864,11 @@
             box.scrollIntoView && box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         function mintAnother() {
-            mintState.last = null; mintState.doc = null; mintState.attrs = [{ k: '', v: '' }];
-            ['mint-image', 'mint-video', 'mint-name', 'mint-desc', 'mint-external', 'mint-uri'].forEach(i => { mel(i).value = ''; });
-            mel('mint-verify-box').classList.add('hidden'); mel('mint-success').classList.add('hidden');
-            renderAttrRows(); mintRecalc(); window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    const keep = mintState.issuerTaxons, acct = connectedAccount;
+    resetMintForm();
+    mintState.issuerTaxons = keep; mintState.taxonFor = acct;
+    renderMintPage(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
     </script>
 </body>

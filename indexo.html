@@ -92,6 +92,7 @@
                 <nav class="flex space-x-1 text-xs font-mono overflow-x-auto max-w-full">
                     <button onclick="switchTab('store')" id="tab-store" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition nav-active whitespace-nowrap">Store</button>
                     <button onclick="switchTab('market')" id="tab-market" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Marketplace</button>
+                    <button onclick="switchTab('mint')" id="tab-mint" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Mint</button>
                     <button onclick="switchTab('mynfts')" id="tab-mynfts" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Holdings</button>
                     <button onclick="switchTab('about')" id="tab-about" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">About</button>
                     <button onclick="switchTab('admin')" id="tab-admin" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-400 hover:text-white border border-obsidian-gold/30 whitespace-nowrap">Admin</button>
@@ -210,6 +211,102 @@
                 </div>
             </div>
             <nav id="pager-holdings" aria-label="Pagination"></nav>
+        </section>
+        <section id="view-mint" class="hidden space-y-6 max-w-6xl mx-auto">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8">
+                <span class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20" data-i18n="mintBadge">Create</span>
+                <h2 class="text-2xl sm:text-3xl font-light text-white tracking-tight mt-2" data-i18n="mintTitle">Mint a new NFT</h2>
+                <p class="text-slate-400 text-sm leading-relaxed mt-1 max-w-3xl" data-i18n="mintDesc"></p>
+            </div>
+            <div id="mint-locked" class="hidden rounded-2xl border border-dashed border-obsidian-border p-8 text-center space-y-3">
+                <h3 class="text-base text-white" data-i18n="mintLockedTitle"></h3>
+                <p class="text-xs text-slate-400" data-i18n="mintLockedDesc"></p>
+                <button onclick="openWalletModal()" class="btn-xaman px-5 py-2.5 rounded-lg text-xs font-semibold" data-i18n="connectBtnLabel">Connect Wallet</button>
+            </div>
+            <div id="mint-success" class="hidden"></div>
+            <div id="mint-app" class="hidden">
+              <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+                <div class="lg:col-span-3 space-y-6 min-w-0">
+                    <section class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-5 sm:p-6 space-y-4">
+                        <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-obsidian-gold/15 border border-obsidian-gold/40 text-obsidian-gold text-xs font-mono flex items-center justify-center flex-shrink-0">1</span><div><h3 class="text-sm font-semibold text-white" data-i18n="mintStep1"></h3><p class="text-[11px] text-slate-400" data-i18n="mintStep1Sub"></p></div></div>
+                        <details class="group rounded-xl border border-obsidian-border bg-obsidian-dark/50 px-3.5 py-3 text-[11px] text-slate-300">
+                            <summary class="cursor-pointer text-slate-200 font-mono flex items-center justify-between gap-2"><span data-i18n="mintGuideTitle"></span><span class="text-obsidian-gold group-open:rotate-180 transition-transform" aria-hidden="true">&#8964;</span></summary>
+                            <div class="pt-3 space-y-2 leading-relaxed">
+                                <p data-i18n="mintGuide1"></p>
+                                <div class="flex flex-wrap gap-2">
+                                    <a href="https://pinata.cloud" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg border border-obsidian-border bg-obsidian-card/60 hover:border-obsidian-gold/60 text-[10px] font-mono text-slate-200 transition">Pinata &#8599;</a>
+                                    <a href="https://filebase.com" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg border border-obsidian-border bg-obsidian-card/60 hover:border-obsidian-gold/60 text-[10px] font-mono text-slate-200 transition">Filebase &#8599;</a>
+                                    <a href="https://storacha.network" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg border border-obsidian-border bg-obsidian-card/60 hover:border-obsidian-gold/60 text-[10px] font-mono text-slate-200 transition">Storacha &#8599;</a>
+                                </div>
+                                <p data-i18n="mintGuide2"></p>
+                                <p class="text-amber-200/90" data-i18n="mintGuide3"></p>
+                            </div>
+                        </details>
+                        <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintImage"></span><input id="mint-image" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                        <div id="mint-image-status" class="text-[11px] min-h-[1rem]" aria-live="polite"></div>
+                        <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintVideo"></span><input id="mint-video" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                    </section>
+                    <section class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-5 sm:p-6 space-y-4">
+                        <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-obsidian-gold/15 border border-obsidian-gold/40 text-obsidian-gold text-xs font-mono flex items-center justify-center flex-shrink-0">2</span><div><h3 class="text-sm font-semibold text-white" data-i18n="mintStep2"></h3><p class="text-[11px] text-slate-400" data-i18n="mintStep2Sub"></p></div></div>
+                        <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintName"></span><input id="mint-name" type="text" maxlength="120" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                        <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintDescription"></span><textarea id="mint-desc" rows="3" maxlength="1000" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs text-white focus:border-obsidian-gold outline-none"></textarea></label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCategory"></span><select id="mint-category" onchange="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></select></label>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCollectionName"></span><input id="mint-collection-name" type="text" maxlength="80" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                        </div>
+                        <p class="text-[10px] text-slate-500 -mt-2" data-i18n="mintCollectionHint"></p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintExternal"></span><input id="mint-external" type="url" placeholder="https://" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCreator"></span><input id="mint-creator" type="text" maxlength="80" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                        </div>
+                        <div class="space-y-2">
+                            <span class="text-[11px] text-slate-300" data-i18n="mintAttrs"></span>
+                            <div id="mint-attrs" class="space-y-2"></div>
+                            <button type="button" data-action="mint-attr-add" class="text-[11px] font-mono text-obsidian-gold hover:underline" data-i18n="mintAddAttr"></button>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-obsidian-border/60">
+                            <div class="flex items-center justify-between gap-2"><h4 class="text-[11px] font-mono uppercase tracking-wider text-slate-400" data-i18n="mintJsonTitle"></h4>
+                                <div id="mint-json-actions" class="hidden flex gap-3 text-[10px] font-mono"><button type="button" data-action="mint-copy-json" class="underline text-slate-400 hover:text-white" data-i18n="mintCopyJson"></button><button type="button" data-action="mint-download-json" class="underline text-slate-400 hover:text-white" data-i18n="mintDownloadJson"></button></div></div>
+                            <pre id="mint-json" class="text-[10px] font-mono text-slate-300 bg-black/40 border border-obsidian-border rounded-xl p-3 overflow-x-auto max-h-72 whitespace-pre-wrap break-words"></pre>
+                            <p class="text-[10px] text-slate-500 leading-snug" data-i18n="mintJsonHelp"></p>
+                        </div>
+                    </section>
+                    <section class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-5 sm:p-6 space-y-4">
+                        <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-obsidian-gold/15 border border-obsidian-gold/40 text-obsidian-gold text-xs font-mono flex items-center justify-center flex-shrink-0">3</span><div><h3 class="text-sm font-semibold text-white" data-i18n="mintStep3"></h3><p class="text-[11px] text-slate-400" data-i18n="mintUriHelp"></p></div></div>
+                        <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintUri"></span>
+                            <div class="flex gap-2"><input id="mint-uri" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"><button type="button" data-action="mint-verify" class="flex-shrink-0 bg-obsidian-border hover:bg-slate-800 text-slate-200 px-3.5 rounded-lg text-xs font-mono transition" data-i18n="mintVerify"></button></div></label>
+                        <div id="mint-verify-box" class="hidden" aria-live="polite"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCollection"></span><select id="mint-collection" onchange="onCollectionChange()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></select></label>
+                            <label id="mint-taxon-wrap" class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintTaxon"></span><input id="mint-taxon" type="number" min="0" max="4294967295" step="1" oninput="this.dataset.touched=1;mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                        </div>
+                        <p class="text-[10px] text-slate-500 -mt-2" data-i18n="mintTaxonHelp"></p>
+                        <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintRoyalty"></span><input id="mint-royalty" type="number" min="0" max="50" step="0.1" value="5" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"><span class="block text-[10px] text-slate-500" data-i18n="mintRoyaltyHelp"></span></label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-obsidian-border bg-obsidian-dark/50 px-3 py-2.5 hover:border-obsidian-gold/40 transition"><input type="checkbox" id="mint-f-transferable" onchange="mintRecalc()" class="mt-0.5 accent-yellow-500"><span class="min-w-0"><span class="block text-xs text-slate-100" data-i18n="mintFlagTransferable"></span><span class="block text-[10px] text-slate-500 leading-snug" data-i18n="mintFlagTransferableHelp"></span></span></label>
+                            <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-obsidian-border bg-obsidian-dark/50 px-3 py-2.5 hover:border-obsidian-gold/40 transition"><input type="checkbox" id="mint-f-onlyxrp" onchange="mintRecalc()" class="mt-0.5 accent-yellow-500"><span class="min-w-0"><span class="block text-xs text-slate-100" data-i18n="mintFlagOnlyXrp"></span><span class="block text-[10px] text-slate-500 leading-snug" data-i18n="mintFlagOnlyXrpHelp"></span></span></label>
+                            <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-obsidian-border bg-obsidian-dark/50 px-3 py-2.5 hover:border-obsidian-gold/40 transition"><input type="checkbox" id="mint-f-burnable" onchange="mintRecalc()" class="mt-0.5 accent-yellow-500"><span class="min-w-0"><span class="block text-xs text-slate-100" data-i18n="mintFlagBurnable"></span><span class="block text-[10px] text-slate-500 leading-snug" data-i18n="mintFlagBurnableHelp"></span></span></label>
+                            <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-obsidian-border bg-obsidian-dark/50 px-3 py-2.5 hover:border-obsidian-gold/40 transition"><input type="checkbox" id="mint-f-mutable" onchange="mintRecalc()" class="mt-0.5 accent-yellow-500"><span class="min-w-0"><span class="block text-xs text-slate-100" data-i18n="mintFlagMutable"></span><span class="block text-[10px] text-slate-500 leading-snug" data-i18n="mintFlagMutableHelp"></span></span></label>
+                        </div>
+                    </section>
+                </div>
+                <aside class="lg:col-span-2 min-w-0">
+                    <div class="lg:sticky lg:top-24 space-y-4">
+                        <div class="rounded-2xl border border-obsidian-gold/30 bg-obsidian-card/70 p-4 sm:p-5 space-y-3">
+                            <h4 class="text-[10px] font-mono uppercase tracking-[0.18em] text-obsidian-gold" data-i18n="mintPreview"></h4>
+                            <div id="mint-preview-media" class="h-56 sm:h-64 bg-black rounded-xl overflow-hidden flex items-center justify-center"></div>
+                            <h3 id="mint-preview-name" class="text-sm font-medium text-white break-words">&mdash;</h3>
+                            <div id="mint-sum" class="space-y-1.5 text-[11px] font-mono"></div>
+                        </div>
+                        <div class="rounded-2xl border border-obsidian-border bg-obsidian-dark/50 p-4 space-y-1.5">
+                            <h4 class="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-400" data-i18n="mintCosts"></h4>
+                            <p class="text-[11px] text-slate-400 leading-relaxed" data-i18n="mintCostText"></p>
+                        </div>
+                        <button id="mint-submit" type="button" data-action="mint-submit" class="w-full btn-buy py-3.5 rounded-xl text-xs font-bold tracking-wide uppercase disabled:opacity-50"><span id="mint-submit-label">Mint NFT</span></button>
+                    </div>
+                </aside>
+              </div>
+            </div>
         </section>
         <!-- VISTA 4: ABOUT -->
         <section id="view-about" class="hidden space-y-8 max-w-4xl mx-auto">
@@ -2186,6 +2283,7 @@
             state.holdings.items = []; state.holdings.loadedAt = 0;
             renderAll();
             loadHoldings(true);
+            if (currentTab === 'mint') renderMintPage();
         }
 
         // ----- Xaman -----
@@ -2369,6 +2467,7 @@
             for (const it of nftIndex.values()) { it.myOffers = []; }
             if (!document.getElementById('view-mynfts').classList.contains('hidden')) switchTab('store');
             renderAll();
+            if (currentTab === 'mint') renderMintPage();
             showToast(T('walletDisc'), 'info');
         }
 
@@ -2900,7 +2999,7 @@
            NAVEGACIÓN, EVENTOS E INICIO
            ===================================================================== */
         function switchTab(tab) {
-            ['store', 'market', 'mynfts', 'about', 'admin'].forEach(v => {
+            ['store', 'market', 'mint', 'mynfts', 'about', 'admin'].forEach(v => {
                 const el = document.getElementById(`view-${v}`), tabEl = document.getElementById(`tab-${v}`);
                 if (el) el.classList.add('hidden');
                 if (tabEl) tabEl.classList.remove('nav-active');
@@ -2913,6 +3012,7 @@
             else if (tab === 'market') loadMarket();
             else if (tab === 'mynfts') loadHoldings();
             else if (tab === 'admin') loadAnalytics();
+            else if (tab === 'mint') renderMintPage();
         }
         function applyExtraI18n() {
             const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
@@ -2926,7 +3026,7 @@
             set('t-bsign-warn', T('bifrostSignWarn')); set('bifrost-reset-btn', T('bifrostReset'));
             set('t-admin-title', '🛠 ' + T('adminMediaTitle')); set('t-admin-desc', T('adminMediaDesc')); set('t-admin-image-lbl', T('adminMediaImage')); set('t-admin-video-lbl', T('adminMediaVideo'));
             set('admin-save-btn', T('adminMediaSave')); set('admin-clear-btn', T('adminMediaClear')); set('admin-export-btn', T('adminMediaExport')); set('detail-admin-note', T('adminMediaXamanOnly'));
-            renderAboutBody(); updateMetaToggle(); renderIncoming(); applyFooter(); applyAdminI18n(); set('t-bsign-cancel', T('cancel'));
+            renderAboutBody(); updateMetaToggle(); renderIncoming(); applyFooter(); applyAdminI18n(); applyMintI18n(); set('t-bsign-cancel', T('cancel'));
             document.querySelectorAll('[data-action="refresh"]').forEach(b => b.textContent = '↻ ' + T('refresh'));
             const ti = document.getElementById('detail-history-toggle'); if (ti && lastHistory) renderHistory(lastHistory.events, lastHistory.ok);
         }
@@ -2958,6 +3058,15 @@
                 case 'admin-csv': exportConnectionsCsv(); break;
                 case 'admin-more': adminState.shown += 25; renderAdmin(); break;
                 case 'admin-verify': verifyAdminSession(); break;
+                case 'mint-verify': verifyMintUri(); break;
+                case 'mint-submit': submitMint(); break;
+                case 'mint-attr-add': if (mintState.attrs.length < 12) { mintState.attrs.push({ k: '', v: '' }); renderAttrRows(); } break;
+                case 'mint-attr-del': mintState.attrs.splice(+id, 1); if (!mintState.attrs.length) mintState.attrs.push({ k: '', v: '' }); renderAttrRows(); mintRecalc(); break;
+                case 'mint-copy-json': copyMintJson(); break;
+                case 'mint-download-json': downloadMintJson(); break;
+                case 'mint-view': if (mintState.last) openDetailsModal(mintState.last.id); break;
+                case 'mint-list': if (mintState.last) openListNftModal(mintState.last.id); break;
+                case 'mint-another': mintAnother(); break;
                 case 'copy-meta': if (currentActiveDetailNft && currentActiveDetailNft.metaRaw) copyToClipboard(JSON.stringify(currentActiveDetailNft.metaRaw, null, 2)); break;
                 case 'accept-transfer': acceptTransfer(id, el.dataset.offer); break;
                 case 'admin-save': saveMediaOverride(false); break;
@@ -3055,10 +3164,10 @@
                         'Nothing on this website is financial, investment, legal or tax advice, and Aeterna makes no promise of profit. NFTs are offered as digital collectibles, not as investment products. You are responsible for your own tax obligations.'
                     ] },
                     { h: 'Permanence and availability of content', p: [
-                        'Words such as “permanent” or “forever” describe the intent of recording on a public blockchain, not a guarantee. The token record depends on the XRP Ledger network. Metadata and media are usually stored off-chain (for example on IPFS) and depend on third-party pinning services and gateways, including free public gateways such as Orbitor. Aeterna does not guarantee their availability or integrity, and may change the gateways used to display content. Creators and holders are encouraged to keep their own copies and pins.'
+                        'Words such as “permanent” or “forever” describe the intent of recording on a public blockchain, not a guarantee. The token record depends on the XRP Ledger network. Metadata and media are usually stored off-chain (for example on IPFS) and depend on third-party pinning services and gateways, including free public gateways such as Orbitor. Aeterna does not guarantee their availability or integrity, and may change the gateways used to display content. Aeterna does not host the files of NFTs created by users: creators are responsible for storing and pinning their own files. Creators and holders are encouraged to keep their own copies and pins.'
                     ] },
                     { h: 'Creators, listings and prohibited content', p: [
-                        'If you list or sell an NFT you represent and warrant that you have the right to do so and that the content does not infringe third-party rights and is lawful. The following is prohibited: infringing, fraudulent, misleading or impersonating content; illegal content; malware; hateful or violent content; any content that sexualises or exploits minors.',
+                        'If you mint, list or sell an NFT you represent and warrant that you have the right to do so and that the content does not infringe third-party rights and is lawful. The following is prohibited: infringing, fraudulent, misleading or impersonating content; illegal content; malware; hateful or violent content; any content that sexualises or exploits minors.',
                         'Aeterna may hide listings or media from its interface, or restrict access, at its discretion or after a valid notice. It cannot remove or alter tokens recorded on the XRP Ledger. Notices about infringing or unlawful content can be sent to the contact below.'
                     ] },
                     { h: 'Intellectual property and third-party marks', p: [
@@ -3120,10 +3229,10 @@
                         'Nada en este sitio es asesoría financiera, de inversión, legal ni tributaria, y Aeterna no promete ganancias. Los NFTs se ofrecen como coleccionables digitales, no como productos de inversión. Eres responsable de tus obligaciones tributarias.'
                     ] },
                     { h: 'Permanencia y disponibilidad del contenido', p: [
-                        'Palabras como “permanente” o “para siempre” describen la intención de registrar en una blockchain pública, no una garantía. El registro del token depende de la red XRP Ledger. Los metadatos y medios suelen almacenarse fuera de la cadena (por ejemplo en IPFS) y dependen de servicios de pinning y gateways de terceros, incluidos gateways públicos gratuitos como Orbitor. Aeterna no garantiza su disponibilidad ni integridad y puede cambiar los gateways usados para mostrar el contenido. Se recomienda a creadores y titulares conservar sus propias copias y pins.'
+                        'Palabras como “permanente” o “para siempre” describen la intención de registrar en una blockchain pública, no una garantía. El registro del token depende de la red XRP Ledger. Los metadatos y medios suelen almacenarse fuera de la cadena (por ejemplo en IPFS) y dependen de servicios de pinning y gateways de terceros, incluidos gateways públicos gratuitos como Orbitor. Aeterna no garantiza su disponibilidad ni integridad y puede cambiar los gateways usados para mostrar el contenido. Aeterna no aloja los archivos de los NFTs creados por usuarios: cada creador es responsable de almacenar y mantener (pin) sus propios archivos. Se recomienda a creadores y titulares conservar sus propias copias y pins.'
                     ] },
                     { h: 'Creadores, publicaciones y contenido prohibido', p: [
-                        'Si publicas o vendes un NFT declaras y garantizas que tienes derecho a hacerlo, que el contenido no infringe derechos de terceros y que es lícito. Está prohibido: contenido infractor, fraudulento, engañoso o que suplante identidades; contenido ilegal; malware; contenido de odio o violento; y cualquier contenido que sexualice o explote a menores.',
+                        'Si creas (mint), publicas o vendes un NFT declaras y garantizas que tienes derecho a hacerlo, que el contenido no infringe derechos de terceros y que es lícito. Está prohibido: contenido infractor, fraudulento, engañoso o que suplante identidades; contenido ilegal; malware; contenido de odio o violento; y cualquier contenido que sexualice o explote a menores.',
                         'Aeterna puede ocultar publicaciones o medios en su interfaz, o restringir el acceso, a su criterio o tras un aviso válido. No puede eliminar ni modificar los tokens registrados en el XRP Ledger. Los avisos sobre contenido infractor o ilícito pueden enviarse al contacto indicado abajo.'
                     ] },
                     { h: 'Propiedad intelectual y marcas de terceros', p: [
@@ -3389,6 +3498,345 @@
         let adminResizeTimer = null;
         window.addEventListener('resize', () => { clearTimeout(adminResizeTimer); adminResizeTimer = setTimeout(() => { if (currentTab === 'admin' && adminState.data) renderAdmin(); }, 200); });
         setInterval(() => { if (currentTab === 'admin' && document.visibilityState === 'visible' && adminState.token && !adminState.loading) loadAnalytics(); }, 60000);
+
+
+        /* =====================================================================
+           MINT: crea NFTs (NFTokenMint) firmando con Xaman o Bifrost.
+           La web NO aloja archivos: el usuario sube los suyos a IPFS (servicio gratuito) y pega los CID.
+           ===================================================================== */
+        Object.assign(EXTRA_I18N.en, {
+            mintBadge: 'Create', mintTitle: 'Mint a new NFT', mintDesc: 'Create your own NFT on the XRP Ledger. You sign with your wallet and your files stay on IPFS: Aeterna never hosts them.',
+            mintLockedTitle: 'Connect your wallet to mint', mintLockedDesc: 'Minting is signed in your own wallet (Xaman or Bifrost). Your keys never leave it.',
+            mintStep1: 'Media', mintStep1Sub: 'Your files live on IPFS. Upload them with a free service and paste the CID or link here.',
+            mintGuideTitle: 'How do I get a CID for free?', mintGuide1: 'Create a free account on one of these services:', mintGuide2: 'Upload your image (and video) and copy its CID. It starts with "bafy…", "bafk…" or "Qm…".',
+            mintGuide3: 'Keep the files pinned in your account. If they are unpinned they can disappear and the NFT will lose its media.',
+            mintImage: 'Image (CID or ipfs://…) *', mintVideo: 'Video / 3D (optional)', mintChecking: 'Checking…',
+            mintImgOk: '✓ The image loads through the gateway', mintImgFail: '⚠ The image could not be loaded yet. Check the CID and that the file is pinned (a new upload can take a minute).', mintImgBad: '⚠ This is not a valid CID or link.',
+            mintStep2: 'Details', mintStep2Sub: 'We build the metadata file (XLS-24) for you.',
+            mintName: 'Name *', mintDescription: 'Description', mintCategory: 'Category', mintCollectionName: 'Collection name', mintCollectionHint: 'Saved in the metadata (collection.name). Use the same name for every NFT of the collection.',
+            mintExternal: 'External link (optional, https)', mintCreator: 'Creator (optional)', mintAttrs: 'Attributes', mintAddAttr: '+ Add attribute', mintAttrName: 'Trait', mintAttrValue: 'Value',
+            mintJsonTitle: 'Metadata file (JSON)', mintCopyJson: 'Copy', mintDownloadJson: 'Download', mintJsonHelp: 'Upload this file to IPFS with the same service, then paste its CID in step 3. Already have your own metadata file? Skip to step 3.',
+            mintJsonEmpty: 'Fill in the name and a valid image to see the file.',
+            mintStep3: 'Mint settings', mintUri: 'Metadata URI (CID or ipfs://…) *', mintVerify: 'Verify', mintUriHelp: 'This is the link stored on the ledger (max. 256 bytes).',
+            mintVerifyOk: 'Metadata found', mintVerifyMissing: 'Missing in the metadata: {fields}', mintVerifyFail: 'We could not read the metadata. Check the CID and that it is pinned.', mintVerifyNotJson: 'This link is a plain file, not a JSON metadata file. It will mint, but it will show no name or description.',
+            mintCollection: 'Collection', mintNewCollection: 'New collection', mintTaxon: 'Collection number (taxon)', mintTaxonHelp: 'Identifies the collection on the ledger and cannot be changed after minting. Reuse a number to add to that collection.',
+            mintRoyalty: 'Royalty on resales (%)', mintRoyaltyHelp: 'Paid to you (the issuer) on every resale. From 0 to 50. Many marketplaces use 2.5 to 10.',
+            mintFlagTransferable: 'Transferable', mintFlagTransferableHelp: 'Needed to sell or give it away. Always on if you set a royalty.',
+            mintFlagOnlyXrp: 'Sell in XRP only', mintFlagOnlyXrpHelp: 'Recommended: this marketplace trades in XRP.',
+            mintFlagBurnable: 'Burnable by me', mintFlagBurnableHelp: 'Lets you, as issuer, burn the NFT even after someone buys it. Leaving it off builds more trust.',
+            mintFlagMutable: 'Updatable metadata', mintFlagMutableHelp: 'Lets you change the metadata link later (useful if you change storage). Some collectors prefer immutable NFTs.',
+            mintPreview: 'Preview', mintSummary: 'Summary', mintUriBytes: 'URI size', mintCosts: 'Costs', mintCostText: 'Network fee: a tiny fraction of an XRP. Reserve: 0.2 XRP per page of up to 32 NFTs, recoverable if you burn them. You need that XRP in your wallet.',
+            mintSubmit: 'Mint NFT', mintMinting: 'Waiting for your signature…', scanToMint: 'Scan with Xaman to mint "{name}"',
+            mintNeedImage: 'Add a valid image.', mintNeedName: 'Add a name.', mintNeedUri: 'Paste the metadata URI (step 3).', mintUriInvalid: 'The metadata URI is not a valid CID or https link.', mintUriTooLong: 'The URI is {n} bytes; XRPL allows 256.',
+            mintBadTaxon: 'The collection number must be a whole number from 0 to 4294967295.', mintBadRoyalty: 'The royalty must be between 0 and 50.', mintLowBalance: 'Your balance looks low for the reserve (0.2 XRP). The transaction may fail.',
+            mintOk: 'NFT minted: "{name}".', mintPending: 'Signed, but the NFT has not appeared yet. Check My NFTs in a moment.',
+            mintSuccessTitle: 'NFT minted!', mintSuccessDesc: '"{name}" is now in your wallet.', mintViewNft: 'View NFT', mintListNft: 'List for sale', mintAnother: 'Mint another', mintIdLbl: 'NFTokenID', mintTxLbl: 'Transaction',
+            mintCollectionOpt: 'Collection #{n}', mintCollectionOptNamed: '#{n} · {name}', mintItems: '{n} NFTs', mintItem: '{n} NFT'
+        });
+        Object.assign(EXTRA_I18N.es, {
+            mintBadge: 'Crear', mintTitle: 'Crear un nuevo NFT', mintDesc: 'Crea tu propio NFT en el XRP Ledger. Firmas con tu billetera y tus archivos quedan en IPFS: Aeterna nunca los aloja.',
+            mintLockedTitle: 'Conecta tu billetera para crear NFTs', mintLockedDesc: 'El mint se firma en tu propia billetera (Xaman o Bifrost). Tus llaves nunca salen de ella.',
+            mintStep1: 'Medios', mintStep1Sub: 'Tus archivos viven en IPFS. Súbelos con un servicio gratuito y pega aquí el CID o el enlace.',
+            mintGuideTitle: '¿Cómo obtengo un CID gratis?', mintGuide1: 'Crea una cuenta gratuita en uno de estos servicios:', mintGuide2: 'Sube tu imagen (y video) y copia su CID. Empieza con "bafy…", "bafk…" o "Qm…".',
+            mintGuide3: 'Mantén los archivos fijados (pinned) en tu cuenta. Si se desfijan pueden desaparecer y el NFT perdería sus medios.',
+            mintImage: 'Imagen (CID o ipfs://…) *', mintVideo: 'Video / 3D (opcional)', mintChecking: 'Comprobando…',
+            mintImgOk: '✓ La imagen carga a través del gateway', mintImgFail: '⚠ Aún no se pudo cargar la imagen. Revisa el CID y que el archivo esté fijado (una subida nueva puede tardar un minuto).', mintImgBad: '⚠ Esto no es un CID ni un enlace válido.',
+            mintStep2: 'Detalles', mintStep2Sub: 'Armamos por ti el archivo de metadatos (XLS-24).',
+            mintName: 'Nombre *', mintDescription: 'Descripción', mintCategory: 'Categoría', mintCollectionName: 'Nombre de la colección', mintCollectionHint: 'Se guarda en los metadatos (collection.name). Usa el mismo nombre para todos los NFTs de la colección.',
+            mintExternal: 'Enlace externo (opcional, https)', mintCreator: 'Creador (opcional)', mintAttrs: 'Atributos', mintAddAttr: '+ Agregar atributo', mintAttrName: 'Rasgo', mintAttrValue: 'Valor',
+            mintJsonTitle: 'Archivo de metadatos (JSON)', mintCopyJson: 'Copiar', mintDownloadJson: 'Descargar', mintJsonHelp: 'Sube este archivo a IPFS con el mismo servicio y luego pega su CID en el paso 3. ¿Ya tienes tu propio archivo de metadatos? Salta al paso 3.',
+            mintJsonEmpty: 'Completa el nombre y una imagen válida para ver el archivo.',
+            mintStep3: 'Ajustes del mint', mintUri: 'URI de metadatos (CID o ipfs://…) *', mintVerify: 'Verificar', mintUriHelp: 'Es el enlace que se guarda en el ledger (máx. 256 bytes).',
+            mintVerifyOk: 'Metadatos encontrados', mintVerifyMissing: 'Faltan en los metadatos: {fields}', mintVerifyFail: 'No pudimos leer los metadatos. Revisa el CID y que esté fijado.', mintVerifyNotJson: 'Este enlace es un archivo simple, no un JSON de metadatos. Se podrá mintear, pero no mostrará nombre ni descripción.',
+            mintCollection: 'Colección', mintNewCollection: 'Nueva colección', mintTaxon: 'Número de colección (taxon)', mintTaxonHelp: 'Identifica la colección en el ledger y no se puede cambiar después del mint. Repite un número para sumar a esa colección.',
+            mintRoyalty: 'Regalía en reventas (%)', mintRoyaltyHelp: 'Se te paga a ti (el emisor) en cada reventa. De 0 a 50. Muchos mercados usan de 2.5 a 10.',
+            mintFlagTransferable: 'Transferible', mintFlagTransferableHelp: 'Necesario para venderlo o regalarlo. Siempre activo si pones regalía.',
+            mintFlagOnlyXrp: 'Vender solo en XRP', mintFlagOnlyXrpHelp: 'Recomendado: este mercado opera en XRP.',
+            mintFlagBurnable: 'Quemable por mí', mintFlagBurnableHelp: 'Te permite, como emisor, quemar el NFT incluso después de que alguien lo compre. Dejarlo apagado genera más confianza.',
+            mintFlagMutable: 'Metadatos actualizables', mintFlagMutableHelp: 'Te permite cambiar el enlace de metadatos más adelante (útil si cambias de almacenamiento). Algunos coleccionistas prefieren NFTs inmutables.',
+            mintPreview: 'Vista previa', mintSummary: 'Resumen', mintUriBytes: 'Tamaño de la URI', mintCosts: 'Costos', mintCostText: 'Comisión de red: una fracción mínima de XRP. Reserva: 0.2 XRP por cada página de hasta 32 NFTs, recuperable si los quemas. Necesitas ese XRP en tu billetera.',
+            mintSubmit: 'Crear NFT', mintMinting: 'Esperando tu firma…', scanToMint: 'Escanea con Xaman para crear "{name}"',
+            mintNeedImage: 'Agrega una imagen válida.', mintNeedName: 'Agrega un nombre.', mintNeedUri: 'Pega la URI de los metadatos (paso 3).', mintUriInvalid: 'La URI de metadatos no es un CID ni un enlace https válido.', mintUriTooLong: 'La URI mide {n} bytes; XRPL permite 256.',
+            mintBadTaxon: 'El número de colección debe ser un entero de 0 a 4294967295.', mintBadRoyalty: 'La regalía debe estar entre 0 y 50.', mintLowBalance: 'Tu saldo parece bajo para la reserva (0.2 XRP). La transacción podría fallar.',
+            mintOk: 'NFT creado: "{name}".', mintPending: 'Firmado, pero el NFT aún no aparece. Revisa Mis NFTs en un momento.',
+            mintSuccessTitle: '¡NFT creado!', mintSuccessDesc: '"{name}" ya está en tu billetera.', mintViewNft: 'Ver NFT', mintListNft: 'Poner en venta', mintAnother: 'Crear otro', mintIdLbl: 'NFTokenID', mintTxLbl: 'Transacción',
+            mintCollectionOpt: 'Colección #{n}', mintCollectionOptNamed: '#{n} · {name}', mintItems: '{n} NFTs', mintItem: '{n} NFT'
+        });
+
+        const MINT_TAXON_KEY = 'aeterna_taxon_names_v1';
+        const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{40,}|k[a-z0-9]{40,}|z[1-9A-HJ-NP-Za-km-z]{40,})$/i;
+        const mintState = { doc: null, attrs: [{ k: '', v: '' }], issuerTaxons: new Map(), taxonFor: null, busy: false, last: null, probeToken: 0 };
+        const mel = id => document.getElementById(id);
+        const mintTaxonNames = () => loadJson(MINT_TAXON_KEY, {});
+
+        // Acepta CID, ipfs://CID[/ruta], /ipfs/CID, URL de gateway o https. Devuelve la forma canónica ('' si está vacío) o lanza error.
+        function normalizeIpfsInput(v) {
+            let s = String(v ?? '').trim();
+            if (!s) return '';
+            if (s.length > 600 || /[\s<>"'`\\]/.test(s)) throw new Error('invalid');
+            let m = s.match(/^https?:\/\/[^/]+\/ipfs\/([^/?#]+)(\/[^?#]*)?/i) || s.match(/^https?:\/\/([a-z2-7]{40,})\.ipfs\.[^/]+(\/[^?#]*)?/i);
+            if (m) s = 'ipfs://' + m[1] + (m[2] || '');
+            s = s.replace(/^\/ipfs\//i, 'ipfs://').replace(/^ipfs:\/\/ipfs\//i, 'ipfs://');
+            if (!/^[a-z]+:/i.test(s) && CID_RE.test(s.split('/')[0])) s = 'ipfs://' + s;
+            if (/^ipfs:\/\//i.test(s)) { const rest = s.slice(7); if (!CID_RE.test(rest.split('/')[0])) throw new Error('invalid'); return 'ipfs://' + rest; }
+            if (/^https:\/\//i.test(s)) return s;
+            throw new Error('invalid');
+        }
+        const safeNorm = v => { try { return normalizeIpfsInput(v); } catch (e) { return null; } };   // null = inválido, '' = vacío
+
+        function setHtml(id, html) { const e = mel(id); if (e) e.innerHTML = html; }
+        function applyMintI18n() {
+            document.querySelectorAll('#view-mint [data-i18n]').forEach(e => { e.textContent = T(e.dataset.i18n); });
+            document.querySelectorAll('#view-mint [data-i18n-ph]').forEach(e => { e.placeholder = T(e.dataset.i18nPh); });
+            if (mintState.rendered) { fillMintCategories(true); refreshCollectionOptions(); mintRecalc(); }
+        }
+        function fillMintCategories(keep) {
+            const sel = mel('mint-category'); if (!sel) return;
+            const cur = keep ? sel.value : '';
+            sel.innerHTML = [...CATEGORIES, UNCAT].map(c => `<option value="${esc(c)}">${esc(c === UNCAT ? T('uncategorized') : c)}</option>`).join('');
+            sel.value = cur && [...CATEGORIES, UNCAT].includes(cur) ? cur : CATEGORIES[0];
+        }
+
+        // ----- Colecciones del emisor (taxon) -----
+        function collectionList() {
+            const map = new Map();
+            for (const it of state.holdings.items) if (it.issuer === connectedAccount && it.taxon != null) {
+                const e = map.get(it.taxon) || { taxon: it.taxon, name: '', count: 0 }; e.count++;
+                const n = it.metaRaw && it.metaRaw.collection && it.metaRaw.collection.name;
+                if (n && !e.name) e.name = String(n).slice(0, 80);
+                map.set(it.taxon, e);
+            }
+            for (const [t, c] of mintState.issuerTaxons) if (!map.has(t)) map.set(t, { taxon: t, name: '', count: c });
+            const names = mintTaxonNames();
+            for (const e of map.values()) if (!e.name && names[connectedAccount + ':' + e.taxon]) e.name = names[connectedAccount + ':' + e.taxon];
+            return [...map.values()].sort((a, b) => a.taxon - b.taxon);
+        }
+        const nextTaxon = () => { const l = collectionList(); return l.length ? Math.max(...l.map(x => x.taxon)) + 1 : 1; };
+        function refreshCollectionOptions() {
+            const sel = mel('mint-collection'); if (!sel) return;
+            const prev = sel.value, list = collectionList();
+            sel.innerHTML = list.map(e => `<option value="t:${e.taxon}">${esc(e.name ? T('mintCollectionOptNamed', { n: e.taxon, name: e.name }) : T('mintCollectionOpt', { n: e.taxon }))} (${esc(T(e.count === 1 ? 'mintItem' : 'mintItems', { n: e.count }))})</option>`).join('')
+                + `<option value="new">${esc(T('mintNewCollection'))}</option>`;
+            sel.value = [...sel.options].some(o => o.value === prev) ? prev : (list.length ? sel.options[0].value : 'new');
+            if (sel.value === 'new' && !mel('mint-taxon').dataset.touched) mel('mint-taxon').value = String(nextTaxon());
+            onCollectionChange(true);
+        }
+        function onCollectionChange(silent) {
+            const sel = mel('mint-collection'), isNew = sel.value === 'new';
+            mel('mint-taxon-wrap').classList.toggle('hidden', !isNew);
+            if (isNew && !mel('mint-taxon').dataset.touched) mel('mint-taxon').value = String(nextTaxon());
+            if (!isNew) { const t = Number(sel.value.slice(2)), e = collectionList().find(x => x.taxon === t); if (e && e.name && !mel('mint-collection-name').value) mel('mint-collection-name').value = e.name; }
+            if (!silent) mintRecalc();
+        }
+        async function loadIssuerTaxons() {
+            if (!connectedAccount || mintState.taxonFor === connectedAccount) return;
+            mintState.taxonFor = connectedAccount;
+            try {
+                const issued = await fetchNftsByIssuer(connectedAccount);
+                const m = new Map(); issued.forEach(n => { if (n.taxon != null) m.set(n.taxon, (m.get(n.taxon) || 0) + 1); });
+                mintState.issuerTaxons = m; refreshCollectionOptions(); mintRecalc();
+            } catch (e) { /* servidor sin comandos Clio: se usan los NFTs de tu billetera */ }
+        }
+        function getMintTaxon() {
+            const sel = mel('mint-collection');
+            if (sel.value === 'new') { const raw = mel('mint-taxon').value.trim(); return /^\d+$/.test(raw) ? Number(raw) : NaN; }
+            return Number(sel.value.slice(2));
+        }
+
+        // ----- Atributos -----
+        function renderAttrRows() {
+            setHtml('mint-attrs', mintState.attrs.map((a, i) => `<div class="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                <input data-i="${i}" data-f="k" value="${esc(a.k)}" maxlength="40" placeholder="${esc(T('mintAttrName'))}" oninput="mintAttrInput(this)" class="min-w-0 bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none">
+                <input data-i="${i}" data-f="v" value="${esc(a.v)}" maxlength="80" placeholder="${esc(T('mintAttrValue'))}" oninput="mintAttrInput(this)" class="min-w-0 bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none">
+                <button type="button" data-action="mint-attr-del" data-id="${i}" aria-label="Remove" class="w-8 h-8 rounded-lg border border-obsidian-border text-slate-400 hover:text-white hover:border-rose-500/50 transition">&times;</button></div>`).join(''));
+        }
+        function mintAttrInput(el) { const a = mintState.attrs[+el.dataset.i]; if (a) { a[el.dataset.f] = el.value; mintRecalc(); } }
+
+        // ----- Metadatos (JSON XLS-24) -----
+        function readMintForm() {
+            const image = safeNorm(mel('mint-image').value), video = safeNorm(mel('mint-video').value);
+            const name = mel('mint-name').value.trim(), desc = mel('mint-desc').value.trim(), cat = mel('mint-category').value;
+            const ext = mel('mint-external').value.trim(), creator = mel('mint-creator').value.trim(), coll = mel('mint-collection-name').value.trim();
+            return { image, video, name, desc, cat, ext, creator, coll };
+        }
+        function buildMintMetadata(f) {
+            if (!f.name || !f.image) return null;
+            const m = { name: f.name.slice(0, 120) };
+            if (f.desc) m.description = f.desc.slice(0, 1000);
+            m.image = f.image;
+            if (f.video) m.animation_url = f.video;
+            if (f.ext && /^https:\/\/[^\s<>"']+$/i.test(f.ext)) m.external_url = f.ext;
+            if (f.creator) m.creator = f.creator.slice(0, 80);
+            if (f.cat && f.cat !== UNCAT) m.category = f.cat;
+            if (f.coll) m.collection = { name: f.coll.slice(0, 80) };
+            const attrs = mintState.attrs.filter(a => a.k.trim() && a.v.trim()).slice(0, 12).map(a => ({ trait_type: a.k.trim(), value: a.v.trim() }));
+            if (attrs.length) m.attributes = attrs;
+            return m;
+        }
+        let probeTimer = null;
+        function mintRecalc() {
+            if (!mel('mint-image')) return;
+            const f = readMintForm(), meta = buildMintMetadata(f);
+            mel('mint-json').textContent = meta ? JSON.stringify(meta, null, 2) : T('mintJsonEmpty');
+            mel('mint-json-actions').classList.toggle('hidden', !meta);
+            // regalía ⇒ transferible
+            const roy = parseFloat(mel('mint-royalty').value), tr = mel('mint-f-transferable');
+            if (roy > 0) { tr.checked = true; tr.disabled = true; } else tr.disabled = false;
+            // vista previa y resumen
+            const uriRaw = safeNorm(mel('mint-uri').value);
+            const bytes = uriRaw ? new TextEncoder().encode(uriRaw).length : 0;
+            const media = f.image ? renderCardMedia({ img: f.image, video: f.video, title: f.name || '—', metaLoaded: true }, 'w-full h-full object-contain') : '';
+            if (mel('mint-preview-media').dataset.key !== (f.image || '') + '|' + (f.video || '')) { mel('mint-preview-media').dataset.key = (f.image || '') + '|' + (f.video || ''); setHtml('mint-preview-media', media || `<span class="text-slate-600 text-xs font-mono">${esc(T('noMedia'))}</span>`); }
+            mel('mint-preview-name').textContent = f.name || '—';
+            const sel = mel('mint-collection'), t = getMintTaxon();
+            const flags = [];
+            if (mel('mint-f-transferable').checked) flags.push(T('mintFlagTransferable'));
+            if (mel('mint-f-onlyxrp').checked) flags.push('XRP');
+            if (mel('mint-f-burnable').checked) flags.push(T('mintFlagBurnable'));
+            if (mel('mint-f-mutable').checked) flags.push(T('mintFlagMutable'));
+            setHtml('mint-sum', [
+                [T('mintCategory'), f.cat && f.cat !== UNCAT ? f.cat : T('uncategorized')],
+                [T('mintCollection'), `#${Number.isNaN(t) ? '—' : t}${f.coll ? ' · ' + f.coll : ''}`],
+                [T('mintRoyalty'), `${Number.isFinite(roy) ? roy : 0}%`],
+                [T('mintUriBytes'), uriRaw ? `${bytes} / 256` : '—']
+            ].map(([k, v]) => `<div class="flex justify-between gap-3"><span class="text-slate-500">${esc(k)}</span><span class="text-slate-200 text-right break-words min-w-0">${esc(v)}</span></div>`).join('')
+                + `<div class="flex flex-wrap gap-1.5 pt-1">${flags.map(x => `<span class="px-2 py-0.5 rounded bg-obsidian-border/70 text-[10px] text-slate-200">${esc(x)}</span>`).join('')}</div>`);
+            // estado de la imagen (comprobación con retardo)
+            clearTimeout(probeTimer);
+            const rawImg = mel('mint-image').value.trim();
+            if (!rawImg) setHtml('mint-image-status', '');
+            else if (f.image === null) setHtml('mint-image-status', `<span class="text-amber-300">${esc(T('mintImgBad'))}</span>`);
+            else { setHtml('mint-image-status', `<span class="text-slate-500">${esc(T('mintChecking'))}</span>`); const tk = ++mintState.probeToken; probeTimer = setTimeout(() => probeImage(f.image, tk), 700); }
+            mel('mint-submit').disabled = mintState.busy;
+        }
+        async function probeImage(ipfsUri, token) {
+            for (let g = 0; g < CONFIG.IPFS_GATEWAYS.length; g++) {
+                const url = resolveMediaUrl(ipfsUri, g); if (!url) break;
+                const ok = await new Promise(res => { const im = new Image(); const to = setTimeout(() => res(false), 8000); im.onload = () => { clearTimeout(to); res(true); }; im.onerror = () => { clearTimeout(to); res(false); }; im.src = url; });
+                if (token !== mintState.probeToken) return;
+                if (ok) return setHtml('mint-image-status', `<span class="text-emerald-300">${esc(T('mintImgOk'))}</span>`);
+            }
+            if (token === mintState.probeToken) setHtml('mint-image-status', `<span class="text-amber-300">${esc(T('mintImgFail'))}</span>`);
+        }
+        function copyMintJson() { const m = buildMintMetadata(readMintForm()); if (m) copyToClipboard(JSON.stringify(m, null, 2)); }
+        function downloadMintJson() {
+            const m = buildMintMetadata(readMintForm()); if (!m) return;
+            const blob = new Blob([JSON.stringify(m, null, 2)], { type: 'application/json' }), url = URL.createObjectURL(blob), a = document.createElement('a');
+            a.href = url; a.download = (m.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'metadata') + '.json';
+            document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+        }
+
+        // ----- Verificación de la URI de metadatos -----
+        function showVerify(kind, html) {
+            const box = mel('mint-verify-box'); box.classList.remove('hidden');
+            box.className = 'rounded-xl border px-3 py-2.5 text-[11px] space-y-2 ' + (kind === 'ok' ? 'border-emerald-500/30 bg-emerald-950/20 text-emerald-200' : kind === 'warn' ? 'border-amber-500/30 bg-amber-950/20 text-amber-200' : kind === 'err' ? 'border-rose-500/30 bg-rose-950/20 text-rose-200' : 'border-obsidian-border bg-obsidian-dark/60 text-slate-300');
+            box.innerHTML = html;
+        }
+        async function verifyMintUri() {
+            const uri = safeNorm(mel('mint-uri').value);
+            if (uri === null) return showVerify('err', esc(T('mintUriInvalid')));
+            if (!uri) return showVerify('err', esc(T('mintNeedUri')));
+            showVerify('info', `<span class="inline-flex items-center gap-2"><span class="spinner" style="width:14px;height:14px;border-width:2px"></span>${esc(T('mintChecking'))}</span>`);
+            const doc = await fetchMetadataDoc(uri);
+            if (safeNorm(mel('mint-uri').value) !== uri) return;   // el usuario cambió el campo mientras tanto
+            if (!doc) return showVerify('err', esc(T('mintVerifyFail')));
+            mintState.doc = doc; mintState.uriChecked = uri;
+            const plain = Object.keys(doc).length === 1 && (doc.image === uri || doc.video === uri);
+            if (plain) return showVerify('warn', esc(T('mintVerifyNotJson')));
+            const missing = ['name', 'image'].filter(k => !(doc[k] || (k === 'image' && (doc.image_url || doc.imageUrl))));
+            const img = doc.image || doc.image_url || doc.imageUrl || '';
+            const thumb = img ? `<div class="w-14 h-14 rounded-lg overflow-hidden bg-black flex items-center justify-center flex-shrink-0">${renderCardMedia({ img: String(img), title: String(doc.name || ''), metaLoaded: true }, 'w-full h-full object-cover')}</div>` : '';
+            const collName = doc.collection && doc.collection.name ? String(doc.collection.name).slice(0, 80) : '';
+            const lines = [`<div class="font-semibold">${esc(T('mintVerifyOk'))}</div>`, doc.name ? `<div class="text-white">${esc(String(doc.name).slice(0, 120))}</div>` : '', collName ? `<div class="text-slate-300">${esc(T('mintCollectionName'))}: ${esc(collName)}</div>` : '', missing.length ? `<div class="text-amber-200">${esc(T('mintVerifyMissing', { fields: missing.join(', ') }))}</div>` : ''].join('');
+            showVerify(missing.length ? 'warn' : 'ok', `<div class="flex items-center gap-3">${thumb}<div class="min-w-0 space-y-0.5">${lines}</div></div>`);
+            if (collName && !mel('mint-collection-name').value) { mel('mint-collection-name').value = collName; mintRecalc(); }
+        }
+
+        // ----- Página -----
+        function renderMintPage() {
+            if (!mel('view-mint')) return;
+            const locked = !connectedAccount;
+            mel('mint-locked').classList.toggle('hidden', !locked);
+            mel('mint-app').classList.toggle('hidden', locked);
+            if (locked) return;
+            if (!mintState.rendered) { mintState.rendered = true; fillMintCategories(false); renderAttrRows(); mel('mint-f-transferable').checked = true; mel('mint-f-onlyxrp').checked = true; }
+            mel('mint-submit-label').textContent = `${T('mintSubmit')} · ${WALLET_LABEL[walletType] || ''}`;
+            refreshCollectionOptions(); mintRecalc(); loadIssuerTaxons();
+            if (!state.holdings.items.length && !state.holdings.loading) loadHoldings(false).then(() => { refreshCollectionOptions(); mintRecalc(); });
+        }
+        function collectMintInputs() {
+            const f = readMintForm();
+            if (f.image === null || !f.image) return { error: 'mintNeedImage' };
+            if (f.video === null) return { error: 'mintImgBad' };
+            const uri = safeNorm(mel('mint-uri').value);
+            if (uri === null) return { error: 'mintUriInvalid' };
+            if (!uri) return { error: 'mintNeedUri' };
+            const bytes = new TextEncoder().encode(uri).length;
+            if (bytes > 256) return { error: 'mintUriTooLong', params: { n: bytes } };
+            const taxon = getMintTaxon();
+            if (!Number.isInteger(taxon) || taxon < 0 || taxon > 4294967295) return { error: 'mintBadTaxon' };
+            const royaltyPct = mel('mint-royalty').value.trim() === '' ? 0 : Number(mel('mint-royalty').value);
+            if (!Number.isFinite(royaltyPct) || royaltyPct < 0 || royaltyPct > 50) return { error: 'mintBadRoyalty' };
+            const flags = { transferable: mel('mint-f-transferable').checked || royaltyPct > 0, onlyXrp: mel('mint-f-onlyxrp').checked, burnable: mel('mint-f-burnable').checked, mutable: mel('mint-f-mutable').checked };
+            const label = (mintState.doc && mintState.uriChecked === uri && mintState.doc.name) || f.name || short(uri, 12, 6);
+            return { uri, taxon, royaltyPct, flags, category: f.cat !== UNCAT ? f.cat : '', collName: f.coll, name: String(label).slice(0, 80) };
+        }
+        async function submitMint() {
+            if (mintState.busy) return;
+            if (!requireWallet()) return;
+            const v = collectMintInputs();
+            if (v.error) return showToast(T(v.error, v.params), 'warning');
+            mintState.busy = true; mel('mint-submit').disabled = true; mel('mint-submit-label').textContent = T('mintMinting');
+            const acct = connectedAccount;
+            try {
+                try { if ((await fetchXrpBalance(acct)) < 1.3) showToast(T('mintLowBalance'), 'warning'); } catch (e) {}
+                const before = new Set((await fetchAccountNfts(acct).catch(() => [])).map(n => String(n.nftokenId).toUpperCase()));
+                const signed = await signTx({
+                    endpoint: '/api/mint-payload',
+                    body: { account: acct, uri: v.uri, taxon: v.taxon, royaltyPct: v.royaltyPct, flags: v.flags },
+                    description: T('scanToMint', { name: v.name })
+                });
+                if (signed.account && signed.account !== acct) return showToast(T('wrongAccount'), 'error');
+                const fresh = async () => (await fetchAccountNfts(acct)).filter(n => !before.has(String(n.nftokenId).toUpperCase()));
+                const out = await confirmOnLedger(signed, async () => (await fresh()).length > 0);
+                let id = out.meta && out.meta.nftoken_id ? String(out.meta.nftoken_id).toUpperCase() : null;
+                if (!id) { try { const list = await fresh(); const hit = list.find(n => n.uri === v.uri) || list[0]; id = hit && String(hit.nftokenId).toUpperCase(); } catch (e) {} }
+                if (!out.ok && !id) return outcomeToast(out, '');
+                if (v.collName) { const names = mintTaxonNames(); names[acct + ':' + v.taxon] = v.collName; saveJson(MINT_TAXON_KEY, names); }
+                mintState.issuerTaxons.set(v.taxon, (mintState.issuerTaxons.get(v.taxon) || 0) + 1);
+                if (!id) { showToast(T('mintPending'), 'warning'); return; }
+                if (v.category) Registry.add(id, { category: v.category, seller: acct });
+                mintState.last = { id, name: v.name, tx: signed.txHash || null };
+                showToast(T('mintOk', { name: v.name }), 'success');
+                loadHoldings(true).then(() => { refreshCollectionOptions(); renderMintSuccess(); });
+                renderMintSuccess();
+            } catch (e) { reportError(e); }
+            finally { mintState.busy = false; mel('mint-submit').disabled = false; mel('mint-submit-label').textContent = `${T('mintSubmit')} · ${WALLET_LABEL[walletType] || ''}`; }
+        }
+        function renderMintSuccess() {
+            const box = mel('mint-success'), r = mintState.last;
+            if (!r) { box.classList.add('hidden'); return; }
+            box.classList.remove('hidden');
+            const it = nftIndex.get(r.id);
+            box.innerHTML = `<div class="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/30 to-transparent p-5 sm:p-6 space-y-4">
+                <div><h3 class="text-lg text-white font-semibold">✅ ${esc(T('mintSuccessTitle'))}</h3><p class="text-xs text-slate-300 mt-1">${esc(T('mintSuccessDesc', { name: r.name }))}</p></div>
+                <div class="text-[11px] font-mono space-y-1.5 text-slate-300">
+                    <div class="flex items-center gap-2"><span class="text-slate-500">${esc(T('mintIdLbl'))}</span><span id="mint-new-id" class="truncate select-all text-obsidian-gold">${esc(r.id)}</span><button data-action="copy" data-target="mint-new-id" class="underline text-slate-400 hover:text-white flex-shrink-0">Copy</button></div>
+                    ${r.tx ? `<div class="flex items-center gap-2"><span class="text-slate-500">${esc(T('mintTxLbl'))}</span><a href="${esc(explorerTx(r.tx))}" target="_blank" rel="noopener noreferrer" class="truncate text-obsidian-gold hover:underline">${esc(short(r.tx, 10, 8))}</a></div>` : ''}
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button data-action="mint-view" class="btn-xaman px-4 py-2.5 rounded-lg text-xs font-semibold">${esc(T('mintViewNft'))}</button>
+                    <button data-action="mint-list" class="btn-buy px-4 py-2.5 rounded-lg text-xs font-bold">${esc(T('mintListNft'))}</button>
+                    <button data-action="mint-another" class="bg-obsidian-border hover:bg-slate-800 text-slate-200 px-4 py-2.5 rounded-lg text-xs font-mono transition">${esc(T('mintAnother'))}</button>
+                </div></div>`;
+            box.scrollIntoView && box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        function mintAnother() {
+            mintState.last = null; mintState.doc = null; mintState.attrs = [{ k: '', v: '' }];
+            ['mint-image', 'mint-video', 'mint-name', 'mint-desc', 'mint-external', 'mint-uri'].forEach(i => { mel(i).value = ''; });
+            mel('mint-verify-box').classList.add('hidden'); mel('mint-success').classList.add('hidden');
+            renderAttrRows(); mintRecalc(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
     </script>
 </body>

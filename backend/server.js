@@ -411,7 +411,7 @@ app.get('/api/wallet-info/:address', wrap(async (req, res) => {
 
 /* ---------- Salud ---------- */
 app.get('/', (req, res) => res.json({ ok: true, service: 'aeterna-ledger-backend' }));
-app.get('/health', (req, res) => res.json({ ok: true }));
+app.get('/health', (req, res) => res.json({ ok: true, storage: USE_REDIS ? 'redis' : 'file' }));
 
 /* ---------- 1. Conectar billetera (SignIn) ---------- */
 app.post('/api/connect-wallet', wrap(async (req, res) => {
@@ -442,22 +442,32 @@ app.post('/api/buy-nft', wrap(async (req, res) => {
     res.json(await createPayload({ TransactionType: 'Payment', Destination: TREASURY_ADDRESS, Amount: drops }, 'Aeterna Ledger: payment'));
 }));
 
-/* ---------- 4. Mint firmado por el usuario ---------- */
-app.post('/api/mint-payload', wrap(async (req, res) => {
-    const { account, title, category, royalty } = req.body;
+/* ---------- 4. Mint firmado por el usuario (NFTokenMint) ----------
+   La web no aloja archivos: el usuario aporta la URI de sus metadatos (ipfs://CID o https). Todo se valida aquí. */
+const MAX_TAXON = 4294967295;
+app.post('/api/mint-payload', rateLimit(30), wrap(async (req, res) => {
+    const { account } = req.body;
     if (!isAddr(account)) throw new HttpError(400, 'Cuenta inválida.');
-    if (!title || typeof title !== 'string') throw new HttpError(400, 'Falta el título.');
-    const metadataURI = 'ipfs://bafybeigdyrzt5sfp7udm7hu76uh7y26nf4dfuyljbad43rk2q5i4chkuai/' + encodeURIComponent(title);
-    let taxon = 1;
-    if (category && category.includes('Stars')) taxon = 2;
-    else if (category && category.includes('Botanical')) taxon = 3;
-    else if (category && category.includes('Concepts')) taxon = 4;
-    // TransferFee en XRPL: 1 unidad = 0.001 %  (2.5 % → 2500, máximo 50000)
-    const pct = parseFloat(royalty ?? 2.5);
-    const transferFee = Math.min(50000, Math.max(0, Math.round((isNaN(pct) ? 2.5 : pct) * 1000)));
+    const uri = normalizeMedia(req.body.uri);
+    if (!uri) throw new HttpError(400, 'Falta la dirección de los metadatos (URI).');
+    const uriBytes = Buffer.from(uri, 'utf8');
+    if (uriBytes.length > 256) throw new HttpError(400, `La URI mide ${uriBytes.length} bytes; XRPL permite 256 como máximo.`);
+    const taxon = Number(req.body.taxon === undefined || req.body.taxon === null || req.body.taxon === '' ? 0 : req.body.taxon);
+    if (!Number.isInteger(taxon) || taxon < 0 || taxon > MAX_TAXON) throw new HttpError(400, 'Taxon inválido (entero entre 0 y 4294967295).');
+    // Regalía en % (0–50, hasta 3 decimales) → TransferFee de XRPL (1 unidad = 0.001 %)
+    const pct = Number(req.body.royaltyPct === undefined || req.body.royaltyPct === null || req.body.royaltyPct === '' ? 0 : req.body.royaltyPct);
+    if (!Number.isFinite(pct) || pct < 0 || pct > 50) throw new HttpError(400, 'La regalía debe estar entre 0 % y 50 %.');
+    const transferFee = Math.round(pct * 1000);
+    const f = req.body.flags && typeof req.body.flags === 'object' ? req.body.flags : {};
+    let flags = 0;
+    if (f.burnable) flags |= 1;       // tfBurnable
+    if (f.onlyXrp) flags |= 2;        // tfOnlyXRP
+    if (f.transferable) flags |= 8;   // tfTransferable
+    if (f.mutable) flags |= 16;       // tfMutable
+    if (transferFee > 0 && !(flags & 8)) throw new HttpError(400, 'Para cobrar regalía el NFT debe ser transferible.');
     await respondTx(req, res, {
-        TransactionType: 'NFTokenMint', Account: account, NFTokenTaxon: taxon,
-        Flags: 8, URI: Buffer.from(metadataURI).toString('hex').toUpperCase(), TransferFee: transferFee
+        TransactionType: 'NFTokenMint', Account: account, NFTokenTaxon: taxon, Flags: flags,
+        URI: uriBytes.toString('hex').toUpperCase(), ...(transferFee ? { TransferFee: transferFee } : {})
     }, 'Aeterna Ledger: mint');
 }));
 

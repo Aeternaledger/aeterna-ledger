@@ -3008,6 +3008,12 @@
             const view = document.getElementById(`view-${tab}`), tabEl = document.getElementById(`tab-${tab}`);
             if (view) view.classList.remove('hidden');
             if (tabEl) tabEl.classList.add('nav-active');
+            // Al salir de Mint, la tarjeta "NFT minted!" desaparece
+            if (tab !== 'mint' && mintState.last) {
+                mintState.last = null;
+                const sb = document.getElementById('mint-success');
+                if (sb) { sb.innerHTML = ''; sb.classList.add('hidden'); }
+            }
             currentTab = tab;
             if (tab === 'store') loadStore();
             else if (tab === 'market') loadMarket();

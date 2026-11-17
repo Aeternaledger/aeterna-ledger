@@ -1622,6 +1622,7 @@
             it.metaImg = img; it.metaVideo = vid;
             it.metaRaw = Object.keys(m).length ? m : null;
             applyMediaOverride(it);
+            if (it.video && !it.img) detect3d(it).then(() => scheduleRender());
             it.rawCategory = m.category || attr('category') || (m.collection && (m.collection.family || m.collection.name)) || '';
         }
         // Medios alternativos fijados por el administrador (tienen prioridad sobre los del metadata)
@@ -1629,6 +1630,7 @@
             const ov = MEDIA_OVERRIDES[it.nftokenId];
             it.img = (ov && ov.image) || it.metaImg || '';
             it.video = (ov && ov.video) || it.metaVideo || '';
+            if (it.is3dFor !== it.video) { it.is3d = undefined; it.is3dFor = it.video; }
             it.mediaOverride = !!(ov && (ov.image || ov.video));
         }
         function finalizeCategory(it) { it.category = Registry.category(it.nftokenId) || normalizeCategory(it.rawCategory); }
@@ -2483,8 +2485,59 @@
         }
         function renderAll() { renderStore(); renderMarketplace(); renderMyHoldings(); }
 
+        /* ----- Modelos 3D (GLB/GLTF) en el campo video / animation_url ----- */
+        const MODEL_VIEWER_SRC = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer-umd.min.js';
+        const model3dCache = new Map();
+        const isModelUrl = u => /\.(glb|gltf)(\?.*)?$/i.test(u || '');
+        // Lee solo los primeros bytes del archivo: un GLB empieza con "glTF". true / false / null (no se pudo leer)
+        async function sniff3d(raw) {
+            const n = raw.startsWith('ipfs://') ? CONFIG.IPFS_GATEWAYS.length : 1;
+            for (let g = 0; g < n; g++) {
+                const url = resolveMediaUrl(raw, g); if (!url) return null;
+                try {
+                    const res = await fetchT(url, {}, 9000);
+                    if (!res.ok) continue;
+                    const ct = (res.headers.get('content-type') || '').toLowerCase();
+                    if (/model\/gltf/.test(ct)) { try { res.body.cancel(); } catch (e) {} return true; }
+                    if (ct.startsWith('video/') || ct.startsWith('image/')) { try { res.body.cancel(); } catch (e) {} return false; }
+                    const reader = res.body.getReader(), { value } = await reader.read();
+                    try { reader.cancel(); } catch (e) {}
+                    if (value && value.length >= 4) return value[0] === 0x67 && value[1] === 0x6C && value[2] === 0x54 && value[3] === 0x46;
+                } catch (e) { /* probar el siguiente gateway */ }
+            }
+            return null;
+        }
+        async function detect3d(nft) {
+            if (nft.is3d !== undefined) return nft.is3d;
+            const raw = nft.video;
+            if (!raw) return (nft.is3d = false);
+            let r;
+            if (isModelUrl(raw)) r = true;
+            else if (model3dCache.has(raw)) r = model3dCache.get(raw);
+            else { r = await sniff3d(raw); if (r !== null) model3dCache.set(raw, r); }
+            nft.is3d = r === true;
+            return nft.is3d;
+        }
+        async function render3d(c, nft) {
+            c.innerHTML = '<div class="spinner"></div>';
+            try { await loadScript(MODEL_VIEWER_SRC); } catch (e) { c.innerHTML = `<div class="text-slate-500 text-xs font-mono">${esc(T('noMedia'))}</div>`; return; }
+            if (!c.isConnected || currentActiveDetailNft !== nft) return;
+            const raw = nft.video; let gw = 0;
+            const mv = document.createElement('model-viewer');
+            mv.setAttribute('src', resolveMediaUrl(raw, 0));
+            mv.setAttribute('alt', nft.title || '3D');
+            ['camera-controls', 'auto-rotate', 'shadow-intensity=1', 'touch-action=pan-y'].forEach(a => { const [k, v] = a.split('='); mv.setAttribute(k, v === undefined ? '' : v); });
+            mv.style.cssText = 'width:100%;height:100%;min-height:280px;background:transparent;';
+            mv.addEventListener('error', () => {
+                gw++;
+                if (raw.startsWith('ipfs://') && gw < CONFIG.IPFS_GATEWAYS.length) mv.setAttribute('src', resolveMediaUrl(raw, gw));
+                else c.innerHTML = `<div class="text-slate-500 text-xs font-mono">${esc(T('noMedia'))}</div>`;
+            });
+            c.innerHTML = ''; c.appendChild(mv);
+        }
         function renderCardMedia(nft, cls = 'w-full h-full object-contain') {
             const iu = resolveMediaUrl(nft.img);
+            if (!iu && nft.video && nft.is3d) return `<div class="w-full h-full bg-slate-900 flex items-center justify-center text-slate-300 text-xs font-mono">🧊 3D</div>`;
             if (iu) return `<img src="${esc(iu)}" data-raw="${esc(nft.img)}" data-gw="0" loading="lazy" alt="${esc(nft.title)}" class="${cls} bg-black">`;
             const vu = resolveMediaUrl(nft.video);
             if (vu) return `<video src="${esc(vu)}" data-raw="${esc(nft.video)}" data-gw="0" autoplay loop muted playsinline class="${cls} bg-black"></video>`;
@@ -2579,7 +2632,7 @@
             return `<div class="h-44 sm:h-48 bg-black relative overflow-hidden cursor-pointer flex items-center justify-center" data-action="details" data-id="${esc(nft.nftokenId)}">
                         ${renderCardMedia(nft, 'w-full h-full object-contain group-hover:scale-105 transition duration-500')}
                         <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${esc(catLabel(nft))}</span>
-                        ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border">🎬 Video</span>' : ''}
+                        ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border">' + (nft.is3d ? '🧊 3D' : '🎬 Video') + '</span>' : ''}
                     </div>`;
         }
         function listingCard(nft, mode) {
@@ -2647,7 +2700,7 @@
                 div.innerHTML = `<div class="h-44 sm:h-48 bg-black relative overflow-hidden flex items-center justify-center">
                         ${renderCardMedia(nft)}
                         <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${esc(catLabel(nft))}</span>
-                        ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border">🎬 Video</span>' : ''}
+                        ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border">' + (nft.is3d ? '🧊 3D' : '🎬 Video') + '</span>' : ''}
                     </div>
                     <div><h4 class="text-sm font-medium text-white line-clamp-1">${esc(nft.title)}</h4>
                         <p class="text-xs text-obsidian-gold font-mono mt-1">${esc(priceTxt)}</p></div>
@@ -2680,6 +2733,14 @@
             const on = 'px-2.5 py-1 text-[10px] font-mono rounded text-obsidian-gold bg-obsidian-gold/20 border border-obsidian-gold/40';
             const off = 'px-2.5 py-1 text-[10px] font-mono rounded text-slate-400 hover:text-white';
             const vu = resolveMediaUrl(nft.video), iu = resolveMediaUrl(nft.img);
+            bv.textContent = nft.is3d ? '🧊 3D' : '🎬 Video';
+            if (type === 'video' && vu && nft.is3d === undefined) {
+                c.innerHTML = '<div class="spinner"></div>'; bv.className = on; bi.className = off;
+                const tok = nft.nftokenId;
+                detect3d(nft).then(() => { if (currentActiveDetailNft && currentActiveDetailNft.nftokenId === tok) switchDetailMedia('video'); });
+                return;
+            }
+            if (type === 'video' && vu && nft.is3d) { render3d(c, nft); bv.className = on; bi.className = off; return; }
             if (type === 'video' && vu) {
                 c.innerHTML = `<video src="${esc(vu)}" data-raw="${esc(nft.video)}" data-gw="0" controls autoplay loop muted playsinline class="w-full h-full object-contain bg-black"></video>`;
                 bv.className = on; bi.className = off;

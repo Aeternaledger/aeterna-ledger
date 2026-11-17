@@ -3614,16 +3614,24 @@
             return [...map.values()].sort((a, b) => a.taxon - b.taxon);
         }
         const nextTaxon = () => { const l = collectionList(); return l.length ? Math.max(...l.map(x => x.taxon)) + 1 : 1; };
+        function mintCollName() {
+            return mintState.uriCollName || '';
+        }
+        function newCollLabel() {
+            const n = mintCollName();
+            return n ? `${T('mintNewCollection')}: ${n}` : T('mintNewCollection');
+        }
         function refreshCollectionOptions() {
             const sel = mel('mint-collection'); if (!sel) return;
             const prev = sel.value, list = collectionList();
             sel.innerHTML = list.map(e => `<option value="t:${e.taxon}">${esc(e.name ? T('mintCollectionOptNamed', { n: e.taxon, name: e.name }) : T('mintCollectionOpt', { n: e.taxon }))} (${esc(T(e.count === 1 ? 'mintItem' : 'mintItems', { n: e.count }))})</option>`).join('')
-                + `<option value="new">${esc(T('mintNewCollection'))}</option>`;
+                + `<option value="new">${esc(newCollLabel())}</option>`;
             sel.value = [...sel.options].some(o => o.value === prev) ? prev : (list.length ? sel.options[0].value : 'new');
             if (sel.value === 'new' && !mel('mint-taxon').dataset.touched) mel('mint-taxon').value = String(nextTaxon());
             onCollectionChange(true);
         }
         function onCollectionChange(silent) {
+            if (!silent) mintState.collTouched = true;
             const sel = mel('mint-collection'), isNew = sel.value === 'new';
             mel('mint-taxon-wrap').classList.toggle('hidden', !isNew);
             if (isNew && !mel('mint-taxon').dataset.touched) mel('mint-taxon').value = String(nextTaxon());
@@ -3679,6 +3687,26 @@
         function mintRecalc() {
             if (!mel('mint-image')) return;
             const f = readMintForm(), meta = buildMintMetadata(f);
+            // Colección leída del JSON de la URI: se muestra en la opción "New collection"
+            if (safeNorm(mel('mint-uri').value) !== mintState.uriChecked) mintState.uriCollName = '';
+            const collSel = mel('mint-collection');
+            if (collSel) {
+                const optNew = collSel.querySelector('option[value="new"]');
+                if (optNew) optNew.textContent = newCollLabel();
+                const cn = mintCollName();
+                if (!mintState.collTouched && cn) {
+                    const hit = collectionList().find(e => e.name && e.name.toLowerCase() === cn.toLowerCase());
+                    const want = hit ? 't:' + hit.taxon : 'new';
+                    if (collSel.value !== want && [...collSel.options].some(o => o.value === want)) { collSel.value = want; onCollectionChange(true); }
+                }
+            }
+            // Verificación automática al pegar la URI (una sola vez por URI)
+            clearTimeout(mintState.verifyTimer);
+            const uriNow = safeNorm(mel('mint-uri').value);
+            if (uriNow && uriNow !== mintState.uriChecked && uriNow !== mintState.autoTried) {
+                mintState.autoTried = uriNow;
+                mintState.verifyTimer = setTimeout(verifyMintUri, 900);
+            }
             mel('mint-json').textContent = meta ? JSON.stringify(meta, null, 2) : T('mintJsonEmpty');
             mel('mint-json-actions').classList.toggle('hidden', !meta);
             // regalía ⇒ transferible
@@ -3698,7 +3726,7 @@
             if (mel('mint-f-mutable').checked) flags.push(T('mintFlagMutable'));
             setHtml('mint-sum', [
                 [T('mintCategory'), f.cat && f.cat !== UNCAT ? f.cat : T('uncategorized')],
-                [T('mintCollection'), `#${Number.isNaN(t) ? '—' : t}${f.coll ? ' · ' + f.coll : ''}`],
+                [T('mintCollection'), `#${Number.isNaN(t) ? '—' : t}${mintCollName() ? ' · ' + mintCollName() : (f.coll ? ' · ' + f.coll : '')}`],
                 [T('mintRoyalty'), `${Number.isFinite(roy) ? roy : 0}%`],
                 [T('mintUriBytes'), uriRaw ? `${bytes} / 256` : '—']
             ].map(([k, v]) => `<div class="flex justify-between gap-3"><span class="text-slate-500">${esc(k)}</span><span class="text-slate-200 text-right break-words min-w-0">${esc(v)}</span></div>`).join('')
@@ -3749,6 +3777,7 @@
             const img = doc.image || doc.image_url || doc.imageUrl || '';
             const thumb = img ? `<div class="w-14 h-14 rounded-lg overflow-hidden bg-black flex items-center justify-center flex-shrink-0">${renderCardMedia({ img: String(img), title: String(doc.name || ''), metaLoaded: true }, 'w-full h-full object-cover')}</div>` : '';
             const collName = doc.collection && doc.collection.name ? String(doc.collection.name).slice(0, 80) : '';
+            mintState.uriCollName = collName; mintState.collTouched = false; mintRecalc();
             const lines = [`<div class="font-semibold">${esc(T('mintVerifyOk'))}</div>`, doc.name ? `<div class="text-white">${esc(String(doc.name).slice(0, 120))}</div>` : '', collName ? `<div class="text-slate-300">${esc(T('mintCollectionName'))}: ${esc(collName)}</div>` : '', missing.length ? `<div class="text-amber-200">${esc(T('mintVerifyMissing', { fields: missing.join(', ') }))}</div>` : ''].join('');
             showVerify(missing.length ? 'warn' : 'ok', `<div class="flex items-center gap-3">${thumb}<div class="min-w-0 space-y-0.5">${lines}</div></div>`);
             if (collName && !mel('mint-collection-name').value) { mel('mint-collection-name').value = collName; mintRecalc(); }
@@ -3777,6 +3806,7 @@
     set('mint-sum', e => e.innerHTML = '');
     mintState.attrs = [{ k: '', v: '' }]; mintState.doc = null; mintState.uriChecked = null;
     mintState.issuerTaxons = new Map(); mintState.taxonFor = null; mintState.rendered = false;
+    mintState.uriCollName = ''; mintState.collTouched = false; mintState.autoTried = ''; clearTimeout(mintState.verifyTimer);
     if (!keepSuccess) { mintState.last = null; set('mint-success', e => { e.innerHTML = ''; e.classList.add('hidden'); }); }
 }
 
@@ -3807,7 +3837,7 @@
             if (!Number.isFinite(royaltyPct) || royaltyPct < 0 || royaltyPct > 50) return { error: 'mintBadRoyalty' };
             const flags = { transferable: mel('mint-f-transferable').checked || royaltyPct > 0, onlyXrp: mel('mint-f-onlyxrp').checked, burnable: mel('mint-f-burnable').checked, mutable: mel('mint-f-mutable').checked };
             const label = (mintState.doc && mintState.uriChecked === uri && mintState.doc.name) || f.name || short(uri, 12, 6);
-            return { uri, taxon, royaltyPct, flags, category: f.cat !== UNCAT ? f.cat : '', collName: f.coll, name: String(label).slice(0, 80) };
+            return { uri, taxon, royaltyPct, flags, category: f.cat !== UNCAT ? f.cat : '', collName: mintCollName() || f.coll, name: String(label).slice(0, 80) };
         }
         async function submitMint() {
             if (mintState.busy) return;

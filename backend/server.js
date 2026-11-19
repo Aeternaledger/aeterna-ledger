@@ -15,6 +15,7 @@
      UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN → (opcional, gratis) guarda registro, medios, transferencias y conexiones de forma PERMANENTE
      ANALYTICS_FILE   → (sin Upstash) archivo de conexiones de billeteras (por defecto ./data/connections.jsonl)
      STORE_ADDRESSES  → cuentas cuyas ventas son de la Store, separadas por coma (por defecto MINTING_ADDRESS)
+     (mint por lotes: /api/batch-info y /api/mint-batch-payload usan XLS-56 BatchV1_1; no requieren variables nuevas)
      REGISTRY_FILE    → ruta del registro del Marketplace (por defecto ./data/registry.json; en Render usa un Disk, ej. /var/data/registry.json)
    ===================================================================== */
 require('dotenv').config();
@@ -445,6 +446,23 @@ app.post('/api/buy-nft', wrap(async (req, res) => {
 /* ---------- 4. Mint firmado por el usuario (NFTokenMint) ----------
    La web no aloja archivos: el usuario aporta la URI de sus metadatos (ipfs://CID o https). Todo se valida aquí. */
 const MAX_TAXON = 4294967295;
+/* Validación común de taxon / regalía / flags (mint simple y mint por lotes) */
+function mintParams(body) {
+    const taxon = Number(body.taxon === undefined || body.taxon === null || body.taxon === '' ? 0 : body.taxon);
+    if (!Number.isInteger(taxon) || taxon < 0 || taxon > MAX_TAXON) throw new HttpError(400, 'Taxon inválido (entero entre 0 y 4294967295).');
+    // Regalía en % (0–50, hasta 3 decimales) → TransferFee de XRPL (1 unidad = 0.001 %)
+    const pct = Number(body.royaltyPct === undefined || body.royaltyPct === null || body.royaltyPct === '' ? 0 : body.royaltyPct);
+    if (!Number.isFinite(pct) || pct < 0 || pct > 50) throw new HttpError(400, 'La regalía debe estar entre 0 % y 50 %.');
+    const transferFee = Math.round(pct * 1000);
+    const f = body.flags && typeof body.flags === 'object' ? body.flags : {};
+    let flags = 0;
+    if (f.burnable) flags |= 1;       // tfBurnable
+    if (f.onlyXrp) flags |= 2;        // tfOnlyXRP
+    if (f.transferable) flags |= 8;   // tfTransferable
+    if (f.mutable) flags |= 16;       // tfMutable
+    if (transferFee > 0 && !(flags & 8)) throw new HttpError(400, 'Para cobrar regalía el NFT debe ser transferible.');
+    return { taxon, flags, transferFee };
+}
 app.post('/api/mint-payload', rateLimit(30), wrap(async (req, res) => {
     const { account } = req.body;
     if (!isAddr(account)) throw new HttpError(400, 'Cuenta inválida.');
@@ -452,23 +470,67 @@ app.post('/api/mint-payload', rateLimit(30), wrap(async (req, res) => {
     if (!uri) throw new HttpError(400, 'Falta la dirección de los metadatos (URI).');
     const uriBytes = Buffer.from(uri, 'utf8');
     if (uriBytes.length > 256) throw new HttpError(400, `La URI mide ${uriBytes.length} bytes; XRPL permite 256 como máximo.`);
-    const taxon = Number(req.body.taxon === undefined || req.body.taxon === null || req.body.taxon === '' ? 0 : req.body.taxon);
-    if (!Number.isInteger(taxon) || taxon < 0 || taxon > MAX_TAXON) throw new HttpError(400, 'Taxon inválido (entero entre 0 y 4294967295).');
-    // Regalía en % (0–50, hasta 3 decimales) → TransferFee de XRPL (1 unidad = 0.001 %)
-    const pct = Number(req.body.royaltyPct === undefined || req.body.royaltyPct === null || req.body.royaltyPct === '' ? 0 : req.body.royaltyPct);
-    if (!Number.isFinite(pct) || pct < 0 || pct > 50) throw new HttpError(400, 'La regalía debe estar entre 0 % y 50 %.');
-    const transferFee = Math.round(pct * 1000);
-    const f = req.body.flags && typeof req.body.flags === 'object' ? req.body.flags : {};
-    let flags = 0;
-    if (f.burnable) flags |= 1;       // tfBurnable
-    if (f.onlyXrp) flags |= 2;        // tfOnlyXRP
-    if (f.transferable) flags |= 8;   // tfTransferable
-    if (f.mutable) flags |= 16;       // tfMutable
-    if (transferFee > 0 && !(flags & 8)) throw new HttpError(400, 'Para cobrar regalía el NFT debe ser transferible.');
+    const { taxon, flags, transferFee } = mintParams(req.body);
     await respondTx(req, res, {
         TransactionType: 'NFTokenMint', Account: account, NFTokenTaxon: taxon, Flags: flags,
         URI: uriBytes.toString('hex').toUpperCase(), ...(transferFee ? { TransferFee: transferFee } : {})
     }, 'Aeterna Ledger: mint');
+}));
+
+/* ---------- 4b. Mint por LOTES (Batch / XLS-56): de 2 a 8 NFTs con UNA sola firma ----------
+   BatchV1_1 está activo en mainnet desde el 9-oct-2026. Un Batch admite 2–8 transacciones internas.
+   Se usa tfAllOrNothing: o se crean todos los NFTs del lote o ninguno. Para más de 8 NFTs la web encadena varios lotes. */
+const MAX_BATCH_MINT = 8;
+const BATCH_AMENDMENT_ID = crypto.createHash('sha512').update('BatchV1_1').digest('hex').slice(0, 64).toUpperCase();
+const AMENDMENTS_INDEX = '7DB0788C020F02780A673DC74757F23823FA3014C1866E72CC4CD8B226CD6EF4';
+const batchInfo = { t: 0, enabled: null };
+async function batchEnabled() {
+    if (batchInfo.enabled === null || Date.now() - batchInfo.t > 10 * 60 * 1000) {
+        try {
+            batchInfo.enabled = await withClient(async client => {
+                const r = await client.request({ command: 'ledger_entry', index: AMENDMENTS_INDEX, ledger_index: 'validated' });
+                return (r.result.node.Amendments || []).includes(BATCH_AMENDMENT_ID);
+            });
+            batchInfo.t = Date.now();
+        } catch (e) { batchInfo.enabled = null; }   // desconocido: no se bloquea
+    }
+    return batchInfo.enabled;
+}
+app.get('/api/batch-info', rateLimit(30), wrap(async (req, res) => {
+    res.json({ success: true, enabled: await batchEnabled(), min: 2, max: MAX_BATCH_MINT });
+}));
+async function buildMintBatch(client, account, uriHexList, taxon, flags, transferFee) {
+    const acc = await client.request({ command: 'account_info', account, ledger_index: 'current' });
+    const seq = acc.result.account_data.Sequence;
+    const f = await client.request({ command: 'fee' });
+    const unit = Math.max(Number(f.result.drops.base_fee), Number(f.result.drops.open_ledger_fee || 0));
+    const INNER = 1073741824;                                  // tfInnerBatchTxn
+    return {
+        TransactionType: 'Batch', Account: account, Sequence: seq, Flags: 65536,   // tfAllOrNothing
+        Fee: String(Math.ceil(unit * (2 + uriHexList.length) * 1.3)),              // 2×base + 1 por NFT (+30 % de margen)
+        RawTransactions: uriHexList.map((uri, i) => ({ RawTransaction: {
+            TransactionType: 'NFTokenMint', Account: account, NFTokenTaxon: taxon, Flags: (flags | INNER) >>> 0,
+            URI: uri, Sequence: seq + 1 + i, Fee: '0', SigningPubKey: '',
+            ...(transferFee ? { TransferFee: transferFee } : {})
+        } }))
+    };
+}
+app.post('/api/mint-batch-payload', rateLimit(20), wrap(async (req, res) => {
+    const { account } = req.body;
+    if (!isAddr(account)) throw new HttpError(400, 'Cuenta inválida.');
+    const list = Array.isArray(req.body.uris) ? req.body.uris : [];
+    if (list.length < 2 || list.length > MAX_BATCH_MINT) throw new HttpError(400, `Un lote admite de 2 a ${MAX_BATCH_MINT} NFTs por firma.`);
+    const uriHex = list.map((u, i) => {
+        const uri = normalizeMedia(u);
+        if (!uri) throw new HttpError(400, `Falta la URI de metadatos en la posición ${i + 1}.`);
+        const bytes = Buffer.from(uri, 'utf8');
+        if (bytes.length > 256) throw new HttpError(400, `La URI ${i + 1} mide ${bytes.length} bytes; XRPL permite 256 como máximo.`);
+        return bytes.toString('hex').toUpperCase();
+    });
+    const { taxon, flags, transferFee } = mintParams(req.body);
+    if ((await batchEnabled()) === false) throw new HttpError(503, 'El mint por lotes (Batch) aún no está activo en la red XRP Ledger.');
+    const batch = await withClient(client => buildMintBatch(client, account, uriHex, taxon, flags, transferFee));
+    await respondTx(req, res, batch, `Aeterna Ledger: batch mint ${uriHex.length} NFTs`, { options: { signer: account }, extra: { count: uriHex.length } });
 }));
 
 /* ---------- 5. COMPRAR: aceptar una oferta de venta (NFTokenAcceptOffer) ---------- */

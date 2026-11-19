@@ -154,6 +154,11 @@
                     <button onclick="filterCategory('Symbols, Archetypes & Culture', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-symbols">🏛️ Symbols & Culture</button>
                 </div>
             </div>
+            <div class="flex flex-col sm:flex-row gap-2.5 font-ui text-xs" data-toolbar="store">
+                <input id="search-store" type="search" autocomplete="off" spellcheck="false" oninput="onBrowseInput('store')" class="flex-1 min-w-0 bg-obsidian-card border border-obsidian-border rounded-lg px-3.5 py-2.5 text-slate-200 placeholder-slate-500 hover:border-obsidian-gold/40 focus:border-obsidian-gold outline-none transition">
+                <select id="coll-store" onchange="onCollectionFilter('store')" class="sm:w-72 bg-obsidian-card border border-obsidian-border text-slate-300 py-2.5 px-3 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/40 transition"><option value="ALL"></option></select>
+                <button type="button" id="clear-store" data-action="browse-clear" data-target="store" class="hidden bg-obsidian-card border border-obsidian-border hover:border-obsidian-gold/50 text-slate-300 px-3.5 py-2.5 rounded-lg transition whitespace-nowrap"></button>
+            </div>
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 -mb-2"><span id="status-store-text"></span><button data-action="refresh" data-target="store" class="underline hover:text-white">↻ Refresh</button></div>
             <div id="store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 scroll-mt-28"></div>
             <nav id="pager-store" aria-label="Pagination"></nav>
@@ -194,6 +199,11 @@
                     <button onclick="filterCategory('Symbols, Archetypes & Culture', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-symbols">🏛️ Symbols & Culture</button>
                 </div>
             </div>
+            <div class="flex flex-col sm:flex-row gap-2.5 font-ui text-xs" data-toolbar="market">
+                <input id="search-market" type="search" autocomplete="off" spellcheck="false" oninput="onBrowseInput('market')" class="flex-1 min-w-0 bg-obsidian-card border border-obsidian-border rounded-lg px-3.5 py-2.5 text-slate-200 placeholder-slate-500 hover:border-obsidian-gold/40 focus:border-obsidian-gold outline-none transition">
+                <select id="coll-market" onchange="onCollectionFilter('market')" class="sm:w-72 bg-obsidian-card border border-obsidian-border text-slate-300 py-2.5 px-3 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/40 transition"><option value="ALL"></option></select>
+                <button type="button" id="clear-market" data-action="browse-clear" data-target="market" class="hidden bg-obsidian-card border border-obsidian-border hover:border-obsidian-gold/50 text-slate-300 px-3.5 py-2.5 rounded-lg transition whitespace-nowrap"></button>
+            </div>
             <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 -mb-2"><span id="status-market-text"></span><button data-action="refresh" data-target="market" class="underline hover:text-white">↻ Refresh</button></div>
             <div id="market-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 scroll-mt-28"></div>
             <nav id="pager-market" aria-label="Pagination"></nav>
@@ -228,8 +238,16 @@
             <div id="mint-app" class="hidden">
               <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
                 <div class="lg:col-span-3 space-y-6 min-w-0">
+                    <div id="mint-mode" class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-4 sm:p-5 space-y-3">
+                        <div class="inline-flex rounded-xl border border-obsidian-border bg-obsidian-dark/60 p-1 font-ui text-xs" role="tablist">
+                            <button type="button" id="mint-mode-single" role="tab" aria-selected="true" data-action="mint-mode" data-id="single" class="px-4 py-2 rounded-lg bg-obsidian-gold text-black font-bold transition" data-i18n="mintModeSingle"></button>
+                            <button type="button" id="mint-mode-batch" role="tab" aria-selected="false" data-action="mint-mode" data-id="batch" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white transition" data-i18n="mintModeBatch"></button>
+                        </div>
+                        <p id="mint-mode-help" class="text-[11px] text-slate-400 leading-relaxed"></p>
+                        <p id="mint-batch-net" class="hidden text-[11px] leading-relaxed"></p>
+                    </div>
                     <section class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-5 sm:p-6 space-y-4">
-                        <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-obsidian-gold/15 border border-obsidian-gold/40 text-obsidian-gold text-xs font-mono flex items-center justify-center flex-shrink-0">1</span><div><h3 class="text-sm font-semibold text-white" data-i18n="mintStep1"></h3><p class="text-[11px] text-slate-400" data-i18n="mintStep1Sub"></p></div></div>
+                        <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-obsidian-gold/15 border border-obsidian-gold/40 text-obsidian-gold text-xs font-mono flex items-center justify-center flex-shrink-0">1</span><div><h3 id="mint-h1" class="text-sm font-semibold text-white" data-i18n="mintStep1"></h3><p class="text-[11px] text-slate-400" data-i18n="mintStep1Sub"></p></div></div>
                         <details class="group rounded-xl border border-obsidian-border bg-obsidian-dark/50 px-3.5 py-3 text-[11px] text-slate-300">
                             <summary class="cursor-pointer text-slate-200 font-mono flex items-center justify-between gap-2"><span data-i18n="mintGuideTitle"></span><span class="text-obsidian-gold group-open:rotate-180 transition-transform" aria-hidden="true">&#8964;</span></summary>
                             <div class="pt-3 space-y-2 leading-relaxed">
@@ -248,7 +266,7 @@
                         <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintVideo"></span><input id="mint-video" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
                     </section>
                     <section class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-5 sm:p-6 space-y-4">
-                        <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-obsidian-gold/15 border border-obsidian-gold/40 text-obsidian-gold text-xs font-mono flex items-center justify-center flex-shrink-0">2</span><div><h3 class="text-sm font-semibold text-white" data-i18n="mintStep2"></h3><p class="text-[11px] text-slate-400" data-i18n="mintStep2Sub"></p></div></div>
+                        <div class="flex items-start gap-3"><span class="w-7 h-7 rounded-full bg-obsidian-gold/15 border border-obsidian-gold/40 text-obsidian-gold text-xs font-mono flex items-center justify-center flex-shrink-0">2</span><div><h3 id="mint-h2" class="text-sm font-semibold text-white" data-i18n="mintStep2"></h3><p class="text-[11px] text-slate-400" data-i18n="mintStep2Sub"></p></div></div>
                         <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintName"></span><input id="mint-name" type="text" maxlength="120" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
                         <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintDescription"></span><textarea id="mint-desc" rows="3" maxlength="1000" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs text-white focus:border-obsidian-gold outline-none"></textarea></label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -256,6 +274,11 @@
                             <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCollectionName"></span><input id="mint-collection-name" type="text" maxlength="80" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
                         </div>
                         <p class="text-[10px] text-slate-500 -mt-2" data-i18n="mintCollectionHint"></p>
+                        <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCollectionDesc"></span><textarea id="mint-collection-desc" rows="2" maxlength="500" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs text-white focus:border-obsidian-gold outline-none"></textarea></label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCollectionImage"></span><input id="mint-collection-image" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCollectionSite"></span><input id="mint-collection-site" type="url" placeholder="https://" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                        </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintExternal"></span><input id="mint-external" type="url" placeholder="https://" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
                             <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCreator"></span><input id="mint-creator" type="text" maxlength="80" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
@@ -277,6 +300,14 @@
                         <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintUri"></span>
                             <div class="flex gap-2"><input id="mint-uri" type="text" autocomplete="off" spellcheck="false" placeholder="ipfs://bafy..." oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"><button type="button" data-action="mint-verify" class="flex-shrink-0 bg-obsidian-border hover:bg-slate-800 text-slate-200 px-3.5 rounded-lg text-xs font-mono transition" data-i18n="mintVerify"></button></div></label>
                         <div id="mint-verify-box" class="hidden" aria-live="polite"></div>
+                        <div id="mint-batch-box" class="hidden space-y-3">
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintBatchUris"></span>
+                                <textarea id="mint-batch-uris" rows="6" spellcheck="false" autocomplete="off" data-i18n-ph="mintBatchPlaceholder" oninput="onBatchInput()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></textarea></label>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintBatchCopies"></span>
+                                <input id="mint-batch-copies" type="number" min="1" max="40" step="1" value="1" oninput="mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
+                            <p class="text-[10px] text-slate-500 leading-snug" data-i18n="mintBatchHelp"></p>
+                            <p id="mint-batch-note" class="text-[11px] min-h-[1rem]" aria-live="polite"></p>
+                        </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintCollection"></span><select id="mint-collection" onchange="onCollectionChange()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></select></label>
                             <label id="mint-taxon-wrap" class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="mintTaxon"></span><input id="mint-taxon" type="number" min="0" max="4294967295" step="1" oninput="this.dataset.touched=1;mintRecalc()" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:border-obsidian-gold outline-none"></label>
@@ -472,6 +503,7 @@
                     <div id="detail-desc-box">
                         <p id="detail-desc" class="text-xs text-slate-300 leading-relaxed font-sans"></p>
                     </div>
+                <div id="detail-collection" class="hidden items-start justify-between gap-3 bg-obsidian-dark/60 p-3 rounded-xl border border-obsidian-border"></div>
                 <div id="detail-meta-wrap" class="hidden space-y-2.5">
                     <button id="detail-meta-toggle" data-action="toggle-meta" aria-expanded="false" aria-controls="detail-meta-panel" class="w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border border-obsidian-border bg-obsidian-dark/60 hover:border-obsidian-gold/50 text-xs text-slate-200 font-mono transition">
                         <span id="detail-meta-toggle-label">View full metadata</span>
@@ -1779,7 +1811,7 @@
             tecINSUFFICIENT_FUNDS: 'Insufficient XRP balance.', tecUNFUNDED_OFFER: 'Insufficient XRP balance.',
             tecINSUFFICIENT_RESERVE: 'Insufficient XRP reserve in the account.', tecNO_PERMISSION: 'No permission (you are not the owner of this offer/NFT).',
             tecEXPIRED: 'The offer has expired.', tecCANT_ACCEPT_OWN_NFTOKEN_OFFER: 'You cannot accept your own offer.',
-            tecNFTOKEN_OFFER_TYPE_MISMATCH: 'Offer type mismatch.', tecNO_DST: 'Destination account does not exist.',
+            tecNFTOKEN_OFFER_TYPE_MISMATCH: 'Offer type mismatch.', tecBATCH_FAILURE: 'One of the NFTs in the batch failed, so none of them were created.', tecNO_DST: 'Destination account does not exist.',
             tecNFTOKEN_BUY_SELL_MISMATCH: 'Buy/Sell offer mismatch.', tecNO_SUITABLE_NFTOKEN_PAGE: 'Could not place NFT in the destination page.'
         };
         const txErrorText = code => `${code}${TX_ERRORS[code] ? ' — ' + TX_ERRORS[code] : ''}`;
@@ -2636,6 +2668,108 @@
                         ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border">' + (nft.is3d ? '🧊 3D' : '🎬 Video') + '</span>' : ''}
                     </div>`;
         }
+        /* ===== BÚSQUEDA Y COLECCIONES (Store y Marketplace) =====
+           XRPL no tiene un objeto "colección": una colección es el par (emisor, taxon) y su nombre viene del campo collection.name de los metadatos. */
+        const browse = { store: { q: '', coll: 'ALL', label: '' }, market: { q: '', coll: 'ALL', label: '' } };
+        const browseTimers = {};
+        const foldText = s => String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        function collInfo(it) {
+            if (!it || it.taxon == null || !it.issuer) return null;
+            const c = it.metaRaw && it.metaRaw.collection;
+            const name = c && typeof c === 'object' ? (c.name || '') : (typeof c === 'string' ? c : '');
+            return { key: `${it.issuer}:${it.taxon}`, name: String(name).trim().slice(0, 80), taxon: it.taxon, issuer: it.issuer };
+        }
+        const collLabel = ci => ci.name || ('#' + ci.taxon);
+        function queryTerms(q) { return foldText(q).split(/\s+/).filter(Boolean); }
+        function matchesTerms(it, terms) {
+            if (!terms.length) return true;
+            const ci = collInfo(it);
+            const hay = foldText([it.title, it.desc, ci && ci.name, ci && ('#' + ci.taxon), it.category, it.owner, it.issuer, it.nftokenId].filter(Boolean).join(' '));
+            return terms.every(x => hay.includes(x));
+        }
+        function rerenderSection(sec) { if (sec === 'store') renderStore(); else renderMarketplace(); }
+        function updateCollectionOptions(sec) {
+            const sel = document.getElementById('coll-' + sec); if (!sel) return;
+            const map = new Map();
+            for (const n of state[sec].items) {
+                if (!n.listing) continue;
+                const ci = collInfo(n); if (!ci) continue;
+                const e = map.get(ci.key) || { ...ci, count: 0 };
+                e.count++; if (!e.name && ci.name) e.name = ci.name;
+                map.set(ci.key, e);
+            }
+            const dup = new Map();
+            for (const e of map.values()) if (e.name) { const k = foldText(e.name); dup.set(k, (dup.get(k) || 0) + 1); }
+            const opts = [...map.values()].map(e => {
+                let label = collLabel(e);
+                if (!e.name || dup.get(foldText(e.name)) > 1) label += ` · ${short(e.issuer, 6, 4)}`;
+                return { key: e.key, label: `${label} (${e.count})` };
+            }).sort((a, b) => a.label.localeCompare(b.label));
+            const br = browse[sec];
+            if (br.coll !== 'ALL' && !opts.some(o => o.key === br.coll)) {
+                if (state[sec].loading || !state[sec].loadedAt) opts.unshift({ key: br.coll, label: br.label || '…' });
+                else br.coll = 'ALL';
+            }
+            const sig = getCurrentLang() + '|' + opts.map(o => o.key + '=' + o.label).join('|');
+            if (sel.dataset.sig !== sig) {
+                sel.dataset.sig = sig;
+                sel.innerHTML = `<option value="ALL">${esc(T('allCollections'))}</option>` + opts.map(o => `<option value="${esc(o.key)}">${esc(o.label)}</option>`).join('');
+            }
+            sel.value = br.coll;
+        }
+        function updateClearButton(sec) {
+            const b = document.getElementById('clear-' + sec); if (!b) return;
+            const br = browse[sec];
+            b.classList.toggle('hidden', !(br.q.trim() || br.coll !== 'ALL'));
+        }
+        function onBrowseInput(sec) {
+            clearTimeout(browseTimers[sec]);
+            browseTimers[sec] = setTimeout(() => { browse[sec].q = document.getElementById('search-' + sec).value; state[sec].page = 1; rerenderSection(sec); }, 180);
+        }
+        function onCollectionFilter(sec) {
+            const sel = document.getElementById('coll-' + sec);
+            browse[sec].coll = sel.value;
+            browse[sec].label = sel.value === 'ALL' ? '' : (sel.options[sel.selectedIndex] || {}).textContent || '';
+            state[sec].page = 1; rerenderSection(sec);
+        }
+        function setBrowseCollection(sec, key, label) {
+            browse[sec].coll = key || 'ALL'; browse[sec].label = label || '';
+            state[sec].page = 1; rerenderSection(sec);
+        }
+        function clearBrowse(sec) {
+            browse[sec] = { q: '', coll: 'ALL', label: '' };
+            const i = document.getElementById('search-' + sec); if (i) i.value = '';
+            state[sec].page = 1; rerenderSection(sec);
+        }
+        function collChip(nft, sec) {
+            const ci = collInfo(nft); if (!ci) return '';
+            return `<button type="button" data-action="coll-filter" data-target="${esc(sec)}" data-id="${esc(ci.key)}" data-label="${esc(collLabel(ci))}" title="${esc(T('viewCollection'))}" class="block max-w-full truncate text-left text-[10px] font-ui text-obsidian-gold/90 hover:underline">🗂 ${esc(collLabel(ci))}</button>`;
+        }
+        function renderDetailCollection(nft) {
+            const box = document.getElementById('detail-collection'); if (!box) return;
+            const ci = collInfo(nft);
+            if (!ci) { box.classList.add('hidden'); box.classList.remove('flex'); box.innerHTML = ''; return; }
+            const c = nft.metaRaw && nft.metaRaw.collection && typeof nft.metaRaw.collection === 'object' ? nft.metaRaw.collection : null;
+            box.classList.remove('hidden'); box.classList.add('flex');
+            box.innerHTML = `<div class="min-w-0"><span class="text-slate-400 block text-[9px] uppercase">${esc(T('collectionLbl'))}</span><span class="text-xs text-white break-words">${esc(collLabel(ci))}</span><span class="block text-[10px] text-slate-500">#${esc(String(ci.taxon))} · ${esc(short(ci.issuer, 6, 4))}</span>${c && c.description ? `<span class="block text-[10px] text-slate-400 mt-1 break-words">${esc(String(c.description).slice(0, 300))}</span>` : ''}</div><button type="button" data-action="coll-open" data-id="${esc(nft.nftokenId)}" class="flex-shrink-0 text-[10px] font-ui text-obsidian-gold border border-obsidian-gold/40 rounded-lg px-2.5 py-1.5 hover:bg-obsidian-gold/10 transition">${esc(T('viewCollection'))}</button>`;
+        }
+        function openCollectionOf(id) {
+            const it = nftIndex.get(id), ci = it && collInfo(it); if (!ci) return;
+            const sec = CONFIG.STORE_ACCOUNTS.includes(it.owner) ? 'store' : 'market';
+            browse[sec] = { q: '', coll: ci.key, label: collLabel(ci) };
+            const inp = document.getElementById('search-' + sec); if (inp) inp.value = '';
+            state[sec].page = 1;
+            closeDetails(); switchTab(sec); rerenderSection(sec);
+        }
+        function applyBrowseI18n() {
+            ['store', 'market'].forEach(sec => {
+                const i = document.getElementById('search-' + sec); if (i) { i.placeholder = T('searchPlaceholder'); i.setAttribute('aria-label', T('searchPlaceholder')); }
+                const c = document.getElementById('coll-' + sec); if (c) { c.setAttribute('aria-label', T('collectionLbl')); delete c.dataset.sig; }
+                const b = document.getElementById('clear-' + sec); if (b) b.textContent = T('clearFilters');
+                updateCollectionOptions(sec); updateClearButton(sec);
+            });
+            if (typeof updateMintModeUi === 'function') updateMintModeUi();
+        }
         function listingCard(nft, mode) {
             const t = translations[getCurrentLang()] || translations.en;
             const id = esc(nft.nftokenId);
@@ -2649,7 +2783,7 @@
                 : `<p class="text-[11px] text-slate-400 line-clamp-2">${esc(nft.desc)}</p>`;
             const div = document.createElement('div');
             div.className = 'bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden hover:border-obsidian-gold/50 transition duration-300 group flex flex-col justify-between';
-            div.innerHTML = `<div>${cardTop(nft)}<div class="p-4 space-y-1.5"><h4 class="text-sm font-medium text-white line-clamp-1">${esc(nft.title)}</h4>${sub}</div></div>
+            div.innerHTML = `<div>${cardTop(nft)}<div class="p-4 space-y-1.5"><h4 class="text-sm font-medium text-white line-clamp-1">${esc(nft.title)}</h4>${collChip(nft, mode)}${sub}</div></div>
                 <div class="p-4 pt-0 flex justify-between items-center border-t border-obsidian-border/60 mt-2">
                     <div><span class="text-[9px] text-slate-500 uppercase block">${esc(t.detailsPriceLbl)}</span>
                     <span class="text-obsidian-gold font-mono font-bold text-xs">${esc(nft.listing.xrp)} XRP</span>
@@ -2663,12 +2797,15 @@
             if (!container) return;
             updateStatus(sec);
             const s = state[sec];
-            let items = s.items.filter(n => n.listing && (filter === 'ALL' || n.category === filter));
+            updateCollectionOptions(sec);
+            const br = browse[sec], terms = queryTerms(br.q);
+            let items = s.items.filter(n => n.listing && (filter === 'ALL' || n.category === filter) && (br.coll === 'ALL' || (collInfo(n) || {}).key === br.coll) && matchesTerms(n, terms));
+            updateClearButton(sec);
             sortItems(items, document.getElementById(sortId).value);
             container.innerHTML = '';
             if (!items.length) {
                 if (s.loading) container.innerHTML = `<div class="col-span-full flex justify-center py-12"><div class="spinner"></div></div>`;
-                else container.innerHTML = emptyBox(s.error === 'config' ? T('configMissing') : s.error === 'rpc' ? T('rpcDown') : T(emptyMsgKey));
+                else container.innerHTML = emptyBox(s.error === 'config' ? T('configMissing') : s.error === 'rpc' ? T('rpcDown') : (s.items.some(n => n.listing) ? T('noResults') : T(emptyMsgKey)));
                 renderPager(sec, 0);
                 return;
             }
@@ -2773,6 +2910,7 @@
             const descBox = document.getElementById('detail-desc-box');
             if (nft.desc && nft.desc.trim()) { document.getElementById('detail-desc').textContent = nft.desc; descBox.classList.remove('hidden'); } else descBox.classList.add('hidden');
             renderMetaSection(nft);
+            renderDetailCollection(nft);
             const key = `${nft.img}|${nft.video}|${nft.metaLoaded}`;
             if (key !== detailMediaKey) {
                 detailMediaKey = key;
@@ -3095,7 +3233,7 @@
             set('t-bsign-warn', T('bifrostSignWarn')); set('bifrost-reset-btn', T('bifrostReset'));
             set('t-admin-title', '🛠 ' + T('adminMediaTitle')); set('t-admin-desc', T('adminMediaDesc')); set('t-admin-image-lbl', T('adminMediaImage')); set('t-admin-video-lbl', T('adminMediaVideo'));
             set('admin-save-btn', T('adminMediaSave')); set('admin-clear-btn', T('adminMediaClear')); set('admin-export-btn', T('adminMediaExport')); set('detail-admin-note', T('adminMediaXamanOnly'));
-            renderAboutBody(); updateMetaToggle(); renderIncoming(); applyFooter(); applyAdminI18n(); applyMintI18n(); set('t-bsign-cancel', T('cancel'));
+            renderAboutBody(); updateMetaToggle(); renderIncoming(); applyFooter(); applyAdminI18n(); applyMintI18n(); set('t-bsign-cancel', T('cancel')); applyBrowseI18n();
             document.querySelectorAll('[data-action="refresh"]').forEach(b => b.textContent = '↻ ' + T('refresh'));
             const ti = document.getElementById('detail-history-toggle'); if (ti && lastHistory) renderHistory(lastHistory.events, lastHistory.ok);
         }
@@ -3136,6 +3274,11 @@
                 case 'mint-view': if (mintState.last) openDetailsModal(mintState.last.id); break;
                 case 'mint-list': if (mintState.last) openListNftModal(mintState.last.id); break;
                 case 'mint-another': mintAnother(); break;
+                case 'mint-mode': setMintMode(id); break;
+                case 'mint-holdings': switchTab('mynfts'); break;
+                case 'coll-filter': setBrowseCollection(target, id, el.dataset.label); break;
+                case 'coll-open': openCollectionOf(id); break;
+                case 'browse-clear': clearBrowse(target); break;
                 case 'copy-meta': if (currentActiveDetailNft && currentActiveDetailNft.metaRaw) copyToClipboard(JSON.stringify(currentActiveDetailNft.metaRaw, null, 2)); break;
                 case 'accept-transfer': acceptTransfer(id, el.dataset.offer); break;
                 case 'admin-save': saveMediaOverride(false); break;
@@ -3633,6 +3776,42 @@
             mintCollectionOpt: 'Colección #{n}', mintCollectionOptNamed: '#{n} · {name}', mintItems: '{n} NFTs', mintItem: '{n} NFT'
         });
 
+        Object.assign(EXTRA_I18N.en, {
+            searchPlaceholder: 'Search by name, collection, seller or ID…', allCollections: 'All collections', collectionLbl: 'Collection', viewCollection: 'View collection',
+            clearFilters: 'Clear filters', noResults: 'No assets match your search or collection filter.',
+            mintCollectionDesc: 'Collection description (optional)', mintCollectionImage: 'Collection cover (CID or ipfs://…, optional)', mintCollectionSite: 'Collection website (https, optional)',
+            mintModeSingle: 'Single NFT', mintModeBatch: 'Batch mint', mintModeHelp: 'Create one NFT with its media, details and metadata file.',
+            mintModeHelpBatch: 'Mint up to 8 NFTs with a single signature. It is atomic: either all of them are created or none. Longer lists are split into several signatures.',
+            mintBatchNetOk: 'Batch transactions (XLS-56) are active on the XRP Ledger.', mintBatchUnsupported: 'Batch transactions are not active on the XRP Ledger right now, so batch mint is unavailable.',
+            mintBatchUris: 'Metadata URIs, one per line (CID or ipfs://…) *', mintBatchPlaceholder: 'ipfs://bafy…1\nipfs://bafy…2\nipfs://bafy…3',
+            mintBatchCopies: 'Copies of each URI (editions)', mintBatchHelp: 'Every NFT is minted into the collection, royalty and flags chosen below. Each line must be a metadata JSON already uploaded to IPFS. The first line is verified to read its name and collection.',
+            mintBatchBadLine: 'Line {n} is not a valid CID or https link.', mintBatchLong: 'Line {n}: the URI is {b} bytes; XRPL allows 256.', mintBatchEmpty: 'Paste at least one metadata URI.',
+            mintBatchBadCopies: 'Copies must be a whole number between 1 and 40.', mintBatchTooMany: 'The maximum is {max} NFTs per run.',
+            mintBatchSummary: '{n} NFTs · {s} signature(s)', mintBatchTitle: 'Batch mint', mintBatchSigs: 'Signatures',
+            mintSubmitBatch: 'Mint {n} NFTs', mintBatchProgress: 'Signature {i} of {t} · {n} NFTs…',
+            scanToBatch: 'Scan with Xaman to mint {n} NFTs at once (signature {i} of {t})',
+            mintBatchWalletHint: 'Your wallet may not support Batch transactions yet. Use Xaman, or mint the NFTs one by one.',
+            mintBatchOk: '{n} NFTs minted.', mintBatchPartial: 'Minted {done} of {total}. The remaining URIs are still in the box so you can continue.',
+            mintBatchSuccessTitle: '{n} NFTs minted!', mintBatchSuccessDesc: 'They are now in your wallet, in collection #{t}.', mintViewHoldings: 'View in Holdings'
+        });
+        Object.assign(EXTRA_I18N.es, {
+            searchPlaceholder: 'Buscar por nombre, colección, vendedor o ID…', allCollections: 'Todas las colecciones', collectionLbl: 'Colección', viewCollection: 'Ver colección',
+            clearFilters: 'Limpiar filtros', noResults: 'Ningún activo coincide con tu búsqueda o colección.',
+            mintCollectionDesc: 'Descripción de la colección (opcional)', mintCollectionImage: 'Portada de la colección (CID o ipfs://…, opcional)', mintCollectionSite: 'Web de la colección (https, opcional)',
+            mintModeSingle: 'NFT individual', mintModeBatch: 'Mint por lotes', mintModeHelp: 'Crea un NFT con sus medios, detalles y archivo de metadatos.',
+            mintModeHelpBatch: 'Crea hasta 8 NFTs con una sola firma. Es atómico: se crean todos o ninguno. Las listas más largas se dividen en varias firmas.',
+            mintBatchNetOk: 'Las transacciones Batch (XLS-56) están activas en el XRP Ledger.', mintBatchUnsupported: 'Las transacciones Batch no están activas ahora en el XRP Ledger, así que el mint por lotes no está disponible.',
+            mintBatchUris: 'URIs de metadatos, una por línea (CID o ipfs://…) *', mintBatchPlaceholder: 'ipfs://bafy…1\nipfs://bafy…2\nipfs://bafy…3',
+            mintBatchCopies: 'Copias de cada URI (ediciones)', mintBatchHelp: 'Cada NFT se crea con la colección, regalía y opciones elegidas abajo. Cada línea debe ser un JSON de metadatos ya subido a IPFS. La primera línea se verifica para leer su nombre y colección.',
+            mintBatchBadLine: 'La línea {n} no es un CID ni un enlace https válido.', mintBatchLong: 'Línea {n}: la URI mide {b} bytes; XRPL permite 256.', mintBatchEmpty: 'Pega al menos una URI de metadatos.',
+            mintBatchBadCopies: 'Las copias deben ser un entero entre 1 y 40.', mintBatchTooMany: 'El máximo es {max} NFTs por tanda.',
+            mintBatchSummary: '{n} NFTs · {s} firma(s)', mintBatchTitle: 'Mint por lotes', mintBatchSigs: 'Firmas',
+            mintSubmitBatch: 'Crear {n} NFTs', mintBatchProgress: 'Firma {i} de {t} · {n} NFTs…',
+            scanToBatch: 'Escanea con Xaman para crear {n} NFTs de una vez (firma {i} de {t})',
+            mintBatchWalletHint: 'Tu billetera quizá aún no soporte transacciones Batch. Usa Xaman o crea los NFTs uno por uno.',
+            mintBatchOk: '{n} NFTs creados.', mintBatchPartial: 'Se crearon {done} de {total}. Las URIs restantes siguen en el cuadro para que continúes.',
+            mintBatchSuccessTitle: '¡{n} NFTs creados!', mintBatchSuccessDesc: 'Ya están en tu billetera, en la colección #{t}.', mintViewHoldings: 'Ver en Mis NFTs'
+        });
         const MINT_TAXON_KEY = 'aeterna_taxon_names_v1';
         const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{40,}|k[a-z0-9]{40,}|z[1-9A-HJ-NP-Za-km-z]{40,})$/i;
         const mintState = { doc: null, attrs: [{ k: '', v: '' }], issuerTaxons: new Map(), taxonFor: null, busy: false, last: null, probeToken: 0 };
@@ -3735,7 +3914,9 @@
             const image = safeNorm(mel('mint-image').value), video = safeNorm(mel('mint-video').value);
             const name = mel('mint-name').value.trim(), desc = mel('mint-desc').value.trim(), cat = mel('mint-category').value;
             const ext = mel('mint-external').value.trim(), creator = mel('mint-creator').value.trim(), coll = mel('mint-collection-name').value.trim();
-            return { image, video, name, desc, cat, ext, creator, coll };
+            const collDesc = mel('mint-collection-desc').value.trim(), collSite = mel('mint-collection-site').value.trim();
+            const collImgRaw = mel('mint-collection-image').value.trim(), collImg = collImgRaw ? safeNorm(collImgRaw) : '';
+            return { image, video, name, desc, cat, ext, creator, coll, collDesc, collImg, collSite };
         }
         function buildMintMetadata(f) {
             if (!f.name || !f.image) return null;
@@ -3746,7 +3927,12 @@
             if (f.ext && /^https:\/\/[^\s<>"']+$/i.test(f.ext)) m.external_url = f.ext;
             if (f.creator) m.creator = f.creator.slice(0, 80);
             if (f.cat && f.cat !== UNCAT) m.category = f.cat;
-            if (f.coll) m.collection = { name: f.coll.slice(0, 80) };
+            if (f.coll) {
+                m.collection = { name: f.coll.slice(0, 80) };
+                if (f.collDesc) m.collection.description = f.collDesc.slice(0, 500);
+                if (f.collImg) m.collection.image = f.collImg;
+                if (f.collSite && /^https:\/\/[^\s<>"']+$/i.test(f.collSite)) m.collection.website = f.collSite;
+            }
             const attrs = mintState.attrs.filter(a => a.k.trim() && a.v.trim()).slice(0, 12).map(a => ({ trait_type: a.k.trim(), value: a.v.trim() }));
             if (attrs.length) m.attributes = attrs;
             return m;
@@ -3806,6 +3992,7 @@
             else if (f.image === null) setHtml('mint-image-status', `<span class="text-amber-300">${esc(T('mintImgBad'))}</span>`);
             else { setHtml('mint-image-status', `<span class="text-slate-500">${esc(T('mintChecking'))}</span>`); const tk = ++mintState.probeToken; probeTimer = setTimeout(() => probeImage(f.image, tk), 700); }
             mel('mint-submit').disabled = mintState.busy;
+            renderBatchSummary();
         }
         async function probeImage(ipfsUri, token) {
             for (let g = 0; g < CONFIG.IPFS_GATEWAYS.length; g++) {
@@ -3853,10 +4040,12 @@
        
         function resetMintForm(keepSuccess) {
     clearTimeout(probeTimer); mintState.probeToken++;
-    ['mint-image','mint-video','mint-name','mint-desc','mint-external','mint-creator','mint-collection-name','mint-uri']
+    ['mint-image','mint-video','mint-name','mint-desc','mint-external','mint-creator','mint-collection-name','mint-collection-desc','mint-collection-image','mint-collection-site','mint-batch-uris','mint-uri']
         .forEach(i => { const e = mel(i); if (e) e.value = ''; });
     const set = (id, fn) => { const e = mel(id); if (e) fn(e); };
     set('mint-royalty', e => e.value = '5');
+    set('mint-batch-copies', e => e.value = '1');
+    set('mint-batch-note', e => e.textContent = '');
     set('mint-taxon', e => { e.value = ''; delete e.dataset.touched; });
     set('mint-collection', e => e.innerHTML = '');
     set('mint-category', e => e.innerHTML = '');
@@ -3879,6 +4068,174 @@
 }
 
         // ----- Página -----
+        /* ===== MINT POR LOTES (Batch / XLS-56): hasta 8 NFTs por firma, todo o nada ===== */
+        const MINT_BATCH_MAX = 8, MINT_BATCH_TOTAL_MAX = 40;
+        mintState.mode = 'single'; mintState.batchOk = null; mintState.batchInfoLoaded = false;
+        // Reparte N NFTs en lotes de 2 a 8 (un NFT suelto se mintea sin Batch). 9 -> [5,4]; 17 -> [6,6,5]
+        function planBatches(total) {
+            if (!Number.isInteger(total) || total < 1) return [];
+            if (total === 1) return [1];
+            const n = Math.ceil(total / MINT_BATCH_MAX), base = Math.floor(total / n), rem = total % n;
+            return Array.from({ length: n }, (_, i) => base + (i < rem ? 1 : 0));
+        }
+        function parseBatchUris() {
+            const lines = mel('mint-batch-uris').value.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            const uris = [];
+            for (let i = 0; i < lines.length; i++) {
+                const u = safeNorm(lines[i]);
+                if (!u) return { error: 'mintBatchBadLine', params: { n: i + 1 }, uris: [] };
+                const b = new TextEncoder().encode(u).length;
+                if (b > 256) return { error: 'mintBatchLong', params: { n: i + 1, b }, uris: [] };
+                uris.push(u);
+            }
+            return { uris };
+        }
+        function batchCopies() {
+            const raw = mel('mint-batch-copies').value.trim(), n = raw === '' ? 1 : Number(raw);
+            return Number.isInteger(n) && n >= 1 && n <= MINT_BATCH_TOTAL_MAX ? n : NaN;
+        }
+        function readMintSettings() {
+            const taxon = getMintTaxon();
+            if (!Number.isInteger(taxon) || taxon < 0 || taxon > 4294967295) return { error: 'mintBadTaxon' };
+            const rv = mel('mint-royalty').value.trim(), royaltyPct = rv === '' ? 0 : Number(rv);
+            if (!Number.isFinite(royaltyPct) || royaltyPct < 0 || royaltyPct > 50) return { error: 'mintBadRoyalty' };
+            const flags = { transferable: mel('mint-f-transferable').checked || royaltyPct > 0, onlyXrp: mel('mint-f-onlyxrp').checked, burnable: mel('mint-f-burnable').checked, mutable: mel('mint-f-mutable').checked };
+            return { taxon, royaltyPct, flags };
+        }
+        function collectBatchInputs() {
+            const p = parseBatchUris(); if (p.error) return p;
+            if (!p.uris.length) return { error: 'mintBatchEmpty' };
+            const copies = batchCopies(); if (Number.isNaN(copies)) return { error: 'mintBatchBadCopies' };
+            const uris = []; p.uris.forEach(u => { for (let i = 0; i < copies; i++) uris.push(u); });
+            if (uris.length > MINT_BATCH_TOTAL_MAX) return { error: 'mintBatchTooMany', params: { max: MINT_BATCH_TOTAL_MAX } };
+            const s = readMintSettings(); if (s.error) return s;
+            return { uris, ...s };
+        }
+        function updateMintModeUi() {
+            if (!mel('mint-mode')) return;
+            const batch = mintState.mode === 'batch';
+            ['mint-h1', 'mint-h2'].forEach(id => { const h = mel(id), sec = h && h.closest('section'); if (sec) sec.classList.toggle('hidden', batch); });
+            const lbl = mel('mint-uri') && mel('mint-uri').closest('label'); if (lbl) lbl.classList.toggle('hidden', batch);
+            mel('mint-batch-box').classList.toggle('hidden', !batch);
+            const on = 'px-4 py-2 rounded-lg bg-obsidian-gold text-black font-bold transition', off = 'px-4 py-2 rounded-lg text-slate-300 hover:text-white transition';
+            mel('mint-mode-single').className = batch ? off : on; mel('mint-mode-batch').className = batch ? on : off;
+            mel('mint-mode-single').setAttribute('aria-selected', String(!batch)); mel('mint-mode-batch').setAttribute('aria-selected', String(batch));
+            mel('mint-mode-help').textContent = T(batch ? 'mintModeHelpBatch' : 'mintModeHelp');
+            const net = mel('mint-batch-net');
+            if (batch && mintState.batchOk !== null) {
+                net.textContent = T(mintState.batchOk ? 'mintBatchNetOk' : 'mintBatchUnsupported');
+                net.className = 'text-[11px] leading-relaxed ' + (mintState.batchOk ? 'text-emerald-300' : 'text-amber-200');
+            } else { net.className = 'hidden'; net.textContent = ''; }
+            if (!batch && !mintState.busy) mel('mint-submit-label').textContent = `${T('mintSubmit')} · ${WALLET_LABEL[walletType] || ''}`;
+        }
+        function applyMintMode() { updateMintModeUi(); mintRecalc(); }
+        function setMintMode(m) {
+            mintState.mode = m === 'batch' ? 'batch' : 'single';
+            if (mintState.mode === 'batch') loadBatchInfo();
+            applyMintMode();
+        }
+        async function loadBatchInfo() {
+            if (mintState.batchInfoLoaded) return;
+            mintState.batchInfoLoaded = true;
+            try {
+                const { res, data } = await backendFetch('/api/batch-info', { retry: false });
+                if (res.ok && data.success) mintState.batchOk = data.enabled === true ? true : (data.enabled === false ? false : null);
+            } catch (e) { /* desconocido: no se bloquea */ }
+            updateMintModeUi();
+        }
+        // La primera URI se pasa al campo oculto de verificación: así se lee su nombre y su colección
+        function onBatchInput() {
+            const first = mel('mint-batch-uris').value.split(/\r?\n/).map(s => s.trim()).find(Boolean) || '';
+            mel('mint-uri').value = (first && safeNorm(first)) || '';
+            mintRecalc();
+        }
+        function renderBatchSummary() {
+            if (mintState.mode !== 'batch' || !mel('mint-sum')) return;
+            const p = parseBatchUris(), copies = batchCopies();
+            const total = p.error || Number.isNaN(copies) ? 0 : p.uris.length * copies, plan = planBatches(total);
+            const roy = parseFloat(mel('mint-royalty').value), tx = getMintTaxon();
+            setHtml('mint-preview-media', `<div class="text-center space-y-1"><div class="text-4xl" aria-hidden="true">📦</div><div class="text-sm text-white font-mono">${esc(T(total === 1 ? 'mintItem' : 'mintItems', { n: total }))}</div></div>`);
+            mel('mint-preview-name').textContent = T('mintBatchTitle');
+            const rows = [
+                [T('mintBatchSigs'), plan.length ? `${plan.length} (${plan.join(' + ')})` : '—'],
+                [T('mintCollection'), `#${Number.isNaN(tx) ? '—' : tx}${mintCollName() ? ' · ' + mintCollName() : ''}`],
+                [T('mintRoyalty'), `${Number.isFinite(roy) ? roy : 0}%`]
+            ];
+            setHtml('mint-sum', rows.map(([k, v]) => `<div class="flex justify-between gap-3"><span class="text-slate-500">${esc(k)}</span><span class="text-slate-200 text-right break-words min-w-0">${esc(v)}</span></div>`).join(''));
+            const note = mel('mint-batch-note');
+            if (p.error) { note.textContent = T(p.error, p.params); note.className = 'text-[11px] min-h-[1rem] text-amber-300'; }
+            else if (Number.isNaN(copies)) { note.textContent = T('mintBatchBadCopies'); note.className = 'text-[11px] min-h-[1rem] text-amber-300'; }
+            else if (total > MINT_BATCH_TOTAL_MAX) { note.textContent = T('mintBatchTooMany', { max: MINT_BATCH_TOTAL_MAX }); note.className = 'text-[11px] min-h-[1rem] text-amber-300'; }
+            else { note.textContent = total ? T('mintBatchSummary', { n: total, s: plan.length }) : ''; note.className = 'text-[11px] min-h-[1rem] text-emerald-300'; }
+            if (!mintState.busy) mel('mint-submit-label').textContent = `${T('mintSubmitBatch', { n: total })} · ${WALLET_LABEL[walletType] || ''}`;
+        }
+        async function submitBatchMint() {
+            if (mintState.busy) return;
+            if (!requireWallet()) return;
+            const v = collectBatchInputs();
+            if (v.error) return showToast(T(v.error, v.params), 'warning');
+            if (mintState.batchOk === false && v.uris.length > 1) return showToast(T('mintBatchUnsupported'), 'warning');
+            mintState.busy = true; mel('mint-submit').disabled = true;
+            const acct = connectedAccount, plan = planBatches(v.uris.length), txs = [];
+            const known = new Set();
+            let offset = 0, done = 0;
+            try {
+                try { if ((await fetchXrpBalance(acct)) < 1.3) showToast(T('mintLowBalance'), 'warning'); } catch (e) {}
+                for (let i = 0; i < plan.length; i++) {
+                    const part = v.uris.slice(offset, offset + plan[i]), single = part.length === 1;
+                    mel('mint-submit-label').textContent = T('mintBatchProgress', { i: i + 1, t: plan.length, n: part.length });
+                    (await fetchAccountNfts(acct).catch(() => [])).forEach(n => known.add(String(n.nftokenId).toUpperCase()));
+                    const before = new Set(known);
+                    let signed;
+                    try {
+                        signed = await signTx({
+                            endpoint: single ? '/api/mint-payload' : '/api/mint-batch-payload',
+                            body: single ? { account: acct, uri: part[0], taxon: v.taxon, royaltyPct: v.royaltyPct, flags: v.flags } : { account: acct, uris: part, taxon: v.taxon, royaltyPct: v.royaltyPct, flags: v.flags },
+                            description: single ? T('scanToMint', { name: short(part[0], 12, 6) }) : T('scanToBatch', { n: part.length, i: i + 1, t: plan.length })
+                        });
+                    } catch (e) {
+                        reportError(e);
+                        if (e && e.code === 'bifrost' && !single) showToast(T('mintBatchWalletHint'), 'warning');
+                        break;
+                    }
+                    if (signed.account && signed.account !== acct) { showToast(T('wrongAccount'), 'error'); break; }
+                    const fresh = async () => (await fetchAccountNfts(acct)).filter(n => !before.has(String(n.nftokenId).toUpperCase()));
+                    const out = await confirmOnLedger(signed, async () => (await fresh()).length >= part.length);
+                    if (!out.ok) { outcomeToast(out, ''); break; }
+                    try { await pollCondition(async () => (await fresh()).length >= part.length, 15000); (await fresh()).forEach(n => known.add(String(n.nftokenId).toUpperCase())); } catch (e) {}
+                    done += part.length; offset += part.length;
+                    if (signed.txHash) txs.push(signed.txHash);
+                }
+            } catch (e) { reportError(e); }
+            finally { mintState.busy = false; mel('mint-submit').disabled = false; }
+            if (!done) { updateMintModeUi(); renderBatchSummary(); return; }
+            const cn = mintCollName();
+            if (cn) { const names = mintTaxonNames(); names[acct + ':' + v.taxon] = cn; saveJson(MINT_TAXON_KEY, names); }
+            const remaining = v.uris.slice(done);
+            const keepTaxons = new Map(mintState.issuerTaxons);
+            keepTaxons.set(v.taxon, (keepTaxons.get(v.taxon) || 0) + done);
+            resetMintForm(true);
+            mintState.issuerTaxons = keepTaxons; mintState.taxonFor = acct;
+            mintState.last = { batch: true, count: done, taxon: v.taxon, txs };
+            renderMintPage();
+            if (remaining.length) { mel('mint-batch-uris').value = remaining.join('\n'); onBatchInput(); showToast(T('mintBatchPartial', { done, total: v.uris.length }), 'warning'); }
+            else showToast(T('mintBatchOk', { n: done }), 'success');
+            renderBatchSuccess();
+            loadHoldings(true).then(() => { refreshCollectionOptions(); });
+        }
+        function renderBatchSuccess() {
+            const box = mel('mint-success'), r = mintState.last;
+            if (!r || !r.batch) return;
+            box.classList.remove('hidden');
+            box.innerHTML = `<div class="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/30 to-transparent p-5 sm:p-6 space-y-4">
+                <div><h3 class="text-lg text-white font-semibold">✅ ${esc(T('mintBatchSuccessTitle', { n: r.count }))}</h3><p class="text-xs text-slate-300 mt-1">${esc(T('mintBatchSuccessDesc', { t: r.taxon }))}</p></div>
+                <div class="text-[11px] font-mono space-y-1.5 text-slate-300">${(r.txs || []).map((h, i) => `<div class="flex items-center gap-2"><span class="text-slate-500">${esc(T('mintTxLbl'))} ${i + 1}</span><a href="${esc(explorerTx(h))}" target="_blank" rel="noopener noreferrer" class="truncate text-obsidian-gold hover:underline">${esc(short(h, 10, 8))}</a></div>`).join('')}</div>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button data-action="mint-holdings" class="btn-xaman px-4 py-2.5 rounded-lg text-xs font-semibold">${esc(T('mintViewHoldings'))}</button>
+                    <button data-action="mint-another" class="bg-obsidian-border hover:bg-slate-800 text-slate-200 px-4 py-2.5 rounded-lg text-xs font-mono transition">${esc(T('mintAnother'))}</button>
+                </div></div>`;
+            box.scrollIntoView && box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
         function renderMintPage() {
             if (!mel('view-mint')) return;
             const locked = !connectedAccount;
@@ -3887,13 +4244,13 @@
             if (locked) return;
             if (!mintState.rendered) { mintState.rendered = true; fillMintCategories(false); renderAttrRows(); mel('mint-f-transferable').checked = true; mel('mint-f-onlyxrp').checked = true; }
             mel('mint-submit-label').textContent = `${T('mintSubmit')} · ${WALLET_LABEL[walletType] || ''}`;
-            refreshCollectionOptions(); mintRecalc(); loadIssuerTaxons();
+            refreshCollectionOptions(); mintRecalc(); loadIssuerTaxons(); applyMintMode(); loadBatchInfo();
             if (!state.holdings.items.length && !state.holdings.loading) loadHoldings(false).then(() => { refreshCollectionOptions(); mintRecalc(); });
         }
         function collectMintInputs() {
             const f = readMintForm();
             if (f.image === null || !f.image) return { error: 'mintNeedImage' };
-            if (f.video === null) return { error: 'mintImgBad' };
+            if (f.video === null || f.collImg === null) return { error: 'mintImgBad' };
             const uri = safeNorm(mel('mint-uri').value);
             if (uri === null) return { error: 'mintUriInvalid' };
             if (!uri) return { error: 'mintNeedUri' };
@@ -3908,6 +4265,7 @@
             return { uri, taxon, royaltyPct, flags, category: f.cat !== UNCAT ? f.cat : '', collName: mintCollName() || f.coll, name: String(label).slice(0, 80) };
         }
         async function submitMint() {
+            if (mintState.mode === 'batch') return submitBatchMint();
             if (mintState.busy) return;
             if (!requireWallet()) return;
             const v = collectMintInputs();
@@ -3946,6 +4304,7 @@
         function renderMintSuccess() {
             const box = mel('mint-success'), r = mintState.last;
             if (!r) { box.classList.add('hidden'); return; }
+            if (r.batch) return renderBatchSuccess();
             box.classList.remove('hidden');
             const it = nftIndex.get(r.id);
             box.innerHTML = `<div class="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/30 to-transparent p-5 sm:p-6 space-y-4">

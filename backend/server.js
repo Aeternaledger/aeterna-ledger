@@ -194,7 +194,7 @@ function jsonStore(name, file) {
    (de CUALQUIER emisor). Cada entrada se verifica contra el ledger y las que dejan de estar a la venta se eliminan solas. */
 const REGISTRY_FILE = process.env.REGISTRY_FILE || path.join(__dirname, 'data', 'registry.json');
 const REGISTRY_MAX = 5000;
-const CATEGORIES = ['Planets & Moons', 'Stars & Stellar Systems', 'Fauna & Wild Species', 'Botany & Master Flora', 'Minerals & Pure Elements', 'Global Geography & Waters', 'Concepts, Ideas & Knowledge', 'Symbols, Archetypes & Culture'];
+const CATEGORIES = ['Planets & Moons', 'Stars & Stellar Systems', 'Fauna & Wild Species', 'Botany & Master Flora', 'Minerals & Pure Elements', 'Global Geography & Waters', 'Concepts, Ideas & Knowledge', 'Symbols, Archetypes & Culture', 'Art & Creation'];
 const registryStore = jsonStore('registry', REGISTRY_FILE);
 const registry = registryStore.data;
 const saveRegistry = registryStore.save;

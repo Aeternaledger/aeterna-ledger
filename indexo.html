@@ -26,6 +26,9 @@
     <style>
         body { background-color: #070A0F; color: #F1F5F9; font-family: system-ui, -apple-system, sans-serif; }
         .font-ui { font-family: system-ui, -apple-system, sans-serif; }
+        /* Tarjetas de NFTs: usan la misma tipografía del resto de la web (los datos técnicos, IDs y direcciones conservan monoespaciada) */
+        #store-grid .font-mono, #market-grid .font-mono, #my-nfts-grid .font-mono, #incoming-box .font-mono, nav[id^="pager-"] .font-mono { font-family: system-ui, -apple-system, sans-serif; }
+        #store-grid a.font-mono, #market-grid a.font-mono, #my-nfts-grid a.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
         .btn-xaman { background-color: #087bff; color: #ffffff; transition: all 0.2s ease; }
         .btn-xaman:hover { background-color: #3395ff; box-shadow: 0 0 20px rgba(8, 123, 255, 0.35); }
         .btn-buy { background-color: #D4AF37; color: #000000; font-weight: 700; transition: all 0.2s ease; }
@@ -83,7 +86,7 @@
                     <img src="data:image/png;base64,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" alt="Aeterna Ledger" width="80" height="40" class="h-9 sm:h-10 w-auto flex-shrink-0 select-none" style="filter: drop-shadow(0 0 12px rgba(59,130,246,.28))">
                     <div>
                         <h1 class="text-base sm:text-lg font-bold tracking-widest text-white flex items-center gap-2 flex-wrap">
-                            AETERNA LEDGER <span class="text-[10px] bg-obsidian-gold/10 text-obsidian-gold px-2 py-0.5 rounded border border-obsidian-gold/30 font-mono">XRPL XLS-20</span>
+                            AETERNA LEDGER <span class="text-[9px] tracking-wider bg-obsidian-gold/10 text-obsidian-gold px-1.5 py-px rounded border border-obsidian-gold/30 font-mono">XRPL</span>
                         </h1>
                         <p id="t-subtitle" class="text-[11px] text-slate-400">Universal Unclaimed Asset Ledger</p>
                     </div>
@@ -126,10 +129,10 @@
         <!-- VISTA 1: STORE -->
         <section id="view-store" class="space-y-6">
             <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8">
-                <span id="t-tag-genesis" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Official Genesis Registry</span>
+                <span id="t-tag-genesis" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">The Aeterna Collection</span>
                 <h2 id="t-store-title" class="text-2xl sm:text-3xl font-light text-white tracking-tight mt-2">The Unclaimed Universe, Immortalized as NFTs</h2>
                 <p id="t-store-desc" class="text-slate-400 text-sm leading-relaxed mt-1">
-                    Acquire digital NFTs for natural elements, celestial bodies, flora, and archetypes with direct settlement in <strong class="text-obsidian-gold">XRP</strong> via <code class="text-obsidian-gold font-mono">NFTokenCreateOffer</code>.
+                    A permanent digital registry of planetary worlds, natural elements, original art, and foundational archetypes—anchored on the XRP Ledger.
                 </p>
             </div>
             <div class="space-y-4">
@@ -152,6 +155,7 @@
                     <button onclick="filterCategory('Global Geography & Waters', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-geo">🌊 Geography & Waters</button>
                     <button onclick="filterCategory('Concepts, Ideas & Knowledge', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-concepts">💡 Concepts & Knowledge</button>
                     <button onclick="filterCategory('Symbols, Archetypes & Culture', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-symbols">🏛️ Symbols & Culture</button>
+                    <button onclick="filterCategory('Art & Creation', 'store', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-store-art">🎨 Art & Creation</button>
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-2.5 font-ui text-xs" data-toolbar="store">
@@ -168,13 +172,14 @@
             <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <span id="t-market-badge" class="text-[11px] uppercase tracking-widest text-emerald-400 font-mono bg-emerald-950/40 px-3 py-1 rounded border border-emerald-500/30 inline-flex items-center gap-1.5">
-                        <span>🛡️</span> Peer-to-Peer Verified Market
+                        Curated Community Marketplace
                     </span>
-                    <h2 id="t-market-title" class="text-xl sm:text-2xl font-light text-white mt-2">Verified Secondary XLS-20 Trade</h2>
-                    <p id="t-market-desc" class="text-slate-400 text-xs mt-1">Secondary and community listings powered by native XRPL <code class="text-obsidian-gold font-mono">NFTokenCreateOffer</code>.</p>
+                    <h2 id="t-market-title" class="text-xl sm:text-2xl font-light text-white mt-2">Trade &amp; List Your Minted NFTs</h2>
+                    <p id="t-market-desc" class="text-slate-400 text-xs mt-1 max-w-xl leading-relaxed">Already hold minted NFTs or full collections? Click <strong class="text-obsidian-gold font-semibold">List NFT for Sale</strong> to showcase your pieces live in the marketplace and connect with collectors.</p>
+                    <p class="text-xs text-slate-400 mt-3 font-ui"><span id="t-market-invite">Haven't minted yet?</span> <button type="button" id="t-market-invite-btn" data-action="goto-mint" class="font-semibold text-obsidian-gold hover:underline underline-offset-4">Mint your first NFT →</button></p>
                 </div>
                 <button onclick="openListNftModal()" id="btn-list-nft" class="btn-simple-yellow font-mono text-sm sm:text-base font-bold px-6 py-3 rounded-xl uppercase tracking-wider whitespace-nowrap cursor-pointer shadow-md hover:scale-[1.01] transition-all">
-                    <span id="btn-list-nft-text">List NFT for sale</span>
+                    <span id="btn-list-nft-text">List NFT for Sale</span>
                 </button>
             </div>
             <div class="space-y-4">
@@ -197,6 +202,7 @@
                     <button onclick="filterCategory('Global Geography & Waters', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-geo">🌊 Geography & Waters</button>
                     <button onclick="filterCategory('Concepts, Ideas & Knowledge', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-concepts">💡 Concepts & Knowledge</button>
                     <button onclick="filterCategory('Symbols, Archetypes & Culture', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-symbols">🏛️ Symbols & Culture</button>
+                    <button onclick="filterCategory('Art & Creation', 'market', this)" class="cat-chip px-4 py-2 rounded-xl" id="chip-market-art">🎨 Art & Creation</button>
                 </div>
             </div>
             <div class="flex flex-col sm:flex-row gap-2.5 font-ui text-xs" data-toolbar="market">
@@ -350,24 +356,24 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                     <div class="bg-obsidian-dark/70 border border-obsidian-border p-6 rounded-xl space-y-3">
-                        <div id="t-about-box1-sub" class="text-obsidian-gold font-mono text-xs uppercase tracking-wider">01. Digital Asset Ledger</div>
-                        <h3 id="t-about-box1-title" class="text-lg font-medium text-white">Unowned Elements, Reborn as NFTs</h3>
+                        <div id="t-about-box1-sub" class="text-obsidian-gold font-mono text-xs uppercase tracking-wider">01. Digital Collecting Redefined</div>
+                        <h3 id="t-about-box1-title" class="text-lg font-medium text-white">Collect the Universe, Piece by Piece</h3>
                         <p id="t-about-box1-desc" class="text-xs text-slate-400 leading-relaxed">
-                            We created this platform so that anyone can trade digital representations of natural elements, plants, ideas, or concepts as NFTs strictly within the XRPL network.
+                            From distant planets and rare minerals to original art and timeless symbols, we empower creators and collectors to discover, own, and trade meaningful digital assets.
                         </p>
                     </div>
                     <div class="bg-obsidian-dark/70 border border-obsidian-border p-6 rounded-xl space-y-3">
-                        <div id="t-about-box2-sub" class="text-obsidian-gold font-mono text-xs uppercase tracking-wider">02. Powered by XRPL</div>
-                        <h3 id="t-about-box2-title" class="text-lg font-medium text-white">Speed, Security & Global Scale</h3>
+                        <div id="t-about-box2-sub" class="text-obsidian-gold font-mono text-xs uppercase tracking-wider">02. Seamless &amp; Secure</div>
+                        <h3 id="t-about-box2-title" class="text-lg font-medium text-white">Direct Custody, Effortless Trading</h3>
                         <p id="t-about-box2-desc" class="text-xs text-slate-400 leading-relaxed">
-                            We selected the XRP Ledger (XRPL) for its speed and security. Collectible NFTs exist exclusively within the XRPL blockchain ecosystem.
+                            Powered by XRPL’s high-speed, low-cost infrastructure, every transaction happens directly from your wallet with cryptographic security and borderless potential.
                         </p>
                     </div>
                 </div>
                 <div class="border-t border-obsidian-border pt-6 text-center">
-                    <p id="t-about-quote" class="text-xs text-slate-400 italic font-mono mb-6">"Digital elements on the XRP Ledger without real-world ownership claims."</p>
+                    <p id="t-about-quote" class="text-xs text-slate-400 italic font-mono mb-6">"A curated digital universe where art, nature, and ideas live permanently on the blockchain."</p>
                     <button onclick="switchTab('store')" id="t-about-btn" class="btn-buy px-6 py-3 rounded-xl text-xs font-bold tracking-widest uppercase shadow-lg">
-                        Explore Genesis Store &rarr;
+                        Browse the Collection &rarr;
                     </button>
                 </div>
             </div>
@@ -684,13 +690,7 @@
                 navAbout: "About",
                 connectWallet: "Connect Xaman",
                 connected: "Connected",
-                tagGenesis: "Official Genesis Registry",
-                storeTitle: "The Unclaimed Universe, Immortalized as NFTs",
-                storeDesc: "Acquire digital NFTs for natural elements, celestial bodies, flora, and archetypes with direct settlement in XRP via NFTokenCreateOffer.",
                 filterLbl: "Filter Category:",
-                marketBadge: "Peer-to-Peer Verified Market",
-                marketTitle: "Verified Secondary XLS-20 Trade",
-                marketDesc: "Secondary and community listings powered by native XRPL NFTokenCreateOffer.",
                 listBtn: "List NFT for sale",
                 cancelBtn: "Cancel sale",
                 holdingsTitle: "Personal Digital Holdings",
@@ -699,14 +699,6 @@
                 aboutBadge: "Manifesto & Vision",
                 aboutTitle: "What is Aeterna Ledger?",
                 aboutDesc: "A digital registry dedicated to unclaimed elements associated with nature and the cosmos, represented strictly as NFTs on the XRP Ledger.",
-                aboutBox1Sub: "01. Digital Asset Ledger",
-                aboutBox1Title: "Unowned Elements, Reborn as NFTs",
-                aboutBox1Desc: "We created this platform so that anyone can trade digital representations of natural elements, plants, ideas, or concepts as NFTs strictly within the XRPL network.",
-                aboutBox2Sub: "02. Powered by XRPL",
-                aboutBox2Title: "Speed, Security & Global Scale",
-                aboutBox2Desc: "We selected the XRP Ledger (XRPL) for its speed and security. Collectible NFTs exist exclusively within the XRPL blockchain ecosystem.",
-                aboutQuote: '"Digital elements on the XRP Ledger without real-world ownership claims."',
-                aboutExploreBtn: "Explore Genesis Store →",
                 footerText: "Aeterna Ledger Ecosystem • XRPL XLS-20 Standard & Xaman • NFTs represent digital assets exclusively valid within the XRPL network.",
                 modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPL Token Identifier) *",
@@ -744,13 +736,7 @@
                 navAbout: "Nosotros",
                 connectWallet: "Conectar Xaman",
                 connected: "Conectado",
-                tagGenesis: "Registro Oficial Génesis",
-                storeTitle: "El Universo Sin Dueño, Inmortalizado en NFTs",
-                storeDesc: "Adquiere NFTs digitales de elementos naturales, cuerpos celestes, flora y arquetipos con liquidación directa en XRP mediante NFTokenCreateOffer.",
                 filterLbl: "Filtrar Categoría:",
-                marketBadge: "Mercado Verificado P2P",
-                marketTitle: "Comercio Secundario XLS-20 Verificado",
-                marketDesc: "Listados comunitarios y secundarios respaldados por ofertas nativas NFTokenCreateOffer en XRPL.",
                 listBtn: "List NFT for sale",
                 cancelBtn: "Cancel sale",
                 holdingsTitle: "Billetera de Activos Digitales",
@@ -759,14 +745,6 @@
                 aboutBadge: "Manifiesto y Visión",
                 aboutTitle: "¿Qué es Aeterna Ledger?",
                 aboutDesc: "Un registro digital dedicado a elementos de la naturaleza y del cosmos sin dueño, representados estrictamente como NFTs en la red XRP Ledger.",
-                aboutBox1Sub: "01. Registro de Activos Digitales",
-                aboutBox1Title: "Elementos Sin Dueño, Renacidos como NFTs",
-                aboutBox1Desc: "Creamos esta plataforma para permitir el intercambio de representaciones digitales de elementos naturales, flora e ideas exclusivamente en la red XRPL.",
-                aboutBox2Sub: "02. Desarrollado en XRPL",
-                aboutBox2Title: "Velocidad, Seguridad y Escala Global",
-                aboutBox2Desc: "Elegimos XRP Ledger (XRPL) por su rapidez y seguridad. Los NFTs coleccionables existen únicamente en el ecosistema XRPL.",
-                aboutQuote: '"Elementos digitales en XRP Ledger sin reclamos de propiedad en el mundo real."',
-                aboutExploreBtn: "Explorar Tienda Génesis →",
                 footerText: "Ecosistema Aeterna Ledger • Estándar XRPL XLS-20 & Xaman • Los NFTs representan activos válidos exclusivamente en la red XRPL.",
                 modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (Identificador del Token XRPL) *",
@@ -804,13 +782,7 @@
                 navAbout: "概要",
                 connectWallet: "Xaman接続",
                 connected: "接続済み",
-                tagGenesis: "公式創世レジストリ",
-                storeTitle: "持ち主のいない宇宙を、NFTとして永遠に",
-                storeDesc: "XRP LedgerのNFTokenCreateOfferを通じて、自然・天体・植物のデジタルNFTを直接決済で取得。",
                 filterLbl: "カテゴリーフィルター:",
-                marketBadge: "P2P認証済み市場",
-                marketTitle: "検証済みXLS-20二次取引",
-                marketDesc: "ネイティブXRPLオファーによるコミュニティ二次流通マーケット。",
                 listBtn: "List NFT for sale",
                 cancelBtn: "Cancel sale",
                 holdingsTitle: "個人のデジタル保有資産",
@@ -819,14 +791,6 @@
                 aboutBadge: "マニフェストとビジョン",
                 aboutTitle: "Aeterna Ledgerとは？",
                 aboutDesc: "自然や宇宙に関する未所有要素をXRPL上のNFTとして記録するデジタルレジストリ。",
-                aboutBox1Sub: "01. デジタル資産レジャー",
-                aboutBox1Title: "持ち主のいない要素を、NFTとして新たに",
-                aboutBox1Desc: "誰でも自然要素や概念をXRPLネットワーク上のNFTとして取引できるプラットフォーム。",
-                aboutBox2Sub: "02. XRPL基盤",
-                aboutBox2Title: "高速・安全・グローバルスケール",
-                aboutBox2Desc: "高速で安全なXRP Ledgerを採用。コレクター向けNFTはXRPL内限定で存在します。",
-                aboutQuote: "「現実世界の所有権主張を伴わないXRP Ledger上のデジタル資産」",
-                aboutExploreBtn: "創世ストアを探索 →",
                 footerText: "Aeterna Ledger • XRPL XLS-20規格 & Xaman • NFTはXRPL内限定で有効なデジタル資産です。",
                 modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPLトークンID) *",
@@ -864,13 +828,7 @@
                 navAbout: "소개",
                 connectWallet: "Xaman 연결",
                 connected: "연결됨",
-                tagGenesis: "공식 제네시스 등록소",
-                storeTitle: "주인 없는 우주를 NFT로 영원히",
-                storeDesc: "XRP Ledger의 NFTokenCreateOffer를 통해 자연, 천체, 식물 NFT를 XRP로 직접 거래하세요.",
                 filterLbl: "카테고리 필터:",
-                marketBadge: "P2P 검증된 시장",
-                marketTitle: "검증된 XLS-20 2차 거래",
-                marketDesc: "XRPL 원시 오퍼 기반의 커뮤니티 2차 시장.",
                 listBtn: "List NFT for sale",
                 cancelBtn: "Cancel sale",
                 holdingsTitle: "개인 디지털 자산",
@@ -879,14 +837,6 @@
                 aboutBadge: "선언문 및 비전",
                 aboutTitle: "Aeterna Ledger란 무엇인가요?",
                 aboutDesc: "자연과 우주의 미소유 요소를 XRP Ledger 상의 NFT로 기록하는 디지털 원장입니다.",
-                aboutBox1Sub: "01. 디지털 자산 원장",
-                aboutBox1Title: "주인 없는 요소, NFT로 다시 태어나다",
-                aboutBox1Desc: "누구나 자연 요소와 개념을 XRPL 네트워크 내 NFT로 거래할 수 있는 플랫폼입니다.",
-                aboutBox2Sub: "02. XRPL 기반",
-                aboutBox2Title: "속도, 보안 및 글로벌 확장성",
-                aboutBox2Desc: "빠르고 안전한 XRP Ledger를 채택했습니다. 수집용 NFT는 XRPL 생태계 내에서만 존재합니다.",
-                aboutQuote: '"실제 소유권 주장 없는 XRP Ledger 상의 디지털 요소."',
-                aboutExploreBtn: "제네시스 상점 둘러보기 →",
                 footerText: "Aeterna Ledger • XRPL XLS-20 표준 & Xaman • NFT는 XRPL 내에서만 유효한 디지털 자산입니다.",
                 modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPL 토큰 식별자) *",
@@ -924,13 +874,7 @@
                 navAbout: "关于",
                 connectWallet: "连接 Xaman",
                 connected: "已连接",
-                tagGenesis: "官方创世注册库",
-                storeTitle: "将无主的宇宙，永久铸为 NFT",
-                storeDesc: "通过 XRPL 的 NFTokenCreateOffer 协议，直接使用 XRP 购买自然、天体及概念 NFT。",
                 filterLbl: "分类筛选:",
-                marketBadge: "P2P 点对点验证市场",
-                marketTitle: "验证通过的 XLS-20 二级交易",
-                marketDesc: "基于 XRPL 原生 Offer 协议驱动的二次流通与社区交易。",
                 listBtn: "List NFT for sale",
                 cancelBtn: "Cancel sale",
                 holdingsTitle: "个人数字资产",
@@ -939,14 +883,6 @@
                 aboutBadge: "宣言与愿景",
                 aboutTitle: "什么是 Aeterna Ledger？",
                 aboutDesc: "一个致力于将自然与宇宙无主元素以 NFT 形式记录在 XRP Ledger 上的数字账本。",
-                aboutBox1Sub: "01. 数字资产账本",
-                aboutBox1Title: "无主元素，化身 NFT",
-                aboutBox1Desc: "我们创建此平台，让任何人都能在 XRPL 网络中交易自然元素、植物与概念 NFT。",
-                aboutBox2Sub: "02. 基于 XRPL",
-                aboutBox2Title: "高速、安全与全球化",
-                aboutBox2Desc: "我们选择 XRP Ledger (XRPL) 是因其极高的速度与安全性。收藏级 NFT 仅存在于 XRPL 生态中。",
-                aboutQuote: "“在 XRP Ledger 上的数字元素，不代表现实世界的所有权”",
-                aboutExploreBtn: "探索创世商店 →",
                 footerText: "Aeterna Ledger 生态 • XRPL XLS-20 标准 & Xaman • NFT 仅在 XRPL 网络内有效。",
                 modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (XRPL 代币标识符) *",
@@ -984,13 +920,7 @@
                 navAbout: "О нас",
                 connectWallet: "Подключить Xaman",
                 connected: "Подключено",
-                tagGenesis: "Официальный реестр Genesis",
-                storeTitle: "Вселенная без владельца, увековеченная в NFT",
-                storeDesc: "Приобретайте NFT природных элементов, космических тел и концептов с расчетом в XRP через NFTokenCreateOffer.",
                 filterLbl: "Фильтр категорий:",
-                marketBadge: "Проверенный P2P рынок",
-                marketTitle: "Вторичная торговля XLS-20",
-                marketDesc: "Вторичные предложения сообщества на базе протокола NFTokenCreateOffer в XRPL.",
                 listBtn: "List NFT for sale",
                 cancelBtn: "Cancel sale",
                 holdingsTitle: "Личные цифровые активы",
@@ -999,14 +929,6 @@
                 aboutBadge: "Манифест и Видение",
                 aboutTitle: "Что такое Aeterna Ledger?",
                 aboutDesc: "Цифровой реестр бесхозных элементов природы и космоса в виде NFT на блокчейне XRP Ledger.",
-                aboutBox1Sub: "01. Реестр цифровых активов",
-                aboutBox1Title: "Ничейные элементы, рождённые как NFT",
-                aboutBox1Desc: "Платформа для торговли цифровыми представлениями элементов природы и идей строго в сети XRPL.",
-                aboutBox2Sub: "02. На базе XRPL",
-                aboutBox2Title: "Скорость, Безопасность и Масштаб",
-                aboutBox2Desc: "Мы выбрали XRP Ledger за его скорость и надежность. Коллекционные NFT существуют только в XRPL.",
-                aboutQuote: '"Цифровые элементы в XRP Ledger без претензий на право собственности в реальном мире."',
-                aboutExploreBtn: "Исследовать Genesis Store →",
                 footerText: "Экосистема Aeterna Ledger • Стандарт XRPL XLS-20 и Xaman • NFT действительны только в сети XRPL.",
                 modalListTitle: "List NFT for sale",
                 lblNftId: "NFTokenID (Идентификатор XRPL) *",
@@ -1051,7 +973,7 @@
             document.getElementById('connect-btn').innerText = t.connectWallet;
             document.getElementById('t-tag-genesis').innerText = t.tagGenesis;
             document.getElementById('t-store-title').innerText = t.storeTitle;
-            document.getElementById('t-store-desc').innerHTML = t.storeDesc.replace('XRP', '<strong class="text-obsidian-gold">XRP</strong>');
+            document.getElementById('t-store-desc').innerText = t.storeDesc;
             document.getElementById('t-filter-store-lbl').innerText = t.filterLbl;
             document.getElementById('opt-store-newest').innerText = t.sortNewest;
             document.getElementById('opt-store-p-asc').innerText = t.sortPAsc;
@@ -1066,9 +988,10 @@
             document.getElementById('chip-store-geo').innerText = t.catGeo;
             document.getElementById('chip-store-concepts').innerText = t.catConcepts;
             document.getElementById('chip-store-symbols').innerText = t.catSymbols;
-            document.getElementById('t-market-badge').innerHTML = `<span>🛡️</span> ${t.marketBadge}`;
+            document.getElementById('chip-store-art').innerText = t.catArt;
+            document.getElementById('t-market-badge').textContent = t.marketBadge;
             document.getElementById('t-market-title').innerText = t.marketTitle;
-            document.getElementById('t-market-desc').innerHTML = t.marketDesc;
+            { const el = document.getElementById('t-market-desc'), parts = String(t.marketDesc).split('{list}'); el.innerHTML = esc(parts[0]) + '<strong class="text-obsidian-gold font-semibold">' + esc(t.listBtn) + '</strong>' + esc(parts[1] || ''); }
             document.getElementById('btn-list-nft-text').innerText = t.listBtn;
             document.getElementById('t-filter-market-lbl').innerText = t.filterLbl;
             document.getElementById('opt-market-newest').innerText = t.sortNewest;
@@ -1084,6 +1007,7 @@
             document.getElementById('chip-market-geo').innerText = t.catGeo;
             document.getElementById('chip-market-concepts').innerText = t.catConcepts;
             document.getElementById('chip-market-symbols').innerText = t.catSymbols;
+            document.getElementById('chip-market-art').innerText = t.catArt;
             document.getElementById('t-holdings-title').innerText = t.holdingsTitle;
             document.getElementById('t-holdings-desc').innerText = t.holdingsDesc;
             document.getElementById('t-about-badge').innerText = t.aboutBadge;
@@ -1387,6 +1311,79 @@
         Object.assign(translations.zh, { listBtn: '挂牌出售 NFT', cancelBtn: '取消挂单', modalListTitle: '挂牌出售 NFT' });
         if (translations.ru) Object.assign(translations.ru, { listBtn: 'Выставить NFT на продажу', cancelBtn: 'Отменить продажу', modalListTitle: 'Выставить NFT на продажу' });
 
+        /* ===== Textos de Store, Marketplace y About (6 idiomas) ===== */
+        Object.assign(translations.en, {
+            tagGenesis: "The Aeterna Collection", storeTitle: "The Unclaimed Universe, Immortalized as NFTs",
+            storeDesc: "A permanent digital registry of planetary worlds, natural elements, original art, and foundational archetypes—anchored on the XRP Ledger.",
+            marketBadge: "Curated Community Marketplace", marketTitle: "Trade & List Your Minted NFTs",
+            marketDesc: "Already hold minted NFTs or full collections? Click {list} to showcase your pieces live in the marketplace and connect with collectors.",
+            listBtn: "List NFT for Sale", modalListTitle: "List NFT for Sale", catArt: "🎨 Art & Creation",
+            aboutBox1Sub: "01. Digital Collecting Redefined", aboutBox1Title: "Collect the Universe, Piece by Piece",
+            aboutBox1Desc: "From distant planets and rare minerals to original art and timeless symbols, we empower creators and collectors to discover, own, and trade meaningful digital assets.",
+            aboutBox2Sub: "02. Seamless & Secure", aboutBox2Title: "Direct Custody, Effortless Trading",
+            aboutBox2Desc: "Powered by XRPL’s high-speed, low-cost infrastructure, every transaction happens directly from your wallet with cryptographic security and borderless potential.",
+            aboutQuote: '"A curated digital universe where art, nature, and ideas live permanently on the blockchain."', aboutExploreBtn: "Browse the Collection →"
+        });
+        Object.assign(translations.es, {
+            tagGenesis: "La Colección Aeterna", storeTitle: "El Universo Sin Dueño, Inmortalizado en NFTs",
+            storeDesc: "Un registro digital permanente de mundos planetarios, elementos naturales, arte original y arquetipos fundamentales, anclado en el XRP Ledger.",
+            marketBadge: "Marketplace Comunitario Curado", marketTitle: "Publica y Comercia tus NFTs Creados",
+            marketDesc: "¿Ya tienes NFTs creados o colecciones completas? Pulsa {list} para exhibir tus piezas en vivo en el marketplace y conectar con coleccionistas.",
+            catArt: "🎨 Arte y Creación",
+            aboutBox1Sub: "01. El Coleccionismo Digital, Redefinido", aboutBox1Title: "Colecciona el Universo, Pieza a Pieza",
+            aboutBox1Desc: "Desde planetas lejanos y minerales raros hasta arte original y símbolos atemporales, damos a creadores y coleccionistas el poder de descubrir, poseer e intercambiar activos digitales con significado.",
+            aboutBox2Sub: "02. Fluido y Seguro", aboutBox2Title: "Custodia Directa, Comercio sin Esfuerzo",
+            aboutBox2Desc: "Impulsado por la infraestructura rápida y de bajo costo de XRPL, cada transacción se realiza directamente desde tu billetera, con seguridad criptográfica y un potencial sin fronteras.",
+            aboutQuote: '"Un universo digital curado donde el arte, la naturaleza y las ideas viven para siempre en la blockchain."', aboutExploreBtn: "Explorar la Colección →"
+        });
+        Object.assign(translations.ja, {
+            tagGenesis: "AETERNA コレクション", storeTitle: "持ち主のいない宇宙を、NFTとして永遠に",
+            storeDesc: "惑星の世界、自然の要素、オリジナルアート、そして根源的なアーキタイプを記録する恒久的なデジタル・レジストリ。XRP Ledger に刻まれています。",
+            marketBadge: "厳選コミュニティ・マーケットプレイス", marketTitle: "ミント済みNFTを出品・取引する",
+            marketDesc: "ミント済みのNFTやコレクション全体をお持ちですか？「{list}」をクリックして、作品をマーケットプレイスにリアルタイムで展示し、コレクターとつながりましょう。",
+            catArt: "🎨 アート＆クリエーション",
+            aboutBox1Sub: "01. デジタル・コレクションの再定義", aboutBox1Title: "宇宙を、ひとつずつ集めよう",
+            aboutBox1Desc: "遠い惑星や希少な鉱物から、オリジナルアートや時代を超えたシンボルまで、クリエイターとコレクターが意味あるデジタル資産を発見し、所有し、取引できるようにします。",
+            aboutBox2Sub: "02. シームレスで安全", aboutBox2Title: "直接保管、手間いらずの取引",
+            aboutBox2Desc: "XRPLの高速・低コストなインフラに支えられ、すべての取引はあなたのウォレットから直接行われます。暗号技術による安全性と、国境のない可能性を備えています。",
+            aboutQuote: "「アート、自然、そしてアイデアがブロックチェーン上で永遠に息づく、厳選されたデジタル宇宙。」", aboutExploreBtn: "コレクションを見る →"
+        });
+        Object.assign(translations.ko, {
+            tagGenesis: "AETERNA 컬렉션", storeTitle: "주인 없는 우주를 NFT로 영원히",
+            storeDesc: "행성의 세계, 자연 요소, 오리지널 아트, 그리고 근원적인 원형을 담은 영구적인 디지털 레지스트리 — XRP Ledger에 기록됩니다.",
+            marketBadge: "엄선된 커뮤니티 마켓플레이스", marketTitle: "민팅한 NFT를 거래하고 등록하세요",
+            marketDesc: "이미 민팅한 NFT나 전체 컬렉션을 보유하고 계신가요? ‘{list}’ 버튼을 클릭하여 마켓플레이스에 작품을 실시간으로 선보이고 컬렉터와 만나보세요.",
+            catArt: "🎨 아트 & 크리에이션",
+            aboutBox1Sub: "01. 디지털 컬렉팅의 재정의", aboutBox1Title: "우주를 한 조각씩 수집하세요",
+            aboutBox1Desc: "먼 행성과 희귀한 광물부터 오리지널 아트와 시대를 초월한 상징까지, 크리에이터와 컬렉터가 의미 있는 디지털 자산을 발견하고 소유하고 거래할 수 있도록 지원합니다.",
+            aboutBox2Sub: "02. 매끄럽고 안전한", aboutBox2Title: "직접 보관, 손쉬운 거래",
+            aboutBox2Desc: "XRPL의 고속·저비용 인프라를 기반으로, 모든 거래가 암호학적 보안과 국경 없는 가능성과 함께 지갑에서 직접 이루어집니다.",
+            aboutQuote: '"예술, 자연, 아이디어가 블록체인 위에서 영원히 살아 숨 쉬는 큐레이션된 디지털 우주."', aboutExploreBtn: "컬렉션 둘러보기 →"
+        });
+        Object.assign(translations.zh, {
+            tagGenesis: "AETERNA 珍藏系列", storeTitle: "将无主的宇宙，永久铸为 NFT",
+            storeDesc: "一个永久的数字登记册，收录行星世界、自然元素、原创艺术与根本原型——锚定于 XRP Ledger。",
+            marketBadge: "精选社区市场", marketTitle: "交易并挂牌您铸造的 NFT",
+            marketDesc: "已经持有铸造好的 NFT 或完整系列？点击 {list}，即可在市场中实时展示您的作品，并与收藏家建立联系。",
+            catArt: "🎨 艺术与创作",
+            aboutBox1Sub: "01. 重新定义数字收藏", aboutBox1Title: "逐件收藏整个宇宙",
+            aboutBox1Desc: "从遥远的行星、稀有矿物，到原创艺术与永恒符号，我们助力创作者与收藏家发现、拥有并交易有意义的数字资产。",
+            aboutBox2Sub: "02. 流畅且安全", aboutBox2Title: "直接托管，轻松交易",
+            aboutBox2Desc: "依托 XRPL 高速、低成本的基础设施，每笔交易都直接从您的钱包发起，具备密码学级别的安全性与无国界的潜力。",
+            aboutQuote: "“一个精心策展的数字宇宙，让艺术、自然与创意永久存续于区块链之上。”", aboutExploreBtn: "浏览收藏 →"
+        });
+        Object.assign(translations.ru, {
+            tagGenesis: "Коллекция AETERNA", storeTitle: "Вселенная без владельца, увековеченная в NFT",
+            storeDesc: "Постоянный цифровой реестр планетарных миров, природных элементов, оригинального искусства и основополагающих архетипов — закреплённый в XRP Ledger.",
+            marketBadge: "Курируемый маркетплейс сообщества", marketTitle: "Торгуйте и выставляйте свои NFT",
+            marketDesc: "Уже есть выпущенные NFT или целые коллекции? Нажмите «{list}», чтобы выставить свои работы на маркетплейсе и найти коллекционеров.",
+            catArt: "🎨 Искусство и творчество",
+            aboutBox1Sub: "01. Цифровое коллекционирование по-новому", aboutBox1Title: "Коллекционируйте Вселенную по частям",
+            aboutBox1Desc: "От далёких планет и редких минералов до оригинального искусства и вечных символов — мы помогаем авторам и коллекционерам находить, владеть и обменивать значимые цифровые активы.",
+            aboutBox2Sub: "02. Удобно и безопасно", aboutBox2Title: "Прямое хранение, лёгкая торговля",
+            aboutBox2Desc: "Благодаря быстрой и недорогой инфраструктуре XRPL каждая транзакция совершается прямо из вашего кошелька — с криптографической защитой и безграничными возможностями.",
+            aboutQuote: '"Тщательно отобранная цифровая вселенная, где искусство, природа и идеи живут на блокчейне вечно."', aboutExploreBtn: "Смотреть коллекцию →"
+        });
         /* =====================================================================
            UTILIDADES
            ===================================================================== */
@@ -1604,8 +1601,8 @@
         }
 
         /* ---------- Metadatos (XLS-24 / URI) ---------- */
-        const CATEGORIES = ['Planets & Moons', 'Stars & Stellar Systems', 'Fauna & Wild Species', 'Botany & Master Flora', 'Minerals & Pure Elements', 'Global Geography & Waters', 'Concepts, Ideas & Knowledge', 'Symbols, Archetypes & Culture'];
-        const CATEGORY_KEYWORDS = [[/planet|moon|satellite|luna\b/i, 0], [/\bstar|stellar|galax|nebula|estrella/i, 1], [/fauna|animal|species|wild|bird|especie/i, 2], [/botan|flora|plant|tree|flower/i, 3], [/mineral|element|crystal|gem|metal/i, 4], [/geograph|water|ocean|river|mountain|\bsea\b|geograf/i, 5], [/concept|idea|knowledge|saber|principle/i, 6], [/symbol|archetype|culture|myth|s[ií]mbolo/i, 7]];
+        const CATEGORIES = ['Planets & Moons', 'Stars & Stellar Systems', 'Fauna & Wild Species', 'Botany & Master Flora', 'Minerals & Pure Elements', 'Global Geography & Waters', 'Concepts, Ideas & Knowledge', 'Symbols, Archetypes & Culture', 'Art & Creation'];
+        const CATEGORY_KEYWORDS = [[/planet|moon|satellite|luna\b/i, 0], [/\bstar|stellar|galax|nebula|estrella/i, 1], [/fauna|animal|species|wild|bird|especie/i, 2], [/botan|flora|plant|tree|flower/i, 3], [/mineral|element|crystal|gem|metal/i, 4], [/geograph|water|ocean|river|mountain|\bsea\b|geograf/i, 5], [/concept|idea|knowledge|saber|principle/i, 6], [/symbol|archetype|culture|myth|s[ií]mbolo/i, 7], [/\bart\b|artwork|illustration|painting|creation|\barte\b|ilustraci/i, 8]];
         const UNCAT = 'Uncategorized';
         function normalizeCategory(raw) {
             if (!raw) return UNCAT;
@@ -2768,6 +2765,8 @@
                 const b = document.getElementById('clear-' + sec); if (b) b.textContent = T('clearFilters');
                 updateCollectionOptions(sec); updateClearButton(sec);
             });
+            const mi = document.getElementById('t-market-invite'), mb = document.getElementById('t-market-invite-btn');
+            if (mi) mi.textContent = T('mintInviteText'); if (mb) mb.textContent = T('mintInviteBtn');
             if (typeof updateMintModeUi === 'function') updateMintModeUi();
         }
         function listingCard(nft, mode) {
@@ -2834,16 +2833,18 @@
                 const div = document.createElement('div');
                 div.className = 'bg-obsidian-card border border-obsidian-border rounded-xl overflow-hidden p-4 space-y-3 flex flex-col justify-between hover:border-obsidian-gold/60 transition cursor-pointer';
                 div.dataset.action = 'details'; div.dataset.id = nft.nftokenId;
-                const priceTxt = nft.listing ? `${nft.listing.xrp} XRP` : '—';
+                const ci = collInfo(nft), collTxt = ci ? collLabel(ci) : T('noCollection');
+                const ownerHtml = nft.owner ? `<a href="${esc(explorerAcct(nft.owner))}" target="_blank" rel="noopener noreferrer" data-action="noop" title="${esc(nft.owner)}" class="font-mono hover:text-obsidian-gold hover:underline">${esc(short(nft.owner, 6, 4))}</a>` : '—';
                 div.innerHTML = `<div class="h-44 sm:h-48 bg-black relative overflow-hidden flex items-center justify-center">
                         ${renderCardMedia(nft)}
                         <span class="absolute top-2.5 right-2.5 bg-obsidian-dark/85 backdrop-blur text-obsidian-gold text-[10px] font-mono px-2 py-0.5 rounded border border-obsidian-gold/30">${esc(catLabel(nft))}</span>
                         ${nft.video ? '<span class="absolute bottom-2.5 left-2.5 bg-obsidian-dark/90 text-slate-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-obsidian-border">' + (nft.is3d ? '🧊 3D' : '🎬 Video') + '</span>' : ''}
                     </div>
                     <div><h4 class="text-sm font-medium text-white line-clamp-1">${esc(nft.title)}</h4>
-                        <p class="text-xs text-obsidian-gold font-mono mt-1">${esc(priceTxt)}</p></div>
-                    <div class="pt-2 border-t border-obsidian-border/60 flex justify-between items-center gap-2 text-[10px] font-mono">
-                        <span class="text-slate-400 min-w-0 break-words">${esc(pendingTr ? T('transferPending', { to: short(nft.transfer.destination, 6, 4) }) : (listed ? T('listed') : T('inVault')))}</span>
+                        <p class="text-[11px] mt-1 truncate ${ci ? 'text-obsidian-gold/90' : 'text-slate-500'}" title="${esc(collTxt)}">🗂 ${esc(collTxt)}</p>
+                        <p class="text-[10px] text-slate-500 mt-0.5 truncate">${esc(T('ownerLbl'))}: ${ownerHtml}</p></div>
+                    <div class="pt-2 border-t border-obsidian-border/60 flex justify-between items-center gap-2 text-[11px] font-mono">
+                        <span class="text-slate-400 min-w-0 break-words">${esc(pendingTr ? T('transferPending', { to: short(nft.transfer.destination, 6, 4) }) : (listed ? T('listed') + (nft.listing ? ' · ' + nft.listing.xrp + ' XRP' : '') : T('inVault')))}</span>
                         ${listed
                             ? `<button data-action="cancel" data-id="${id}" class="btn-cancel px-2.5 py-1 rounded-lg text-[10px] flex-shrink-0">${esc(pendingTr ? T('cancelTransfer') : t.cancelBtn)}</button>`
                             : `<button data-action="list" data-id="${id}" class="btn-buy px-2.5 py-1 rounded-lg text-[10px]">${esc(t.listBtn)}</button>`}
@@ -3279,6 +3280,7 @@
                 case 'coll-filter': setBrowseCollection(target, id, el.dataset.label); break;
                 case 'coll-open': openCollectionOf(id); break;
                 case 'browse-clear': clearBrowse(target); break;
+                case 'goto-mint': switchTab('mint'); break;
                 case 'copy-meta': if (currentActiveDetailNft && currentActiveDetailNft.metaRaw) copyToClipboard(JSON.stringify(currentActiveDetailNft.metaRaw, null, 2)); break;
                 case 'accept-transfer': acceptTransfer(id, el.dataset.offer); break;
                 case 'admin-save': saveMediaOverride(false); break;
@@ -3812,6 +3814,24 @@
             mintBatchOk: '{n} NFTs creados.', mintBatchPartial: 'Se crearon {done} de {total}. Las URIs restantes siguen en el cuadro para que continúes.',
             mintBatchSuccessTitle: '¡{n} NFTs creados!', mintBatchSuccessDesc: 'Ya están en tu billetera, en la colección #{t}.', mintViewHoldings: 'Ver en Mis NFTs'
         });
+        Object.assign(EXTRA_I18N.en, { ownerLbl: 'Owner', noCollection: 'No collection', mintInviteText: "Haven't minted yet?", mintInviteBtn: 'Mint your first NFT →' });
+        Object.assign(EXTRA_I18N.es, { ownerLbl: 'Propietario', noCollection: 'Sin colección', mintInviteText: '¿Aún no has creado tus NFTs?', mintInviteBtn: 'Crea tu primer NFT →' });
+        Object.assign(EXTRA_I18N.ja = EXTRA_I18N.ja || {}, {
+            ownerLbl: '所有者', noCollection: 'コレクションなし', mintInviteText: 'まだミントしていませんか？', mintInviteBtn: '最初のNFTをミント →',
+            listed: '🟡 マーケットに出品中', inVault: '🟢 ウォレット内（非売品）',
+            searchPlaceholder: '名前・コレクション・出品者・IDで検索…', allCollections: 'すべてのコレクション', collectionLbl: 'コレクション', viewCollection: 'コレクションを見る', clearFilters: 'フィルターをクリア', noResults: '検索条件に一致する資産がありません。' });
+        Object.assign(EXTRA_I18N.ko = EXTRA_I18N.ko || {}, {
+            ownerLbl: '소유자', noCollection: '컬렉션 없음', mintInviteText: '아직 민팅하지 않으셨나요?', mintInviteBtn: '첫 NFT 민팅하기 →',
+            listed: '🟡 마켓에 등록됨', inVault: '🟢 지갑 보관 중 (판매 안 함)',
+            searchPlaceholder: '이름, 컬렉션, 판매자 또는 ID로 검색…', allCollections: '모든 컬렉션', collectionLbl: '컬렉션', viewCollection: '컬렉션 보기', clearFilters: '필터 초기화', noResults: '검색 또는 컬렉션 필터와 일치하는 자산이 없습니다.' });
+        Object.assign(EXTRA_I18N.zh = EXTRA_I18N.zh || {}, {
+            ownerLbl: '所有者', noCollection: '无系列', mintInviteText: '还没有铸造？', mintInviteBtn: '铸造您的第一个 NFT →',
+            listed: '🟡 已在市场挂单', inVault: '🟢 在您的钱包中（未出售）',
+            searchPlaceholder: '按名称、系列、卖家或 ID 搜索…', allCollections: '全部系列', collectionLbl: '系列', viewCollection: '查看系列', clearFilters: '清除筛选', noResults: '没有符合搜索或系列筛选的资产。' });
+        Object.assign(EXTRA_I18N.ru = EXTRA_I18N.ru || {}, {
+            ownerLbl: 'Владелец', noCollection: 'Без коллекции', mintInviteText: 'Ещё не выпускали NFT?', mintInviteBtn: 'Создайте свой первый NFT →',
+            listed: '🟡 Выставлен на маркетплейсе', inVault: '🟢 В вашем кошельке (не продаётся)',
+            searchPlaceholder: 'Поиск по названию, коллекции, продавцу или ID…', allCollections: 'Все коллекции', collectionLbl: 'Коллекция', viewCollection: 'Открыть коллекцию', clearFilters: 'Сбросить фильтры', noResults: 'Нет активов, соответствующих поиску или фильтру коллекции.' });
         const MINT_TAXON_KEY = 'aeterna_taxon_names_v1';
         const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{40,}|k[a-z0-9]{40,}|z[1-9A-HJ-NP-Za-km-z]{40,})$/i;
         const mintState = { doc: null, attrs: [{ k: '', v: '' }], issuerTaxons: new Map(), taxonFor: null, busy: false, last: null, probeToken: 0 };

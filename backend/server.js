@@ -16,6 +16,8 @@
      ANALYTICS_FILE   → (sin Upstash) archivo de conexiones de billeteras (por defecto ./data/connections.jsonl)
      STORE_ADDRESSES  → cuentas cuyas ventas son de la Store, separadas por coma (por defecto MINTING_ADDRESS)
      (mint por lotes: /api/batch-info y /api/mint-batch-payload usan XLS-56 BatchV1_1; no requieren variables nuevas)
+     PINATA_JWT       → (Alchemy) JWT de Pinata para subir los metadatos del premio al reclamarlo; PINATA_API_URL opcional
+     ALCHEMY_ALLOW_FILE_STORAGE → solo pruebas: permite activar Alchemy sin Redis (no usar en producción)
      REGISTRY_FILE    → ruta del registro del Marketplace (por defecto ./data/registry.json; en Render usa un Disk, ej. /var/data/registry.json)
    ===================================================================== */
 require('dotenv').config();
@@ -410,6 +412,291 @@ app.get('/api/wallet-info/:address', wrap(async (req, res) => {
     res.json({ success: true, isAdmin: isAdminAccount(req.params.address) });
 }));
 
+/* ---------- ALCHEMY: reunir NFTs concretos desbloquea un NFT secreto (NO se quema nada) ----------
+   · Los ingredientes se comprueban en el ledger (solo lectura) y la firma de Xaman (SignIn) demuestra que la billetera es del usuario.
+   · Cada NFT ingrediente puede usarse UNA vez por receta (queda marcado aunque se venda). Se bloquea de forma síncrona al reclamar.
+   · El premio se crea en el momento del reclamo (los metadatos nunca salen del servidor antes) con NFTokenMint + oferta de 0 XRP
+     dirigida solo al usuario (amendment NFTokenMintOffer): el usuario la acepta en su billetera / en "Transferencias recibidas".
+   · Requiere almacenamiento permanente (Upstash Redis). Con archivos temporales de Render gratis no se permite activarlo. */
+const PINATA_JWT = process.env.PINATA_JWT || '';
+const PINATA_API_URL = (process.env.PINATA_API_URL || 'https://api.pinata.cloud').replace(/\/+$/, '');
+const ALCHEMY_MAX_TAXON = 4294967295;
+const ALCHEMY_POLL_MS = parseInt(process.env.ALCHEMY_POLL_MS || '5000', 10);
+const alchemyStore = jsonStore('alchemy', process.env.ALCHEMY_FILE || path.join(__dirname, 'data', 'alchemy.json'));
+const AL = () => {                    // acceso perezoso: los datos remotos (Redis) ya están cargados cuando llega una petición
+    const d = alchemyStore.data;
+    if (!d.cfg) d.cfg = { enabled: false };
+    if (!d.recipes) d.recipes = {};
+    if (!d.used) d.used = {};
+    if (!d.claims) d.claims = {};
+    return d;
+};
+const pendingClaim = new Map();       // uuid de SignIn -> { account, recipeId, ts }
+const ownedCache = new Map();
+setInterval(() => { const now = Date.now(); for (const [k, v] of pendingClaim) if (now - v.ts > 15 * 60 * 1000) pendingClaim.delete(k); ownedCache.clear(); }, 5 * 60 * 1000).unref();
+const needAdmin = req => adminFromReq(req);
+
+function claimFor(recipeId) { return Object.values(AL().claims).find(c => c.recipeId === recipeId && c.state !== 'failed') || null; }
+function recipeState(r) {
+    if (claimFor(r.id)) return 'claimed';
+    if (!r.active) return 'inactive';
+    const now = Date.now();
+    if (r.start && now < r.start) return 'upcoming';
+    if (r.end && now > r.end) return 'ended';
+    return 'open';
+}
+function publicRecipe(r) {            // NUNCA incluye datos del premio hasta que se reclama (y entonces solo su NFTokenID)
+    const c = claimFor(r.id);
+    const o = { id: r.id, name: r.name, teaser: r.teaser || '', ingredients: r.ingredients, status: recipeState(r), start: r.start || null, end: r.end || null };
+    if (c && c.state === 'minted') { o.winner = c.account; o.prizeNftId = c.nftokenId || null; }
+    return o;
+}
+async function ownedNftIds(account, fresh) {
+    const c = ownedCache.get(account);
+    if (!fresh && c && Date.now() - c.t < 15000) return c.ids;
+    const ids = new Set();
+    try {
+        await withClient(async client => {
+            let marker, pages = 0;
+            do {
+                const r = await client.request({ command: 'account_nfts', account, limit: 400, ledger_index: 'validated', ...(marker ? { marker } : {}) });
+                for (const n of r.result.account_nfts || []) ids.add(String(n.NFTokenID).toUpperCase());
+                marker = r.result.marker; pages++;
+            } while (marker && pages < 50);
+        });
+    } catch (e) { if (rippledError(e) !== 'actNotFound') throw e; }
+    ownedCache.set(account, { t: Date.now(), ids });
+    return ids;
+}
+function buildPrizeMetadata(r) {
+    const p = r.prize, m = { name: p.name };
+    if (p.description) m.description = p.description;
+    m.image = p.image;
+    if (p.video) m.animation_url = p.video;
+    if (p.category) m.category = p.category;
+    if (p.collectionName) { m.collection = { name: p.collectionName }; if (p.collectionDescription) m.collection.description = p.collectionDescription; }
+    if (p.attributes && p.attributes.length) m.attributes = p.attributes.map(a => ({ trait_type: a.trait_type, value: a.value }));
+    return m;
+}
+async function pinPrizeMetadata(r) {
+    if (!PINATA_JWT) throw new Error('PINATA_JWT no está configurado en Render.');
+    const res = await fetch(PINATA_API_URL + '/pinning/pinJSONToIPFS', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + PINATA_JWT },
+        body: JSON.stringify({ pinataContent: buildPrizeMetadata(r), pinataMetadata: { name: `alchemy-${r.id}.json` }, pinataOptions: { cidVersion: 1 } })
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok || !j.IpfsHash) throw new Error('Pinata: ' + ((j && (j.error && (j.error.details || j.error.reason || j.error) || j.message)) || ('HTTP ' + res.status)));
+    return 'ipfs://' + j.IpfsHash;
+}
+async function mintPrize(r, uri, destination) {
+    if (!MINTING_SECRET) throw new Error('MINTING_SECRET no configurada.');
+    const wallet = xrpl.Wallet.fromSeed(MINTING_SECRET);
+    if (MINTING_ADDRESS && wallet.classicAddress !== MINTING_ADDRESS) throw new Error('MINTING_SECRET no corresponde a MINTING_ADDRESS.');
+    const p = r.prize;
+    const tx = {
+        TransactionType: 'NFTokenMint', Account: wallet.classicAddress, NFTokenTaxon: p.taxon, Flags: 8 | 2,      // transferible + solo XRP
+        URI: Buffer.from(uri, 'utf8').toString('hex').toUpperCase(), Amount: '0', Destination: destination,        // oferta de 0 XRP solo para el usuario
+        ...(p.royaltyPct > 0 ? { TransferFee: Math.round(p.royaltyPct * 1000) } : {})
+    };
+    return withClient(async client => {
+        const prepared = await client.autofill(tx);
+        const signed = wallet.sign(prepared);
+        let result = null;
+        try { result = (await client.submitAndWait(signed.tx_blob)).result; }
+        catch (e) {                                                   // ¿llegó a validarse aunque falló la espera?
+            for (let i = 0; i < 6 && !result; i++) {
+                await sleepMs(ALCHEMY_POLL_MS);
+                try { const x = await client.request({ command: 'tx', transaction: signed.hash }); if (x.result.validated) result = x.result; } catch (e2) { /* aún no */ }
+            }
+            if (!result) { const err = new Error('resultado desconocido: ' + (e && e.message)); err.ambiguous = true; err.txHash = signed.hash; throw err; }
+        }
+        const meta = result.meta || {};
+        if (meta.TransactionResult !== 'tesSUCCESS') throw new Error('XRPL: ' + meta.TransactionResult);
+        let nftokenId = meta.nftoken_id || null, offerIndex = meta.offer_id || null;
+        for (const n of meta.AffectedNodes || []) {
+            const c = n.CreatedNode;
+            if (c && c.LedgerEntryType === 'NFTokenOffer') { offerIndex = offerIndex || c.LedgerIndex; nftokenId = nftokenId || (c.NewFields && c.NewFields.NFTokenID) || null; }
+        }
+        return { txHash: result.hash || signed.hash, nftokenId: nftokenId && String(nftokenId).toUpperCase(), offerIndex: offerIndex && String(offerIndex).toUpperCase(), issuer: wallet.classicAddress };
+    });
+}
+// Bloqueo SÍNCRONO (nada de await antes de marcar): dos reclamos simultáneos no pueden quedarse con los mismos ingredientes
+function startAlchemyClaim(account, recipeId) {
+    const d = AL();
+    if (!d.cfg.enabled) throw new HttpError(409, 'Alchemy no está disponible ahora.');
+    const r = d.recipes[recipeId];
+    if (!r) throw new HttpError(404, 'Receta no encontrada.');
+    const st = recipeState(r);
+    if (st !== 'open') throw new HttpError(409, st === 'claimed' ? 'Esta receta ya fue reclamada.' : st === 'upcoming' ? 'Esta receta aún no está abierta.' : 'Esta receta no está disponible.');
+    if (r.ingredients.some(n => d.used[r.id + ':' + n])) throw new HttpError(409, 'Algún ingrediente ya se usó en esta receta.');
+    const id = crypto.randomBytes(12).toString('hex');
+    d.claims[id] = { id, recipeId, account, state: 'processing', ts: Date.now() };
+    r.ingredients.forEach(n => { d.used[r.id + ':' + n] = id; });
+    alchemyStore.save();
+    processAlchemyClaim(id).catch(e => console.error('[alchemy] error inesperado', e));
+    return id;
+}
+async function processAlchemyClaim(claimId) {
+    const d = AL(), c = d.claims[claimId], r = d.recipes[c.recipeId];
+    const release = (pub, msg) => {
+        c.state = 'failed'; c.publicError = pub; c.error = String(msg).slice(0, 400);
+        r.ingredients.forEach(n => { if (d.used[r.id + ':' + n] === claimId) delete d.used[r.id + ':' + n]; });
+        alchemyStore.save();
+    };
+    try {
+        const owned = await ownedNftIds(c.account, true);
+        if (r.ingredients.some(n => !owned.has(n))) return release('missing', 'faltan ingredientes en la billetera');
+        let uri = r.prize.metadataUri;
+        if (!uri) { try { uri = await pinPrizeMetadata(r); } catch (e) { return release('delivery', e.message); } }
+        let out;
+        try { out = await mintPrize(r, uri, c.account); }
+        catch (e) {
+            if (e && e.ambiguous) { c.state = 'unknown'; c.publicError = 'unknown'; c.error = e.message; c.txHash = e.txHash; c.metadataUri = uri; alchemyStore.save(); return; }
+            return release('delivery', e.message);
+        }
+        Object.assign(c, { state: 'minted', nftokenId: out.nftokenId, offerIndex: out.offerIndex, txHash: out.txHash, from: out.issuer, metadataUri: uri, mintedAt: Date.now() });
+        if (out.offerIndex && HEX64.test(out.offerIndex) && out.nftokenId) {      // aparece en "Transferencias recibidas" del usuario
+            transfersStore.data[out.offerIndex] = { nftokenId: out.nftokenId, from: out.issuer, to: c.account, ts: Date.now() };
+            transfersStore.save();
+        }
+        alchemyStore.save();
+    } catch (e) { release('delivery', e && e.message || e); }
+}
+function parseRecipe(body) {
+    const str = (v, max, req, label) => {
+        const s = typeof v === 'string' ? v.trim() : '';
+        if (req && !s) throw new HttpError(400, `Falta ${label}.`);
+        if (s.length > max) throw new HttpError(400, `${label} es demasiado largo (máx. ${max}).`);
+        return s;
+    };
+    const name = str(body.name, 80, true, 'el nombre de la receta');
+    const teaser = str(body.teaser, 200, false, 'la pista');
+    const ing = [...new Set((Array.isArray(body.ingredients) ? body.ingredients : []).map(x => String(x).trim().toUpperCase()).filter(Boolean))];
+    if (ing.some(x => !HEX64.test(x))) throw new HttpError(400, 'Hay NFTokenID inválidos (deben tener 64 caracteres hexadecimales).');
+    if (ing.length < 2 || ing.length > 5) throw new HttpError(400, 'Una receta necesita de 2 a 5 NFTs distintos.');
+    const p = body.prize && typeof body.prize === 'object' ? body.prize : {};
+    const attributes = (Array.isArray(p.attributes) ? p.attributes : []).map(a => ({ trait_type: str(a && a.trait_type, 40, false, 'el rasgo'), value: str(String(a && a.value != null ? a.value : ''), 80, false, 'el valor') })).filter(a => a.trait_type && a.value).slice(0, 12);
+    const taxon = p.taxon === undefined || p.taxon === null || p.taxon === '' ? 100 : Number(p.taxon);
+    if (!Number.isInteger(taxon) || taxon < 0 || taxon > ALCHEMY_MAX_TAXON) throw new HttpError(400, 'Taxon inválido (entero entre 0 y 4294967295).');
+    const royaltyPct = p.royaltyPct === undefined || p.royaltyPct === null || p.royaltyPct === '' ? 5 : Number(p.royaltyPct);
+    if (!Number.isFinite(royaltyPct) || royaltyPct < 0 || royaltyPct > 50) throw new HttpError(400, 'La regalía debe estar entre 0 % y 50 %.');
+    const prize = {
+        name: str(p.name, 120, true, 'el nombre del premio'), description: str(p.description, 1000, false, 'la descripción del premio'),
+        image: normalizeMedia(p.image) || '', video: normalizeMedia(p.video) || '', metadataUri: normalizeMedia(p.metadataUri) || '',
+        category: CATEGORIES.includes(p.category) ? p.category : '', collectionName: str(p.collectionName, 80, false, 'el nombre de la colección'),
+        collectionDescription: str(p.collectionDescription, 500, false, 'la descripción de la colección'), attributes, taxon, royaltyPct: Math.round(royaltyPct * 1000) / 1000
+    };
+    if (!prize.image && !prize.metadataUri) throw new HttpError(400, 'Falta la imagen del premio (CID o ipfs://…) o una URI de metadatos ya subida.');
+    const num = v => (v === null || v === undefined || v === '' ? null : Number(v));
+    const start = num(body.start), end = num(body.end);
+    if ((start !== null && !Number.isFinite(start)) || (end !== null && !Number.isFinite(end))) throw new HttpError(400, 'Fechas inválidas.');
+    if (start && end && end <= start) throw new HttpError(400, 'La fecha de fin debe ser posterior a la de inicio.');
+    return { name, teaser, ingredients: ing, prize, start, end, active: !!body.active };
+}
+const adminRecipe = r => ({ ...r, status: recipeState(r), claim: claimFor(r.id) });
+
+// --- Público (solo lectura)
+app.get('/api/alchemy/config', rateLimit(120), wrap(async (req, res) => {
+    const d = AL();
+    if (!d.cfg.enabled) return res.json({ success: true, enabled: false, recipes: [] });
+    res.json({ success: true, enabled: true, now: Date.now(), recipes: Object.values(d.recipes).filter(r => r.active || claimFor(r.id)).sort((a, b) => a.createdAt - b.createdAt).map(publicRecipe) });
+}));
+app.get('/api/alchemy/progress/:address', rateLimit(120), wrap(async (req, res) => {
+    if (!isAddr(req.params.address)) throw new HttpError(400, 'Dirección inválida.');
+    const d = AL();
+    if (!d.cfg.enabled) return res.json({ success: true, enabled: false, progress: {} });
+    const owned = await ownedNftIds(req.params.address);
+    const progress = {};
+    for (const r of Object.values(d.recipes)) {
+        if (!(r.active || claimFor(r.id))) continue;
+        const have = r.ingredients.filter(n => owned.has(n)), missing = r.ingredients.filter(n => !owned.has(n)), used = r.ingredients.filter(n => d.used[r.id + ':' + n]);
+        progress[r.id] = { have, missing, used, canClaim: recipeState(r) === 'open' && !missing.length && !used.length };
+    }
+    res.json({ success: true, enabled: true, progress });
+}));
+app.post('/api/alchemy/claim', rateLimit(120), wrap(async (req, res) => {
+    const { account, recipeId } = req.body;
+    if (req.body.wallet === 'bifrost') throw new HttpError(400, 'Por ahora el reclamo requiere una firma de Xaman.');
+    if (!isAddr(account)) throw new HttpError(400, 'Cuenta inválida.');
+    const d = AL();
+    if (!d.cfg.enabled) throw new HttpError(409, 'Alchemy no está disponible ahora.');
+    const r = typeof recipeId === 'string' ? d.recipes[recipeId] : null;
+    if (!r) throw new HttpError(404, 'Receta no encontrada.');
+    const st = recipeState(r);
+    if (st !== 'open') throw new HttpError(409, st === 'claimed' ? 'Esta receta ya fue reclamada.' : 'Esta receta no está disponible ahora.');
+    if (r.ingredients.some(n => d.used[r.id + ':' + n])) throw new HttpError(409, 'Algún ingrediente ya se usó en esta receta.');
+    const owned = await ownedNftIds(account, true);
+    if (r.ingredients.some(n => !owned.has(n))) throw new HttpError(409, 'Aún no tienes todos los ingredientes en esta billetera.');
+    const created = await createPayload({ TransactionType: 'SignIn' }, 'Aeterna Ledger: Alchemy claim', { signer: account });
+    pendingClaim.set(created.uuid, { account, recipeId: r.id, ts: Date.now() });
+    res.json({ success: true, ...created });
+}));
+app.get('/api/alchemy/claim/:id', rateLimit(120), wrap(async (req, res) => {
+    const c = /^[0-9a-f]{24}$/.test(req.params.id) ? AL().claims[req.params.id] : null;
+    if (!c) throw new HttpError(404, 'Reclamo no encontrado.');
+    res.json({ success: true, claim: { state: c.state, error: c.publicError || null, nftokenId: c.nftokenId || null, offerIndex: c.offerIndex || null, from: c.from || null, txHash: c.txHash || null } });
+}));
+
+// --- Administración (sesión de administrador firmada con Xaman)
+app.get('/api/admin/alchemy', rateLimit(120), wrap(async (req, res) => {
+    needAdmin(req);
+    const d = AL();
+    res.json({ success: true, enabled: !!d.cfg.enabled, storage: USE_REDIS ? 'redis' : 'file', pinata: !!PINATA_JWT, minter: MINTING_ADDRESS || null, canMint: !!MINTING_SECRET,
+        recipes: Object.values(d.recipes).sort((a, b) => a.createdAt - b.createdAt).map(adminRecipe),
+        claims: Object.values(d.claims).sort((a, b) => b.ts - a.ts).slice(0, 100) });
+}));
+app.post('/api/admin/alchemy/toggle', rateLimit(120), wrap(async (req, res) => {
+    needAdmin(req);
+    const on = !!req.body.enabled;
+    if (on && !USE_REDIS && !process.env.ALCHEMY_ALLOW_FILE_STORAGE) throw new HttpError(409, 'Configura Upstash Redis en Render antes de activar Alchemy: con archivos temporales los reclamos podrían perderse tras un reinicio.');
+    if (on && !MINTING_SECRET) throw new HttpError(409, 'Falta MINTING_SECRET en Render: sin ella no se pueden crear los premios.');
+    AL().cfg.enabled = on; alchemyStore.save();
+    res.json({ success: true, enabled: on });
+}));
+app.post('/api/admin/alchemy/recipe', rateLimit(120), wrap(async (req, res) => {
+    needAdmin(req);
+    const d = AL(), fields = parseRecipe(req.body);
+    let r = typeof req.body.id === 'string' ? d.recipes[req.body.id] : null;
+    if (req.body.id && !r) throw new HttpError(404, 'Receta no encontrada.');
+    if (r && claimFor(r.id)) throw new HttpError(409, 'Esta receta ya tiene un reclamo: no se puede editar.');
+    if (Object.keys(d.recipes).length >= 200 && !r) throw new HttpError(503, 'Demasiadas recetas.');
+    if (!r) { r = { id: crypto.randomBytes(6).toString('hex'), createdAt: Date.now() }; d.recipes[r.id] = r; }
+    Object.assign(r, fields, { updatedAt: Date.now() });
+    alchemyStore.save();
+    res.json({ success: true, recipe: adminRecipe(r) });
+}));
+app.post('/api/admin/alchemy/recipe/:id/delete', rateLimit(120), wrap(async (req, res) => {
+    needAdmin(req);
+    const d = AL(), r = d.recipes[req.params.id];
+    if (!r) throw new HttpError(404, 'Receta no encontrada.');
+    if (claimFor(r.id)) throw new HttpError(409, 'Esta receta ya tiene un reclamo: no se puede borrar.');
+    delete d.recipes[r.id];
+    for (const k of Object.keys(d.used)) if (k.startsWith(r.id + ':')) delete d.used[k];
+    alchemyStore.save();
+    res.json({ success: true });
+}));
+// Prueba en seco: no crea nada ni bloquea ingredientes
+app.post('/api/admin/alchemy/test', rateLimit(120), wrap(async (req, res) => {
+    const admin = needAdmin(req), d = AL(), r = d.recipes[req.body.recipeId];
+    if (!r) throw new HttpError(404, 'Receta no encontrada.');
+    const account = isAddr(req.body.account) ? req.body.account : admin;
+    const owned = await ownedNftIds(account, true);
+    res.json({ success: true, account, status: recipeState(r), have: r.ingredients.filter(n => owned.has(n)), missing: r.ingredients.filter(n => !owned.has(n)),
+        used: r.ingredients.filter(n => d.used[r.id + ':' + n]), metadata: buildPrizeMetadata(r), metadataUri: r.prize.metadataUri || null, pinata: !!PINATA_JWT });
+}));
+// Liberar un reclamo atascado ("processing"/"unknown"): el administrador comprueba antes en el explorador si el NFT llegó a crearse
+app.post('/api/admin/alchemy/claim/:id/release', rateLimit(120), wrap(async (req, res) => {
+    needAdmin(req);
+    const d = AL(), c = d.claims[req.params.id];
+    if (!c) throw new HttpError(404, 'Reclamo no encontrado.');
+    if (c.state !== 'unknown' && c.state !== 'processing') throw new HttpError(409, 'Solo se pueden liberar reclamos en estado "unknown" o "processing".');
+    const r = d.recipes[c.recipeId];
+    c.state = 'failed'; c.publicError = 'delivery'; c.error = (c.error || '') + ' | liberado por el administrador';
+    if (r) r.ingredients.forEach(n => { if (d.used[r.id + ':' + n] === c.id) delete d.used[r.id + ':' + n]; });
+    alchemyStore.save();
+    res.json({ success: true });
+}));
+
 /* ---------- Salud ---------- */
 app.get('/', (req, res) => res.json({ ok: true, service: 'aeterna-ledger-backend' }));
 app.get('/health', (req, res) => res.json({ ok: true, storage: USE_REDIS ? 'redis' : 'file' }));
@@ -673,7 +960,14 @@ app.get('/api/check-status/:uuid', wrap(async (req, res) => {
             recordConnection(account, 'xaman', true);
             if (isAdminAccount(account)) adminToken = issueAdminSession(account);
         }
-        return res.json({ signed: true, expired: false, account, txHash: info.response.txid || null, isAdmin: isAdminAccount(account), adminApplied, adminToken });
+        let claimId = null, claimError = null;
+        const pc = pendingClaim.get(req.params.uuid);
+        if (pc) {                                               // reclamo de Alchemy (firma verificada)
+            pendingClaim.delete(req.params.uuid);
+            if (pc.account !== account) claimError = 'La cuenta firmante no coincide.';
+            else { try { claimId = startAlchemyClaim(pc.account, pc.recipeId); } catch (e) { claimError = e.message; } }
+        }
+        return res.json({ signed: true, expired: false, account, txHash: info.response.txid || null, isAdmin: isAdminAccount(account), adminApplied, adminToken, claimId, claimError });
     }
     if (expired) return res.json({ signed: false, expired: true });
     if (cancelled || resolved) return res.json({ signed: false, expired: false, rejected: true });   // el usuario rechazó en Xaman

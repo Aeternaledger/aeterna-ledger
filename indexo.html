@@ -29,6 +29,9 @@
         /* Tarjetas de NFTs: usan la misma tipografía del resto de la web (los datos técnicos, IDs y direcciones conservan monoespaciada) */
         #store-grid .font-mono, #market-grid .font-mono, #my-nfts-grid .font-mono, #incoming-box .font-mono, nav[id^="pager-"] .font-mono { font-family: system-ui, -apple-system, sans-serif; }
         #store-grid a.font-mono, #market-grid a.font-mono, #my-nfts-grid a.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+        .al-mystery { width: 4.5rem; height: 4.5rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: #D4AF37; background: radial-gradient(circle at 35% 30%, rgba(212,175,55,.28), rgba(212,175,55,.04) 70%); border: 1px solid rgba(212,175,55,.45); box-shadow: 0 0 28px rgba(212,175,55,.18); animation: alPulse 3.2s ease-in-out infinite; }
+        @keyframes alPulse { 0%, 100% { box-shadow: 0 0 18px rgba(212,175,55,.12); transform: scale(1); } 50% { box-shadow: 0 0 34px rgba(212,175,55,.32); transform: scale(1.04); } }
+        @media (prefers-reduced-motion: reduce) { .al-mystery { animation: none; } }
         .btn-xaman { background-color: #087bff; color: #ffffff; transition: all 0.2s ease; }
         .btn-xaman:hover { background-color: #3395ff; box-shadow: 0 0 20px rgba(8, 123, 255, 0.35); }
         .btn-buy { background-color: #D4AF37; color: #000000; font-weight: 700; transition: all 0.2s ease; }
@@ -96,6 +99,7 @@
                 <nav class="flex space-x-1 text-xs font-ui overflow-x-auto max-w-full">
                     <button onclick="switchTab('store')" id="tab-store" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition nav-active whitespace-nowrap">Store</button>
                     <button onclick="switchTab('market')" id="tab-market" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Marketplace</button>
+                    <button onclick="switchTab('alchemy')" id="tab-alchemy" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Alchemy</button>
                     <button onclick="switchTab('mint')" id="tab-mint" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Mint</button>
                     <button onclick="switchTab('mynfts')" id="tab-mynfts" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Holdings</button>
                     <button onclick="switchTab('about')" id="tab-about" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">About</button>
@@ -346,6 +350,21 @@
               </div>
             </div>
         </section>
+        <!-- VISTA: ALCHEMY -->
+        <section id="view-alchemy" class="hidden space-y-6 max-w-6xl mx-auto">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8">
+                <span id="al-badge" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Alchemy</span>
+                <h2 id="al-title" class="text-2xl sm:text-3xl font-light text-white tracking-tight mt-2">Where Worlds Combine</h2>
+                <p id="al-sub" class="text-slate-400 text-sm leading-relaxed mt-1 max-w-3xl"></p>
+            </div>
+            <div id="al-connect" class="hidden rounded-xl border border-dashed border-obsidian-border p-5 text-center space-y-3">
+                <p id="al-connect-text" class="text-xs text-slate-400"></p>
+                <button type="button" onclick="openWalletModal()" id="al-connect-btn" class="btn-xaman px-5 py-2.5 rounded-lg text-xs font-semibold"></button>
+            </div>
+            <div id="al-result"></div>
+            <div id="al-recipes" class="space-y-6"></div>
+            <p id="al-note" class="text-[11px] text-slate-500 text-center leading-relaxed"></p>
+        </section>
         <!-- VISTA 4: ABOUT -->
         <section id="view-about" class="hidden space-y-8 max-w-4xl mx-auto">
             <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-12 space-y-8 shadow-2xl">
@@ -400,6 +419,49 @@
                 <button id="admin-verify-btn" data-action="admin-verify" class="btn-xaman px-5 py-2.5 rounded-lg text-xs font-semibold">Verify with Xaman</button>
             </div>
             <div id="admin-body" class="space-y-6">
+                <div id="admin-alchemy" class="rounded-2xl border border-obsidian-gold/30 bg-gradient-to-b from-obsidian-gold/5 to-transparent p-4 sm:p-6 space-y-5 min-w-0">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div class="space-y-1 min-w-0"><h3 class="text-sm text-white font-medium">⚗ <span data-i18n="admAlTitle"></span></h3><p class="text-[11px] text-slate-400" data-i18n="admAlSub"></p></div>
+                        <button type="button" id="adm-al-toggle" data-action="adm-al-toggle" class="px-4 py-2 rounded-lg text-xs font-bold tracking-wide transition bg-obsidian-border text-slate-300">OFF</button>
+                    </div>
+                    <div id="adm-al-warn" class="space-y-1.5"></div>
+                    <div class="flex items-center justify-between gap-2"><h4 class="text-xs font-mono uppercase tracking-wider text-slate-400" data-i18n="admAlRecipes"></h4><button type="button" data-action="adm-al-new" class="text-[11px] font-mono text-obsidian-gold hover:underline" data-i18n="admAlNew"></button></div>
+                    <div id="adm-al-list" class="space-y-2.5"></div>
+                    <details id="adm-al-form-wrap" class="rounded-xl border border-obsidian-border bg-obsidian-dark/50 px-3.5 py-3">
+                        <summary id="adm-al-form-title" class="cursor-pointer text-xs text-slate-200 font-mono"></summary>
+                        <div class="pt-4 space-y-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlName"></span><input id="al-f-name" maxlength="80" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlTeaser"></span><input id="al-f-teaser" maxlength="200" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                            </div>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlIngs"></span><textarea id="al-f-ings" rows="4" spellcheck="false" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none font-mono"></textarea></label>
+                            <h5 class="text-[10px] font-mono uppercase tracking-[0.18em] text-obsidian-gold pt-1" data-i18n="admAlPrizeHead"></h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPName"></span><input id="al-f-pname" maxlength="120" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPCat"></span><select id="al-f-pcat" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></select></label>
+                            </div>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPDesc"></span><textarea id="al-f-pdesc" rows="2" maxlength="1000" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></textarea></label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPImage"></span><input id="al-f-pimage" spellcheck="false" placeholder="ipfs://bafy..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none font-mono"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPVideo"></span><input id="al-f-pvideo" spellcheck="false" placeholder="ipfs://bafy..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none font-mono"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPColl"></span><input id="al-f-pcoll" maxlength="80" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPCollDesc"></span><input id="al-f-pcolldesc" maxlength="500" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                            </div>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPAttrs"></span><textarea id="al-f-pattrs" rows="3" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></textarea></label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPTaxon"></span><input id="al-f-ptaxon" type="number" min="0" value="100" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPRoy"></span><input id="al-f-proy" type="number" min="0" max="50" step="0.1" value="5" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlStart"></span><input id="al-f-start" type="datetime-local" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                                <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlEnd"></span><input id="al-f-end" type="datetime-local" class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none"></label>
+                            </div>
+                            <label class="block space-y-1"><span class="text-[11px] text-slate-300" data-i18n="admAlPUri"></span><input id="al-f-puri" spellcheck="false" placeholder="ipfs://bafy..." class="w-full bg-obsidian-dark border border-obsidian-border rounded-lg px-3 py-2 text-xs text-white focus:border-obsidian-gold outline-none font-mono"></label>
+                            <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer"><input type="checkbox" id="al-f-active" checked class="accent-yellow-500"><span data-i18n="admAlActive"></span></label>
+                            <div class="flex flex-wrap gap-2"><button type="button" data-action="adm-al-save" class="btn-buy px-4 py-2.5 rounded-lg text-xs font-bold" data-i18n="admAlSave"></button></div>
+                        </div>
+                    </details>
+                    <pre id="adm-al-test-out" class="hidden text-[10px] font-mono text-slate-300 bg-black/40 border border-obsidian-border rounded-xl p-3 overflow-x-auto max-h-72 whitespace-pre-wrap break-words"></pre>
+                    <div id="adm-al-claims"></div>
+                </div>
                 <div id="admin-kpis" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
                 <div class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-4 sm:p-6 space-y-3 min-w-0">
                     <div class="flex flex-wrap items-center justify-between gap-2">
@@ -2306,6 +2368,7 @@
         }
         function onWalletConnected(address, type, isAdmin) {
             connectedAccount = address; walletType = type; currentUserIsAdmin = !!isAdmin; resetMintForm();
+            if (alchemy.enabled) refreshAlchemyProgress().then(renderAlchemy);
             localStorage.setItem('aeterna_wallet', address);
             localStorage.setItem('aeterna_wallet_type', type);
             localStorage.setItem('aeterna_is_admin', currentUserIsAdmin);
@@ -2501,6 +2564,7 @@
                         resetMintForm();
             renderAll();
             if (currentTab === 'mint') renderMintPage();
+            alchemy.progress = {}; alchemy.result = null; renderAlchemy();
             showToast(T('walletDisc'), 'info');
         }
 
@@ -2767,6 +2831,8 @@
             });
             const mi = document.getElementById('t-market-invite'), mb = document.getElementById('t-market-invite-btn');
             if (mi) mi.textContent = T('mintInviteText'); if (mb) mb.textContent = T('mintInviteBtn');
+            const ta = document.getElementById('tab-alchemy'); if (ta) ta.textContent = T('alchemyTab');
+            if (typeof renderAlchemy === 'function') { renderAlchemy(); applyAdminAlI18n(); renderAdminAlchemy(); }
             if (typeof updateMintModeUi === 'function') updateMintModeUi();
         }
         function listingCard(nft, mode) {
@@ -3201,7 +3267,7 @@
            NAVEGACIÓN, EVENTOS E INICIO
            ===================================================================== */
         function switchTab(tab) {
-            ['store', 'market', 'mint', 'mynfts', 'about', 'admin'].forEach(v => {
+            ['store', 'market', 'mint', 'mynfts', 'about', 'admin', 'alchemy'].forEach(v => {
                 const el = document.getElementById(`view-${v}`), tabEl = document.getElementById(`tab-${v}`);
                 if (el) el.classList.add('hidden');
                 if (tabEl) tabEl.classList.remove('nav-active');
@@ -3221,6 +3287,7 @@
             else if (tab === 'mynfts') loadHoldings();
             else if (tab === 'admin') loadAnalytics();
             else if (tab === 'mint') renderMintPage();
+            else if (tab === 'alchemy') loadAlchemy();
         }
         function applyExtraI18n() {
             const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
@@ -3281,6 +3348,16 @@
                 case 'coll-open': openCollectionOf(id); break;
                 case 'browse-clear': clearBrowse(target); break;
                 case 'goto-mint': switchTab('mint'); break;
+                case 'al-claim': claimAlchemy(id); break;
+                case 'al-accept': acceptAlchemyPrize(id, el.dataset.offer, el.dataset.from); break;
+                case 'al-dismiss': alchemy.result = null; renderAlchemy(); break;
+                case 'adm-al-toggle': adminAlchemyToggle(); break;
+                case 'adm-al-save': adminAlchemySave(); break;
+                case 'adm-al-new': adminAlchemyForm(null); break;
+                case 'adm-al-edit': adminAlchemyForm(id); break;
+                case 'adm-al-delete': adminAlchemyDelete(id); break;
+                case 'adm-al-test': adminAlchemyTest(id); break;
+                case 'adm-al-release': adminAlchemyRelease(id); break;
                 case 'copy-meta': if (currentActiveDetailNft && currentActiveDetailNft.metaRaw) copyToClipboard(JSON.stringify(currentActiveDetailNft.metaRaw, null, 2)); break;
                 case 'accept-transfer': acceptTransfer(id, el.dataset.offer); break;
                 case 'admin-save': saveMediaOverride(false); break;
@@ -3328,6 +3405,7 @@
             try { fetch(BACKEND_URL + '/health', { mode: 'no-cors' }).catch(() => {}); } catch (e) {}
             loadStore(true);
             loadFeeInfo();
+            loadAlchemyConfig();
             loadMediaOverrides();
             if (location.hash === '#legal') openLegal();
             window.addEventListener('hashchange', () => { if (location.hash === '#legal') openLegal(); else closeLegal(); });
@@ -3373,6 +3451,10 @@
                     { h: 'Fees', p: [
                         'A platform fee of {fee}% of the sale price is charged to the buyer on purchases made through this website. It is paid to the platform treasury within the same atomic transaction as the purchase, and the applicable amount is displayed before you sign. Fee rates may change; the rate shown at signing applies.',
                         'XRP Ledger network fees and any royalty embedded in an NFT by its issuer apply separately.'
+                    ] },
+                    { h: 'Alchemy rewards', p: [
+                        'Alchemy is an optional feature that can be turned on or off at any time. While it is on, holding a specific set of NFTs may entitle the holder to claim a digital creation issued by Aeterna Ledger. Nothing is burned or taken from your wallet: the website only reads the public ledger, and a free signature proves that the wallet is yours.',
+                        'Each ingredient NFT can be used once per recipe. Once used it stays tradable, but it cannot be used again for that recipe; this record is kept by the website, not on the ledger. Rewards are digital collectibles with no promise of value, rarity or availability. Recipes may be limited in time or quantity, and delivery requires you to accept the offer in your wallet (an XRP reserve applies).'
                     ] },
                     { h: 'Risks and no advice', p: [
                         'XRP and NFTs are volatile and can lose all of their value. Liquidity and resale are not guaranteed. Blockchain transactions are final and irreversible. You are solely responsible for the security of your wallet and recovery phrase and for verifying every transaction before signing.',
@@ -3438,6 +3520,10 @@
                     { h: 'Comisiones', p: [
                         'Las compras hechas en este sitio llevan una comisión de la plataforma del {fee}% del precio de venta, a cargo del comprador. Se paga a la tesorería de la plataforma dentro de la misma transacción atómica de la compra, y el importe aplicable se muestra antes de firmar. Las tarifas pueden cambiar; rige la mostrada al firmar.',
                         'Las comisiones de red del XRP Ledger y cualquier regalía incorporada al NFT por su emisor se aplican por separado.'
+                    ] },
+                    { h: 'Recompensas de Alchemy', p: [
+                        'Alchemy es una función opcional que puede activarse o desactivarse en cualquier momento. Mientras está activa, tener un conjunto concreto de NFTs puede dar derecho a reclamar una creación digital emitida por Aeterna Ledger. No se quema ni se quita nada de tu billetera: el sitio solo lee el ledger público y una firma gratuita demuestra que la billetera es tuya.',
+                        'Cada NFT ingrediente puede usarse una vez por receta. Una vez usado sigue siendo negociable, pero no puede volver a usarse en esa receta; ese registro lo guarda el sitio web, no el ledger. Las recompensas son coleccionables digitales sin promesa de valor, rareza ni disponibilidad. Las recetas pueden ser limitadas en tiempo o cantidad, y la entrega exige que aceptes la oferta en tu billetera (se aplica una reserva de XRP).'
                     ] },
                     { h: 'Riesgos y ausencia de asesoría', p: [
                         'XRP y los NFTs son volátiles y pueden perder todo su valor. No se garantiza liquidez ni reventa. Las transacciones en blockchain son definitivas e irreversibles. Eres el único responsable de la seguridad de tu billetera y de tu frase de recuperación, y de verificar cada transacción antes de firmarla.',
@@ -3682,6 +3768,7 @@
                 else adminState.error = 'load';
             } catch (e) { adminState.error = 'load'; }
             adminState.loading = false; renderAdmin();
+            loadAdminAlchemy();
         }
         function setAdminRange(v) { adminState.days = [7, 30, 90, 365].includes(+v) ? +v : 30; adminState.shown = 25; loadAnalytics(); }
         async function verifyAdminSession() {
@@ -3832,6 +3919,301 @@
             ownerLbl: 'Владелец', noCollection: 'Без коллекции', mintInviteText: 'Ещё не выпускали NFT?', mintInviteBtn: 'Создайте свой первый NFT →',
             listed: '🟡 Выставлен на маркетплейсе', inVault: '🟢 В вашем кошельке (не продаётся)',
             searchPlaceholder: 'Поиск по названию, коллекции, продавцу или ID…', allCollections: 'Все коллекции', collectionLbl: 'Коллекция', viewCollection: 'Открыть коллекцию', clearFilters: 'Сбросить фильтры', noResults: 'Нет активов, соответствующих поиску или фильтру коллекции.' });
+        /* ===== Textos de Alchemy ===== */
+        Object.assign(EXTRA_I18N.en = EXTRA_I18N.en || {}, {
+            alchemyTab: "Alchemy",
+            alBadge: "Alchemy",
+            alTitle: "Where Worlds Combine",
+            alSub: "Hold the right NFTs and unlock a secret creation. Your ingredients stay in your wallet — nothing is burned.",
+            alConnect: "Connect your wallet to see which ingredients you hold.",
+            alNone: "No recipes are available yet.",
+            alStOpen: "Open",
+            alStClaimed: "Claimed",
+            alStUpcoming: "Coming soon",
+            alStEnded: "Ended",
+            alIngredients: "Ingredients",
+            alPrize: "Secret creation",
+            alPrizeHint: "Revealed when the recipe is completed.",
+            alHave: "In your wallet",
+            alMissing: "Missing",
+            alUsed: "Already used",
+            alProgress: "{n} of {t} ingredients",
+            alClaim: "Claim your creation",
+            alNeedAll: "Collect every ingredient to unlock this recipe.",
+            alUsedWarn: "Some ingredients were already used for this recipe.",
+            alBuyIt: "Buy for {p} XRP",
+            alNotForSale: "Not for sale",
+            alNote: "Each ingredient can be used once per recipe. You keep your NFTs and can still trade them.",
+            alSign: "Scan with Xaman to confirm your claim (no cost)",
+            alWaiting: "Creating your NFT… this can take up to a minute.",
+            alMinted: "Your creation is ready! Accept it to add it to your wallet.",
+            alAccept: "Accept NFT",
+            alFailed: "The claim could not be completed. Nothing was used — you can try again.",
+            alBifrost: "Claiming requires Xaman for now. Disconnect and connect with Xaman.",
+            alWinner: "Claimed by {a}",
+            alViewPrize: "View NFT",
+            alUnknown: "We are verifying the delivery. Please check again in a few minutes.",
+            admAlTitle: "Alchemy",
+            admAlSub: "Combine specific NFTs to unlock a secret creation. Ingredients are never burned: holders keep them.",
+            admAlRecipes: "Recipes",
+            admAlNew: "+ New recipe",
+            admAlName: "Recipe name",
+            admAlTeaser: "Public hint (optional)",
+            admAlIngs: "Ingredient NFTokenIDs (2–5, one per line)",
+            admAlPrizeHead: "Secret prize (never shown before it is claimed)",
+            admAlPName: "Prize name",
+            admAlPCat: "Category",
+            admAlPDesc: "Description",
+            admAlPImage: "Image (CID or ipfs://…)",
+            admAlPVideo: "Video / 3D (optional)",
+            admAlPColl: "Collection name",
+            admAlPCollDesc: "Collection description",
+            admAlPAttrs: "Attributes (one per line: Trait: Value)",
+            admAlPTaxon: "Taxon (collection number)",
+            admAlPRoy: "Royalty (%)",
+            admAlStart: "Opens (optional)",
+            admAlEnd: "Closes (optional)",
+            admAlPUri: "Metadata URI (optional — replaces the generated JSON)",
+            admAlActive: "Visible to visitors while Alchemy is ON",
+            admAlSave: "Save recipe",
+            admAlFormNew: "New recipe",
+            admAlFormEdit: "Edit recipe",
+            admAlEmpty: "No recipes yet.",
+            admAlEdit: "Edit",
+            admAlDelete: "Delete",
+            admAlTest: "Test",
+            admAlConfirmDel: "Delete this recipe?",
+            admAlClaims: "Claims",
+            admAlRelease: "Release",
+            admAlReleaseConfirm: "Check the explorer first. Release this claim so the ingredients can be used again?",
+            admAlSaved: "Recipe saved.",
+            admAlDeleted: "Recipe deleted.",
+            admAlReleased: "Claim released.",
+            admAlStorage: "Storage is a temporary file: set up Upstash Redis in Render before turning Alchemy on.",
+            admAlNoPinata: "PINATA_JWT is missing in Render: the prize metadata cannot be uploaded (you can paste a ready metadata URI instead).",
+            admAlNoMint: "MINTING_SECRET is missing in Render: prizes cannot be created.",
+            admAlMinter: "Prize issuer: {a}",
+            admAlOnMsg: "Alchemy is ON.",
+            admAlOffMsg: "Alchemy is OFF.",
+            admAlLocked: "Claimed — locked",
+            admAlIngCount: "{n} ingredients",
+            admAlSecret: "Prize"
+        });
+        Object.assign(EXTRA_I18N.es = EXTRA_I18N.es || {}, {
+            alchemyTab: "Alchemy",
+            alBadge: "Alchemy",
+            alTitle: "Donde los Mundos se Combinan",
+            alSub: "Reúne los NFT correctos y desbloquea una creación secreta. Tus ingredientes se quedan en tu billetera: no se quema nada.",
+            alConnect: "Conecta tu billetera para ver qué ingredientes tienes.",
+            alNone: "Aún no hay recetas disponibles.",
+            alStOpen: "Abierta",
+            alStClaimed: "Reclamada",
+            alStUpcoming: "Próximamente",
+            alStEnded: "Finalizada",
+            alIngredients: "Ingredientes",
+            alPrize: "Creación secreta",
+            alPrizeHint: "Se revela cuando se completa la receta.",
+            alHave: "En tu billetera",
+            alMissing: "Falta",
+            alUsed: "Ya usado",
+            alProgress: "{n} de {t} ingredientes",
+            alClaim: "Reclamar tu creación",
+            alNeedAll: "Reúne todos los ingredientes para desbloquear esta receta.",
+            alUsedWarn: "Algunos ingredientes ya se usaron en esta receta.",
+            alBuyIt: "Comprar por {p} XRP",
+            alNotForSale: "No está a la venta",
+            alNote: "Cada ingrediente se puede usar una vez por receta. Conservas tus NFT y puedes seguir intercambiándolos.",
+            alSign: "Escanea con Xaman para confirmar tu reclamo (sin costo)",
+            alWaiting: "Creando tu NFT… puede tardar hasta un minuto.",
+            alMinted: "¡Tu creación está lista! Acéptala para añadirla a tu billetera.",
+            alAccept: "Aceptar NFT",
+            alFailed: "No se pudo completar el reclamo. No se usó nada: puedes intentarlo de nuevo.",
+            alBifrost: "Por ahora el reclamo requiere Xaman. Desconéctate y conéctate con Xaman.",
+            alWinner: "Reclamado por {a}",
+            alViewPrize: "Ver NFT",
+            alUnknown: "Estamos verificando la entrega. Vuelve a revisar en unos minutos.",
+            admAlTitle: "Alchemy",
+            admAlSub: "Combina NFTs concretos para desbloquear una creación secreta. Los ingredientes nunca se queman: los titulares los conservan.",
+            admAlRecipes: "Recetas",
+            admAlNew: "+ Nueva receta",
+            admAlName: "Nombre de la receta",
+            admAlTeaser: "Pista pública (opcional)",
+            admAlIngs: "NFTokenID de los ingredientes (2–5, uno por línea)",
+            admAlPrizeHead: "Premio secreto (nunca se muestra antes de reclamarse)",
+            admAlPName: "Nombre del premio",
+            admAlPCat: "Categoría",
+            admAlPDesc: "Descripción",
+            admAlPImage: "Imagen (CID o ipfs://…)",
+            admAlPVideo: "Video / 3D (opcional)",
+            admAlPColl: "Nombre de la colección",
+            admAlPCollDesc: "Descripción de la colección",
+            admAlPAttrs: "Atributos (uno por línea: Rasgo: Valor)",
+            admAlPTaxon: "Taxon (número de colección)",
+            admAlPRoy: "Regalía (%)",
+            admAlStart: "Abre (opcional)",
+            admAlEnd: "Cierra (opcional)",
+            admAlPUri: "URI de metadatos (opcional — reemplaza el JSON generado)",
+            admAlActive: "Visible para los visitantes mientras Alchemy esté ACTIVO",
+            admAlSave: "Guardar receta",
+            admAlFormNew: "Nueva receta",
+            admAlFormEdit: "Editar receta",
+            admAlEmpty: "Aún no hay recetas.",
+            admAlEdit: "Editar",
+            admAlDelete: "Borrar",
+            admAlTest: "Probar",
+            admAlConfirmDel: "¿Borrar esta receta?",
+            admAlClaims: "Reclamos",
+            admAlRelease: "Liberar",
+            admAlReleaseConfirm: "Comprueba antes el explorador. ¿Liberar este reclamo para que los ingredientes puedan usarse de nuevo?",
+            admAlSaved: "Receta guardada.",
+            admAlDeleted: "Receta borrada.",
+            admAlReleased: "Reclamo liberado.",
+            admAlStorage: "El almacenamiento es un archivo temporal: configura Upstash Redis en Render antes de activar Alchemy.",
+            admAlNoPinata: "Falta PINATA_JWT en Render: no se pueden subir los metadatos del premio (puedes pegar una URI de metadatos ya subida).",
+            admAlNoMint: "Falta MINTING_SECRET en Render: no se pueden crear los premios.",
+            admAlMinter: "Emisor de premios: {a}",
+            admAlOnMsg: "Alchemy está ACTIVO.",
+            admAlOffMsg: "Alchemy está DESACTIVADO.",
+            admAlLocked: "Reclamada — bloqueada",
+            admAlIngCount: "{n} ingredientes",
+            admAlSecret: "Premio"
+        });
+        Object.assign(EXTRA_I18N.ja = EXTRA_I18N.ja || {}, {
+            alchemyTab: "Alchemy",
+            alBadge: "Alchemy",
+            alTitle: "世界が交わる場所",
+            alSub: "正しいNFTを揃えて、秘密の創造物を解き放とう。素材はウォレットに残り、何も燃やされません。",
+            alConnect: "ウォレットを接続して、所持している素材を確認しましょう。",
+            alNone: "まだ利用できるレシピがありません。",
+            alStOpen: "受付中",
+            alStClaimed: "受け取り済み",
+            alStUpcoming: "近日公開",
+            alStEnded: "終了",
+            alIngredients: "素材",
+            alPrize: "秘密の創造物",
+            alPrizeHint: "レシピを完成させると明かされます。",
+            alHave: "ウォレットにあり",
+            alMissing: "不足",
+            alUsed: "使用済み",
+            alProgress: "素材 {n} / {t}",
+            alClaim: "創造物を受け取る",
+            alNeedAll: "すべての素材を集めるとこのレシピが解放されます。",
+            alUsedWarn: "一部の素材はこのレシピですでに使用されています。",
+            alBuyIt: "{p} XRPで購入",
+            alNotForSale: "非売品",
+            alNote: "各素材はレシピごとに1回だけ使用できます。NFTは手元に残り、取引も可能です。",
+            alSign: "Xamanでスキャンして受け取りを確定（無料）",
+            alWaiting: "NFTを作成中…最大1分ほどかかります。",
+            alMinted: "創造物の準備ができました！承認してウォレットに追加しましょう。",
+            alAccept: "NFTを受け取る",
+            alFailed: "受け取りを完了できませんでした。何も使用されていません。もう一度お試しください。",
+            alBifrost: "現在、受け取りにはXamanが必要です。切断してXamanで接続してください。",
+            alWinner: "{a} が受け取り済み",
+            alViewPrize: "NFTを見る",
+            alUnknown: "配送を確認中です。数分後にもう一度ご確認ください。"
+        });
+        Object.assign(EXTRA_I18N.ko = EXTRA_I18N.ko || {}, {
+            alchemyTab: "Alchemy",
+            alBadge: "Alchemy",
+            alTitle: "세계가 결합하는 곳",
+            alSub: "올바른 NFT를 모아 비밀 창조물을 해금하세요. 재료는 지갑에 그대로 남으며, 아무것도 소각되지 않습니다.",
+            alConnect: "지갑을 연결하여 보유 중인 재료를 확인하세요.",
+            alNone: "아직 이용 가능한 레시피가 없습니다.",
+            alStOpen: "진행 중",
+            alStClaimed: "수령 완료",
+            alStUpcoming: "공개 예정",
+            alStEnded: "종료",
+            alIngredients: "재료",
+            alPrize: "비밀 창조물",
+            alPrizeHint: "레시피를 완성하면 공개됩니다.",
+            alHave: "지갑에 있음",
+            alMissing: "부족",
+            alUsed: "사용됨",
+            alProgress: "재료 {n} / {t}",
+            alClaim: "창조물 수령하기",
+            alNeedAll: "모든 재료를 모으면 이 레시피가 해금됩니다.",
+            alUsedWarn: "일부 재료는 이 레시피에 이미 사용되었습니다.",
+            alBuyIt: "{p} XRP에 구매",
+            alNotForSale: "판매 안 함",
+            alNote: "각 재료는 레시피당 한 번만 사용할 수 있습니다. NFT는 그대로 보유하며 거래도 가능합니다.",
+            alSign: "Xaman으로 스캔하여 수령을 확인하세요(무료)",
+            alWaiting: "NFT를 생성하는 중… 최대 1분 정도 걸릴 수 있습니다.",
+            alMinted: "창조물이 준비되었습니다! 수락하여 지갑에 추가하세요.",
+            alAccept: "NFT 수락",
+            alFailed: "수령을 완료하지 못했습니다. 아무것도 사용되지 않았으니 다시 시도할 수 있습니다.",
+            alBifrost: "현재 수령에는 Xaman이 필요합니다. 연결을 해제하고 Xaman으로 다시 연결하세요.",
+            alWinner: "{a} 님이 수령함",
+            alViewPrize: "NFT 보기",
+            alUnknown: "전달 여부를 확인 중입니다. 몇 분 후 다시 확인해 주세요."
+        });
+        Object.assign(EXTRA_I18N.zh = EXTRA_I18N.zh || {}, {
+            alchemyTab: "Alchemy",
+            alBadge: "Alchemy",
+            alTitle: "万物交汇之处",
+            alSub: "集齐正确的 NFT，解锁一件秘密创作。您的素材始终留在钱包中——不会被销毁。",
+            alConnect: "连接钱包，查看您持有哪些素材。",
+            alNone: "暂无可用配方。",
+            alStOpen: "进行中",
+            alStClaimed: "已领取",
+            alStUpcoming: "即将开放",
+            alStEnded: "已结束",
+            alIngredients: "素材",
+            alPrize: "秘密创作",
+            alPrizeHint: "完成配方后揭晓。",
+            alHave: "在您的钱包中",
+            alMissing: "缺少",
+            alUsed: "已使用",
+            alProgress: "素材 {n} / {t}",
+            alClaim: "领取您的创作",
+            alNeedAll: "集齐所有素材即可解锁此配方。",
+            alUsedWarn: "部分素材已用于此配方。",
+            alBuyIt: "以 {p} XRP 购买",
+            alNotForSale: "非卖品",
+            alNote: "每个素材在每个配方中只能使用一次。您仍保留自己的 NFT，并可继续交易。",
+            alSign: "使用 Xaman 扫码确认领取（免费）",
+            alWaiting: "正在创建您的 NFT……最长可能需要一分钟。",
+            alMinted: "您的创作已就绪！接受它即可添加到钱包。",
+            alAccept: "接受 NFT",
+            alFailed: "领取未能完成。未使用任何素材，您可以重试。",
+            alBifrost: "目前领取需要使用 Xaman。请断开连接并改用 Xaman 连接。",
+            alWinner: "已由 {a} 领取",
+            alViewPrize: "查看 NFT",
+            alUnknown: "正在核实发放情况，请几分钟后再查看。"
+        });
+        Object.assign(EXTRA_I18N.ru = EXTRA_I18N.ru || {}, {
+            alchemyTab: "Alchemy",
+            alBadge: "Alchemy",
+            alTitle: "Где миры соединяются",
+            alSub: "Соберите нужные NFT и откройте секретное творение. Ваши ингредиенты остаются в кошельке — ничего не сжигается.",
+            alConnect: "Подключите кошелёк, чтобы увидеть, какие ингредиенты у вас есть.",
+            alNone: "Пока нет доступных рецептов.",
+            alStOpen: "Открыт",
+            alStClaimed: "Получен",
+            alStUpcoming: "Скоро",
+            alStEnded: "Завершён",
+            alIngredients: "Ингредиенты",
+            alPrize: "Секретное творение",
+            alPrizeHint: "Раскрывается, когда рецепт собран.",
+            alHave: "В вашем кошельке",
+            alMissing: "Не хватает",
+            alUsed: "Уже использован",
+            alProgress: "{n} из {t} ингредиентов",
+            alClaim: "Получить творение",
+            alNeedAll: "Соберите все ингредиенты, чтобы открыть этот рецепт.",
+            alUsedWarn: "Некоторые ингредиенты уже использованы для этого рецепта.",
+            alBuyIt: "Купить за {p} XRP",
+            alNotForSale: "Не продаётся",
+            alNote: "Каждый ингредиент можно использовать один раз для рецепта. Ваши NFT остаются у вас, ими можно торговать.",
+            alSign: "Отсканируйте в Xaman, чтобы подтвердить получение (бесплатно)",
+            alWaiting: "Создаём ваш NFT… это может занять до минуты.",
+            alMinted: "Ваше творение готово! Примите его, чтобы добавить в кошелёк.",
+            alAccept: "Принять NFT",
+            alFailed: "Не удалось завершить получение. Ничего не использовано — попробуйте ещё раз.",
+            alBifrost: "Сейчас для получения нужен Xaman. Отключитесь и подключитесь через Xaman.",
+            alWinner: "Получил {a}",
+            alViewPrize: "Смотреть NFT",
+            alUnknown: "Мы проверяем доставку. Загляните снова через несколько минут."
+        });
         const MINT_TAXON_KEY = 'aeterna_taxon_names_v1';
         const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{40,}|k[a-z0-9]{40,}|z[1-9A-HJ-NP-Za-km-z]{40,})$/i;
         const mintState = { doc: null, attrs: [{ k: '', v: '' }], issuerTaxons: new Map(), taxonFor: null, busy: false, last: null, probeToken: 0 };
@@ -4088,6 +4470,259 @@
 }
 
         // ----- Página -----
+        /* ===== ALCHEMY: reúne NFTs concretos y reclama una creación secreta (no se quema nada) ===== */
+        const alchemy = { enabled: false, recipes: [], progress: {}, items: new Map(), loading: false, loadedAt: 0, claiming: false, result: null };
+        const AL_STATUS = { open: 'alStOpen', claimed: 'alStClaimed', upcoming: 'alStUpcoming', ended: 'alStEnded' };
+        function updateAlchemyTab() {
+            const tab = document.getElementById('tab-alchemy'); if (!tab) return;
+            tab.classList.toggle('hidden', !alchemy.enabled);
+            if (!alchemy.enabled && currentTab === 'alchemy') switchTab('store');
+        }
+        async function loadAlchemyConfig() {
+            try {
+                const { res, data } = await backendFetch('/api/alchemy/config', { retry: false });
+                if (res.ok && data.success) { alchemy.enabled = !!data.enabled; alchemy.recipes = data.recipes || []; }
+            } catch (e) { /* sin cambios */ }
+            updateAlchemyTab();
+        }
+        async function refreshAlchemyProgress() {
+            alchemy.progress = {};
+            if (!connectedAccount) return;
+            const acct = connectedAccount;
+            try {
+                const { res, data } = await backendFetch(`/api/alchemy/progress/${encodeURIComponent(acct)}`, { retry: false });
+                if (acct === connectedAccount && res.ok && data.success) alchemy.progress = data.progress || {};
+            } catch (e) { /* sin progreso */ }
+        }
+        async function loadAlchemy() {
+            if (alchemy.loading) return;
+            alchemy.loading = true; renderAlchemy();
+            try {
+                await loadAlchemyConfig();
+                if (alchemy.enabled) {
+                    const ids = [...new Set(alchemy.recipes.flatMap(r => r.ingredients.concat(r.prizeNftId ? [r.prizeNftId] : [])))];
+                    await pool(ids, async id => {
+                        const info = await resolveNft(id, [connectedAccount]).catch(() => null);
+                        const it = makeItem(info || { nftokenId: id });
+                        await enrichOffers(it).catch(() => {});
+                        await loadMetadata(it);
+                        alchemy.items.set(id, it);
+                    });
+                    await refreshAlchemyProgress();
+                }
+            } finally { alchemy.loading = false; alchemy.loadedAt = Date.now(); renderAlchemy(); }
+        }
+        function alIngredientHtml(id, prog) {
+            const it = alchemy.items.get(id) || { nftokenId: id, title: short(id, 8, 6), metaLoaded: false };
+            const used = !!(prog && prog.used.includes(id)), have = !!(prog && prog.have.includes(id));
+            let badge = '', cls = 'border-obsidian-border', tone = 'text-slate-400';
+            if (connectedAccount && prog) {
+                if (used) { badge = '⚗ ' + T('alUsed'); cls = 'border-amber-500/40'; tone = 'text-amber-200'; }
+                else if (have) { badge = '✓ ' + T('alHave'); cls = 'border-emerald-500/40'; tone = 'text-emerald-300'; }
+                else { badge = '✕ ' + T('alMissing'); cls = 'border-rose-500/30'; tone = 'text-rose-300'; }
+            }
+            let buy = '';
+            if (connectedAccount && prog && !have && !used) buy = it.listing
+                ? `<button type="button" data-action="buy" data-id="${esc(id)}" class="btn-buy w-full px-2 py-1.5 rounded-lg text-[11px]">${esc(T('alBuyIt', { p: it.listing.xrp }))}</button>`
+                : `<p class="text-[10px] text-slate-500">${esc(T('alNotForSale'))}</p>`;
+            return `<div class="rounded-xl border ${cls} bg-obsidian-card/70 overflow-hidden flex flex-col" data-al-ing="${esc(id)}">
+                <div class="h-28 bg-black flex items-center justify-center cursor-pointer" data-action="details" data-id="${esc(id)}">${renderCardMedia(it, 'w-full h-full object-contain')}</div>
+                <div class="p-3 space-y-1.5"><p class="text-xs text-white line-clamp-1" title="${esc(it.title)}">${esc(it.title)}</p>${badge ? `<p class="text-[10px] font-ui ${tone}">${esc(badge)}</p>` : ''}${buy}</div></div>`;
+        }
+        function alPrizeHtml(r) {
+            if (r.status === 'claimed' && r.prizeNftId) {
+                const it = alchemy.items.get(r.prizeNftId) || { nftokenId: r.prizeNftId, title: short(r.prizeNftId, 8, 6), metaLoaded: false };
+                return `<div class="rounded-xl border border-obsidian-gold/40 bg-gradient-to-b from-obsidian-gold/10 to-transparent overflow-hidden flex flex-col">
+                    <div class="h-36 bg-black flex items-center justify-center cursor-pointer" data-action="details" data-id="${esc(r.prizeNftId)}">${renderCardMedia(it, 'w-full h-full object-contain')}</div>
+                    <div class="p-3 space-y-1.5 text-center"><p class="text-sm text-white font-medium line-clamp-1">${esc(it.title)}</p><p class="text-[10px] text-slate-400">${esc(T('alWinner', { a: short(r.winner || '', 6, 4) }))}</p>
+                    <button type="button" data-action="details" data-id="${esc(r.prizeNftId)}" class="text-[11px] font-ui text-obsidian-gold hover:underline">${esc(T('alViewPrize'))}</button></div></div>`;
+            }
+            return `<div class="rounded-xl border border-obsidian-gold/30 bg-gradient-to-b from-obsidian-gold/10 to-transparent p-4 flex flex-col items-center justify-center text-center gap-2.5 min-h-[11rem]">
+                <div class="al-mystery" aria-hidden="true">?</div><p class="text-sm text-white font-medium">${esc(T('alPrize'))}</p><p class="text-[11px] text-slate-400 max-w-[14rem]">${esc(T('alPrizeHint'))}</p></div>`;
+        }
+        function alRecipeHtml(r) {
+            const prog = alchemy.progress[r.id], total = r.ingredients.length, have = prog ? prog.have.length : 0;
+            const chipCls = r.status === 'open' ? 'text-emerald-300 border-emerald-500/30 bg-emerald-950/30' : r.status === 'claimed' ? 'text-obsidian-gold border-obsidian-gold/40 bg-obsidian-gold/10' : 'text-slate-300 border-obsidian-border bg-obsidian-card';
+            let action = '';
+            if (r.status === 'open') {
+                if (!connectedAccount) action = `<button type="button" onclick="openWalletModal()" class="btn-xaman px-4 py-2.5 rounded-lg text-xs font-semibold">${esc(T('connectBtnLabel'))}</button>`;
+                else if (prog && prog.canClaim) action = `<button type="button" data-action="al-claim" data-id="${esc(r.id)}" ${alchemy.claiming ? 'disabled' : ''} class="btn-buy px-5 py-3 rounded-xl text-xs font-bold tracking-wide ${alchemy.claiming ? 'opacity-60' : ''}">⚗ ${esc(T('alClaim'))}</button>`;
+                else if (prog) action = `<p class="text-[11px] text-slate-400">${esc(prog.used.length ? T('alUsedWarn') : T('alNeedAll'))}</p>`;
+            }
+            return `<article class="rounded-2xl border border-obsidian-border bg-obsidian-card/60 p-4 sm:p-6 space-y-4" data-al-recipe="${esc(r.id)}">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div class="min-w-0"><h3 class="text-lg text-white font-medium break-words">${esc(r.name)}</h3>${r.teaser ? `<p class="text-xs text-slate-400 mt-0.5 break-words">${esc(r.teaser)}</p>` : ''}</div>
+                    <div class="flex items-center gap-2 flex-shrink-0"><span class="text-[10px] font-ui uppercase tracking-wider border rounded px-2 py-0.5 ${chipCls}">${esc(T(AL_STATUS[r.status] || 'alStOpen'))}</span>
+                    ${connectedAccount && prog && r.status === 'open' ? `<span class="text-[10px] font-ui text-slate-400">${esc(T('alProgress', { n: have, t: total }))}</span>` : ''}</div></div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+                    <div class="lg:col-span-2 space-y-2"><h4 class="text-[10px] font-ui uppercase tracking-[0.18em] text-slate-400">${esc(T('alIngredients'))}</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">${r.ingredients.map(id => alIngredientHtml(id, prog)).join('')}</div></div>
+                    <div class="space-y-2"><h4 class="text-[10px] font-ui uppercase tracking-[0.18em] text-slate-400">${esc(T('alPrize'))}</h4>${alPrizeHtml(r)}</div></div>
+                ${action ? `<div class="flex flex-wrap items-center gap-3 pt-1">${action}</div>` : ''}</article>`;
+        }
+        function renderAlchemy() {
+            const box = document.getElementById('al-recipes'); if (!box) return;
+            const set = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+            set('al-badge', T('alBadge')); set('al-title', T('alTitle')); set('al-sub', T('alSub')); set('al-note', T('alNote')); set('al-connect-text', T('alConnect')); set('al-connect-btn', T('connectBtnLabel'));
+            document.getElementById('al-connect').classList.toggle('hidden', !!connectedAccount);
+            const rs = document.getElementById('al-result'), res = alchemy.result;
+            rs.innerHTML = res ? `<div class="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/30 to-transparent p-5 sm:p-6 space-y-3">
+                <p class="text-sm text-white font-medium">✅ ${esc(T('alMinted'))}</p>
+                <div class="flex flex-col sm:flex-row gap-2"><button type="button" data-action="al-accept" data-id="${esc(res.nftokenId || '')}" data-offer="${esc(res.offerIndex || '')}" data-from="${esc(res.from || '')}" class="btn-buy px-4 py-2.5 rounded-lg text-xs font-bold">${esc(T('alAccept'))}</button>
+                <button type="button" data-action="al-dismiss" class="bg-obsidian-border hover:bg-slate-800 text-slate-200 px-4 py-2.5 rounded-lg text-xs font-ui transition">${esc(T('cancel'))}</button></div></div>` : '';
+            if (alchemy.loading && !alchemy.recipes.length) { box.innerHTML = '<div class="flex justify-center py-12"><div class="spinner"></div></div>'; return; }
+            box.innerHTML = alchemy.recipes.length ? alchemy.recipes.map(alRecipeHtml).join('') : emptyBox(T('alNone'));
+        }
+        function pollAlchemyClaim(id) {
+            return (async () => {
+                const t0 = Date.now();
+                while (Date.now() - t0 < 150000) {
+                    try { const { res, data } = await backendFetch('/api/alchemy/claim/' + encodeURIComponent(id), { retry: false }); if (res.ok && data.claim && data.claim.state !== 'processing') return data.claim; } catch (e) { /* reintentar */ }
+                    await sleep(2500);
+                }
+                return { state: 'unknown' };
+            })();
+        }
+        async function claimAlchemy(recipeId) {
+            if (alchemy.claiming) return;
+            if (!requireWallet()) return;
+            if (walletType !== 'xaman') return showToast(T('alBifrost'), 'warning');
+            alchemy.claiming = true; renderAlchemy();
+            try {
+                const signed = await signWithXaman({ endpoint: '/api/alchemy/claim', body: { account: connectedAccount, recipeId }, description: T('alSign') });
+                const raw = signed.raw || {};
+                if (raw.claimError || !raw.claimId) { showToast(raw.claimError || T('alFailed'), 'error'); return; }
+                showToast(T('alWaiting'), 'info');
+                const claim = await pollAlchemyClaim(raw.claimId);
+                if (claim.state === 'minted') { alchemy.result = { ...claim }; showToast(T('alMinted'), 'success'); }
+                else if (claim.state === 'unknown') showToast(T('alUnknown'), 'warning');
+                else showToast(T('alFailed'), 'error');
+            } catch (e) { reportError(e); }
+            finally { alchemy.claiming = false; await loadAlchemy(); }
+        }
+        async function acceptAlchemyPrize(id, offerIndex, from) {
+            if (!requireWallet()) return;
+            try {
+                const oi = String(offerIndex).toUpperCase();
+                const info = await resolveNft(id, [from]).catch(() => null);
+                const it = makeItem(info || { nftokenId: id, owner: from });
+                await loadMetadata(it);
+                if (!incoming.items.some(x => x.it.nftokenId === it.nftokenId && x.offerIndex === oi)) incoming.items.push({ it, offerIndex: oi, from });
+                await acceptTransfer(it.nftokenId, oi);
+                alchemy.result = null; await loadAlchemy();
+            } catch (e) { reportError(e); }
+        }
+
+        /* ----- Administración de Alchemy ----- */
+        const admAl = { data: null, editing: null };
+        const admAlApi = (path, body) => backendFetch(path, { method: body === undefined ? 'GET' : 'POST', body, headers: { Authorization: 'Bearer ' + adminState.token }, retry: false });
+        function applyAdminAlI18n() {
+            document.querySelectorAll('#admin-alchemy [data-i18n]').forEach(e => { e.textContent = T(e.dataset.i18n); });
+            const sel = document.getElementById('al-f-pcat');
+            if (sel && !sel.options.length) sel.innerHTML = ['', ...CATEGORIES].map(c => `<option value="${esc(c)}">${esc(c || '—')}</option>`).join('');
+            const ft = document.getElementById('adm-al-form-title'); if (ft && !ft.textContent) ft.textContent = T('admAlFormNew');
+        }
+        async function loadAdminAlchemy() {
+            if (!adminState.token || !currentUserIsAdmin) return;
+            try {
+                const { res, data } = await admAlApi('/api/admin/alchemy');
+                if (res.status === 401) { setAdminToken(''); admAl.data = null; renderAdmin(); return; }
+                if (res.ok && data.success) admAl.data = data;
+            } catch (e) { /* sin datos */ }
+            renderAdminAlchemy();
+        }
+        function renderAdminAlchemy() {
+            const d = admAl.data, tg = document.getElementById('adm-al-toggle'); if (!tg) return;
+            applyAdminAlI18n();
+            if (!d) { tg.textContent = '…'; return; }
+            tg.textContent = d.enabled ? 'ON' : 'OFF';
+            tg.className = 'px-4 py-2 rounded-lg text-xs font-bold tracking-wide transition ' + (d.enabled ? 'bg-emerald-500/80 text-black' : 'bg-obsidian-border text-slate-300');
+            const warn = (c, m) => `<p class="text-[11px] rounded-lg border px-3 py-2 ${c}">${esc(m)}</p>`;
+            document.getElementById('adm-al-warn').innerHTML =
+                (d.storage !== 'redis' ? warn('border-amber-500/30 bg-amber-950/30 text-amber-200', T('admAlStorage')) : '') +
+                (!d.pinata ? warn('border-amber-500/30 bg-amber-950/30 text-amber-200', T('admAlNoPinata')) : '') +
+                (!d.canMint ? warn('border-rose-500/30 bg-rose-950/30 text-rose-200', T('admAlNoMint')) : '') +
+                (d.minter ? `<p class="text-[10px] font-mono text-slate-500 break-all">${esc(T('admAlMinter', { a: d.minter }))}</p>` : '');
+            document.getElementById('adm-al-list').innerHTML = d.recipes.length ? d.recipes.map(r => {
+                const locked = !!r.claim;
+                return `<div class="rounded-xl border border-obsidian-border bg-obsidian-card/60 p-3 space-y-2" data-adm-recipe="${esc(r.id)}">
+                    <div class="flex flex-wrap items-center justify-between gap-2"><div class="min-w-0"><p class="text-xs text-white font-medium break-words">${esc(r.name)}</p>
+                    <p class="text-[10px] text-slate-400 break-words">${esc(T('admAlSecret'))}: ${esc(r.prize.name)} · ${esc(T('admAlIngCount', { n: r.ingredients.length }))} · <span class="uppercase">${esc(r.status)}</span>${locked ? ' · ' + esc(T('admAlLocked')) : ''}</p></div>
+                    <div class="flex gap-3 text-[11px] font-mono"><button type="button" data-action="adm-al-test" data-id="${esc(r.id)}" class="underline text-slate-300 hover:text-white">${esc(T('admAlTest'))}</button>
+                    ${locked ? '' : `<button type="button" data-action="adm-al-edit" data-id="${esc(r.id)}" class="underline text-slate-300 hover:text-white">${esc(T('admAlEdit'))}</button><button type="button" data-action="adm-al-delete" data-id="${esc(r.id)}" class="underline text-rose-300 hover:text-rose-200">${esc(T('admAlDelete'))}</button>`}</div></div></div>`;
+            }).join('') : `<p class="text-[11px] text-slate-500">${esc(T('admAlEmpty'))}</p>`;
+            const rn = id => { const r = d.recipes.find(x => x.id === id); return r ? r.name : id; };
+            document.getElementById('adm-al-claims').innerHTML = d.claims.length
+                ? `<h4 class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">${esc(T('admAlClaims'))}</h4><div class="overflow-x-auto"><table class="w-full text-left text-[11px] font-mono"><tbody class="divide-y divide-obsidian-border/50">`
+                  + d.claims.map(c => `<tr class="text-slate-300"><td class="py-1.5 pr-3 whitespace-nowrap">${esc(new Date(c.ts).toLocaleString(getCurrentLang(), { dateStyle: 'short', timeStyle: 'short' }))}</td><td class="py-1.5 pr-3">${esc(rn(c.recipeId))}</td>
+                      <td class="py-1.5 pr-3 whitespace-nowrap"><a href="${esc(explorerAcct(c.account))}" target="_blank" rel="noopener noreferrer" class="text-obsidian-gold hover:underline">${esc(short(c.account, 6, 4))}</a></td>
+                      <td class="py-1.5 pr-3 uppercase ${c.state === 'minted' ? 'text-emerald-300' : c.state === 'failed' ? 'text-slate-500' : 'text-amber-300'}" title="${esc(c.error || '')}">${esc(c.state)}</td>
+                      <td class="py-1.5">${c.txHash ? `<a href="${esc(explorerTx(c.txHash))}" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-obsidian-gold underline">tx</a>` : ''} ${(c.state === 'unknown' || c.state === 'processing') ? `<button type="button" data-action="adm-al-release" data-id="${esc(c.id)}" class="underline text-amber-300">${esc(T('admAlRelease'))}</button>` : ''}</td></tr>`).join('')
+                  + '</tbody></table></div>' : '';
+        }
+        async function adminAlchemyToggle() {
+            const d = admAl.data; if (!d) return;
+            try {
+                const { res, data } = await admAlApi('/api/admin/alchemy/toggle', { enabled: !d.enabled });
+                if (!res.ok) return showToast(data.error || 'Error', 'error');
+                showToast(T(data.enabled ? 'admAlOnMsg' : 'admAlOffMsg'), 'success');
+                await loadAdminAlchemy(); loadAlchemyConfig();
+            } catch (e) { reportError(e); }
+        }
+        const toLocalInput = ms => { if (!ms) return ''; const d = new Date(ms - new Date(ms).getTimezoneOffset() * 60000); return d.toISOString().slice(0, 16); };
+        function adminAlchemyForm(id) {
+            const r = id && admAl.data ? admAl.data.recipes.find(x => x.id === id) : null, g = x => document.getElementById(x);
+            admAl.editing = r ? r.id : null;
+            g('adm-al-form-title').textContent = T(r ? 'admAlFormEdit' : 'admAlFormNew');
+            const p = r ? r.prize : {};
+            g('al-f-name').value = r ? r.name : ''; g('al-f-teaser').value = r ? r.teaser || '' : ''; g('al-f-ings').value = r ? r.ingredients.join('\n') : '';
+            g('al-f-pname').value = p.name || ''; g('al-f-pcat').value = p.category || ''; g('al-f-pdesc').value = p.description || '';
+            g('al-f-pimage').value = p.image || ''; g('al-f-pvideo').value = p.video || ''; g('al-f-pcoll').value = p.collectionName || ''; g('al-f-pcolldesc').value = p.collectionDescription || '';
+            g('al-f-pattrs').value = (p.attributes || []).map(a => `${a.trait_type}: ${a.value}`).join('\n');
+            g('al-f-ptaxon').value = p.taxon != null ? p.taxon : 100; g('al-f-proy').value = p.royaltyPct != null ? p.royaltyPct : 5; g('al-f-puri').value = p.metadataUri || '';
+            g('al-f-start').value = r ? toLocalInput(r.start) : ''; g('al-f-end').value = r ? toLocalInput(r.end) : ''; g('al-f-active').checked = r ? !!r.active : true;
+            g('adm-al-form-wrap').open = true;
+        }
+        function adminAlchemyCollect() {
+            const v = x => document.getElementById(x).value, lines = s => s.split(/[\r\n,]+/).map(x => x.trim()).filter(Boolean);
+            const attrs = v('al-f-pattrs').split(/\r?\n/).map(l => { const i = l.indexOf(':'); return i > 0 ? { trait_type: l.slice(0, i).trim(), value: l.slice(i + 1).trim() } : null; }).filter(Boolean);
+            const dt = x => { const s = v(x); return s ? new Date(s).getTime() : null; };
+            return { id: admAl.editing || undefined, name: v('al-f-name'), teaser: v('al-f-teaser'), ingredients: lines(v('al-f-ings')), active: document.getElementById('al-f-active').checked, start: dt('al-f-start'), end: dt('al-f-end'),
+                prize: { name: v('al-f-pname'), description: v('al-f-pdesc'), image: v('al-f-pimage'), video: v('al-f-pvideo'), category: v('al-f-pcat'), collectionName: v('al-f-pcoll'), collectionDescription: v('al-f-pcolldesc'), attributes: attrs, taxon: v('al-f-ptaxon'), royaltyPct: v('al-f-proy'), metadataUri: v('al-f-puri') } };
+        }
+        async function adminAlchemySave() {
+            try {
+                const { res, data } = await admAlApi('/api/admin/alchemy/recipe', adminAlchemyCollect());
+                if (!res.ok) return showToast(data.error || 'Error', 'error');
+                showToast(T('admAlSaved'), 'success'); adminAlchemyForm(null); document.getElementById('adm-al-form-wrap').open = false;
+                await loadAdminAlchemy(); loadAlchemyConfig();
+            } catch (e) { reportError(e); }
+        }
+        async function adminAlchemyDelete(id) {
+            if (!window.confirm(T('admAlConfirmDel'))) return;
+            try {
+                const { res, data } = await admAlApi(`/api/admin/alchemy/recipe/${encodeURIComponent(id)}/delete`, {});
+                if (!res.ok) return showToast(data.error || 'Error', 'error');
+                showToast(T('admAlDeleted'), 'success'); await loadAdminAlchemy(); loadAlchemyConfig();
+            } catch (e) { reportError(e); }
+        }
+        async function adminAlchemyTest(id) {
+            try {
+                const { res, data } = await admAlApi('/api/admin/alchemy/test', { recipeId: id, account: connectedAccount || undefined });
+                const out = document.getElementById('adm-al-test-out');
+                if (!res.ok) return showToast(data.error || 'Error', 'error');
+                out.textContent = JSON.stringify({ account: data.account, status: data.status, have: data.have.length, missing: data.missing.length, used: data.used.length, pinata: data.pinata, metadata: data.metadata, metadataUri: data.metadataUri }, null, 2);
+                out.classList.remove('hidden');
+            } catch (e) { reportError(e); }
+        }
+        async function adminAlchemyRelease(id) {
+            if (!window.confirm(T('admAlReleaseConfirm'))) return;
+            try {
+                const { res, data } = await admAlApi(`/api/admin/alchemy/claim/${encodeURIComponent(id)}/release`, {});
+                if (!res.ok) return showToast(data.error || 'Error', 'error');
+                showToast(T('admAlReleased'), 'success'); await loadAdminAlchemy();
+            } catch (e) { reportError(e); }
+        }
         /* ===== MINT POR LOTES (Batch / XLS-56): hasta 8 NFTs por firma, todo o nada ===== */
         const MINT_BATCH_MAX = 8, MINT_BATCH_TOTAL_MAX = 40;
         mintState.mode = 'single'; mintState.batchOk = null; mintState.batchInfoLoaded = false;

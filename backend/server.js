@@ -448,19 +448,23 @@ function recipeState(r) {
 function publicRecipe(r) {            // NUNCA incluye datos del premio hasta que se reclama (y entonces solo su NFTokenID)
     const c = claimFor(r.id);
     const o = { id: r.id, name: r.name, teaser: r.teaser || '', ingredients: r.ingredients, status: recipeState(r), start: r.start || null, end: r.end || null };
-    if (c && c.state === 'minted') { o.winner = c.account; o.prizeNftId = c.nftokenId || null; }
+    if (c && c.state === 'minted') { o.winner = c.account; o.prizeNftId = c.nftokenId || null; o.prizeUri = c.metadataUri || null; }
     return o;
 }
 async function ownedNftIds(account, fresh) {
     const c = ownedCache.get(account);
     if (!fresh && c && Date.now() - c.t < 15000) return c.ids;
-    const ids = new Set();
+    const ids = new Set(), uris = new Map();
+    ids.uris = uris;
     try {
         await withClient(async client => {
             let marker, pages = 0;
             do {
                 const r = await client.request({ command: 'account_nfts', account, limit: 400, ledger_index: 'validated', ...(marker ? { marker } : {}) });
-                for (const n of r.result.account_nfts || []) ids.add(String(n.NFTokenID).toUpperCase());
+                for (const n of r.result.account_nfts || []) {
+                    const k = String(n.NFTokenID).toUpperCase(); ids.add(k);
+                    if (n.URI) uris.set(k, Buffer.from(String(n.URI), 'hex').toString('utf8').slice(0, 300));
+                }
                 marker = r.result.marker; pages++;
             } while (marker && pages < 50);
         });
@@ -605,14 +609,15 @@ app.get('/api/alchemy/progress/:address', rateLimit(120), wrap(async (req, res) 
     if (!isAddr(req.params.address)) throw new HttpError(400, 'Dirección inválida.');
     const d = AL();
     if (!d.cfg.enabled) return res.json({ success: true, enabled: false, progress: {} });
-    const owned = await ownedNftIds(req.params.address);
-    const progress = {};
+    const owned = await ownedNftIds(req.params.address, req.query.fresh === '1');
+    const progress = {}, uris = {};
     for (const r of Object.values(d.recipes)) {
         if (!(r.active || claimFor(r.id))) continue;
         const have = r.ingredients.filter(n => owned.has(n)), missing = r.ingredients.filter(n => !owned.has(n)), used = r.ingredients.filter(n => d.used[r.id + ':' + n]);
         progress[r.id] = { have, missing, used, canClaim: recipeState(r) === 'open' && !missing.length && !used.length };
+        for (const n of have) { const u = owned.uris && owned.uris.get(n); if (u) uris[n] = u; }
     }
-    res.json({ success: true, enabled: true, progress });
+    res.json({ success: true, enabled: true, progress, uris });
 }));
 app.post('/api/alchemy/claim', rateLimit(120), wrap(async (req, res) => {
     const { account, recipeId } = req.body;

@@ -32,6 +32,16 @@
         .al-mystery { width: 4.5rem; height: 4.5rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: #D4AF37; background: radial-gradient(circle at 35% 30%, rgba(212,175,55,.28), rgba(212,175,55,.04) 70%); border: 1px solid rgba(212,175,55,.45); box-shadow: 0 0 28px rgba(212,175,55,.18); animation: alPulse 3.2s ease-in-out infinite; }
         @keyframes alPulse { 0%, 100% { box-shadow: 0 0 18px rgba(212,175,55,.12); transform: scale(1); } 50% { box-shadow: 0 0 34px rgba(212,175,55,.32); transform: scale(1.04); } }
         @media (prefers-reduced-motion: reduce) { .al-mystery { animation: none; } }
+        /* Menú principal: cada sección con su color (el activo se rellena y brilla) */
+        .nav-btn { --c: 212,175,55; flex-shrink: 0; padding: .5rem .85rem; border-radius: .65rem; border: 1px solid rgba(var(--c), .4); background: rgba(var(--c), .10); color: rgb(var(--c)); font-weight: 600; letter-spacing: .01em; white-space: nowrap; transition: background .2s, border-color .2s, box-shadow .2s, color .2s, transform .2s; }
+        .nav-btn:hover { background: rgba(var(--c), .22); border-color: rgba(var(--c), .8); color: #fff; transform: translateY(-1px); }
+        .nav-btn.nav-active { background: rgba(var(--c), .30); border-width: 1px; border-color: rgb(var(--c)); color: #fff; font-weight: 700; box-shadow: 0 0 16px rgba(var(--c), .32), inset 0 -2px 0 rgb(var(--c)); }
+        .nav-store { --c: 212,175,55; } .nav-market { --c: 56,189,248; } .nav-mint { --c: 167,139,250; } .nav-holdings { --c: 45,212,191; } .nav-admin { --c: 251,113,133; }
+        .nav-alchemy { --c: 52,211,153; background: linear-gradient(135deg, rgba(16,185,129,.42), rgba(52,211,153,.14)); border-color: rgba(52,211,153,.85); color: #d1fae5; font-weight: 700; box-shadow: 0 0 14px rgba(52,211,153,.3); animation: alGlow 3s ease-in-out infinite; }
+        @keyframes alGlow { 0%, 100% { box-shadow: 0 0 10px rgba(52,211,153,.22); } 50% { box-shadow: 0 0 22px rgba(52,211,153,.55); } }
+        .al-art { animation: alFloat 6s ease-in-out infinite; filter: drop-shadow(0 8px 18px rgba(0,0,0,.45)); }
+        @keyframes alFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @media (prefers-reduced-motion: reduce) { .nav-alchemy, .al-art { animation: none; } .nav-btn { transition: none; } }
         .btn-xaman { background-color: #087bff; color: #ffffff; transition: all 0.2s ease; }
         .btn-xaman:hover { background-color: #3395ff; box-shadow: 0 0 20px rgba(8, 123, 255, 0.35); }
         .btn-buy { background-color: #D4AF37; color: #000000; font-weight: 700; transition: all 0.2s ease; }
@@ -96,14 +106,13 @@
                 </div>
             </div>
             <div class="flex flex-wrap items-center justify-center md:justify-end gap-2.5 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-                <nav class="flex space-x-1 text-xs font-ui overflow-x-auto max-w-full">
-                    <button onclick="switchTab('store')" id="tab-store" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition nav-active whitespace-nowrap">Store</button>
-                    <button onclick="switchTab('market')" id="tab-market" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Marketplace</button>
-                    <button onclick="switchTab('alchemy')" id="tab-alchemy" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Alchemy</button>
-                    <button onclick="switchTab('mint')" id="tab-mint" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Mint</button>
-                    <button onclick="switchTab('mynfts')" id="tab-mynfts" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">Holdings</button>
-                    <button onclick="switchTab('about')" id="tab-about" class="px-2.5 sm:px-3 py-2 rounded text-slate-300 hover:text-white transition whitespace-nowrap">About</button>
-                    <button onclick="switchTab('admin')" id="tab-admin" class="hidden px-2.5 sm:px-3 py-2 rounded text-slate-400 hover:text-white border border-obsidian-gold/30 whitespace-nowrap">Admin</button>
+                <nav class="flex gap-1.5 text-xs font-ui overflow-x-auto max-w-full pb-1 md:pb-0" aria-label="Main">
+                    <button onclick="switchTab('store')" id="tab-store" class="nav-btn nav-store nav-active">Store</button>
+                    <button onclick="switchTab('market')" id="tab-market" class="nav-btn nav-market">Marketplace</button>
+                    <button onclick="switchTab('mint')" id="tab-mint" class="nav-btn nav-mint">Mint</button>
+                    <button onclick="switchTab('mynfts')" id="tab-mynfts" class="hidden nav-btn nav-holdings">Holdings</button>
+                    <button onclick="switchTab('alchemy')" id="tab-alchemy" class="hidden nav-btn nav-alchemy">⚗ Alchemy</button>
+                    <button onclick="switchTab('admin')" id="tab-admin" class="hidden nav-btn nav-admin">Admin</button>
                 </nav>
                 <div class="relative inline-block text-left font-ui text-xs">
                     <select id="language-select" onchange="changeLanguage(this.value)" class="bg-obsidian-card border border-obsidian-border text-slate-300 py-1.5 px-2 rounded-lg outline-none cursor-pointer hover:border-obsidian-gold/50 transition">
@@ -352,10 +361,61 @@
         </section>
         <!-- VISTA: ALCHEMY -->
         <section id="view-alchemy" class="hidden space-y-6 max-w-6xl mx-auto">
-            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8">
+            <div class="rounded-2xl border border-obsidian-border bg-gradient-to-b from-obsidian-card to-obsidian-dark p-6 sm:p-8 overflow-hidden">
+                <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-6">
+                <div class="min-w-0">
                 <span id="al-badge" class="text-[11px] uppercase tracking-widest text-obsidian-gold font-mono bg-obsidian-gold/10 px-3 py-1 rounded border border-obsidian-gold/20">Alchemy</span>
                 <h2 id="al-title" class="text-2xl sm:text-3xl font-light text-white tracking-tight mt-2">Where Worlds Combine</h2>
-                <p id="al-sub" class="text-slate-400 text-sm leading-relaxed mt-1 max-w-3xl"></p>
+                <p id="al-sub" class="text-slate-400 text-sm leading-relaxed mt-1 max-w-xl"></p>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" class="al-art w-44 sm:w-52 lg:w-64 h-auto flex-shrink-0 mx-auto sm:mx-0 select-none" role="img" aria-label="Alchemy potions: one green, one lilac" focusable="false">
+                <defs>
+                <radialGradient id="alpGlowG" cx="50%" cy="55%" r="55%"><stop offset="0" stop-color="#34d399" stop-opacity=".5"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/></radialGradient>
+                <radialGradient id="alpGlowP" cx="50%" cy="55%" r="55%"><stop offset="0" stop-color="#a78bfa" stop-opacity=".5"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></radialGradient>
+                <linearGradient id="alpLiqG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ee7b7"/><stop offset=".55" stop-color="#10b981"/><stop offset="1" stop-color="#047857"/></linearGradient>
+                <linearGradient id="alpLiqP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8b4fe"/><stop offset=".55" stop-color="#8b5cf6"/><stop offset="1" stop-color="#5b21b6"/></linearGradient>
+                <linearGradient id="alpGlass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".34"/><stop offset=".45" stop-color="#fff" stop-opacity=".04"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>
+                <linearGradient id="alpCork" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9955c"/><stop offset="1" stop-color="#8a5a2b"/></linearGradient>
+                <clipPath id="alpClipG"><circle cx="92" cy="132" r="48"/></clipPath>
+                <clipPath id="alpClipP"><path d="M200 84 L168 164 Q163 180 180 180 L246 180 Q263 180 258 164 L226 84 Z"/></clipPath>
+                </defs>
+                <ellipse cx="92" cy="138" rx="86" ry="72" fill="url(#alpGlowG)"/>
+                <ellipse cx="213" cy="138" rx="86" ry="72" fill="url(#alpGlowP)"/>
+                <ellipse cx="92" cy="184" rx="44" ry="6" fill="#000" opacity=".4"/>
+                <ellipse cx="213" cy="186" rx="52" ry="6" fill="#000" opacity=".4"/>
+                <!-- Frasco verde -->
+                <rect x="81" y="50" width="22" height="42" rx="3" fill="#0b1b17" fill-opacity=".5"/>
+                <rect x="81" y="50" width="22" height="42" rx="3" fill="url(#alpGlass)" stroke="#a7f3d0" stroke-opacity=".65"/>
+                <rect x="75" y="42" width="34" height="10" rx="3.5" fill="url(#alpGlass)" stroke="#a7f3d0" stroke-opacity=".65"/>
+                <circle cx="92" cy="132" r="48" fill="#06130f" fill-opacity=".55"/>
+                <g clip-path="url(#alpClipG)">
+                <rect x="40" y="114" width="104" height="70" fill="url(#alpLiqG)"/>
+                <path d="M40 114 Q54 107 68 114 T96 114 T124 114 T152 114 V122 H40 Z" fill="#bbf7d0" opacity=".55"/>
+                <circle cx="74" cy="148" r="4" fill="#d1fae5" opacity=".7"/><circle cx="104" cy="156" r="3" fill="#d1fae5" opacity=".6"/><circle cx="90" cy="166" r="2.4" fill="#d1fae5" opacity=".6"/><circle cx="110" cy="138" r="2" fill="#d1fae5" opacity=".6"/>
+                </g>
+                <circle cx="92" cy="132" r="48" fill="url(#alpGlass)" stroke="#a7f3d0" stroke-opacity=".75" stroke-width="1.6"/>
+                <path d="M62 118 Q66 102 82 95" stroke="#fff" stroke-opacity=".6" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+                <path d="M112 170 Q122 162 126 150" stroke="#fff" stroke-opacity=".25" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                <rect x="83" y="31" width="18" height="14" rx="3" fill="url(#alpCork)"/><rect x="83" y="31" width="18" height="4" rx="2" fill="#e3b37d" opacity=".7"/>
+                <circle cx="92" cy="22" r="3" fill="#6ee7b7" opacity=".7"/><circle cx="98" cy="12" r="2" fill="#6ee7b7" opacity=".5"/><circle cx="88" cy="6" r="1.5" fill="#6ee7b7" opacity=".4"/>
+                <!-- Frasco lila (Erlenmeyer) -->
+                <rect x="203" y="48" width="26" height="42" rx="3" fill="#120a24" fill-opacity=".5"/>
+                <rect x="203" y="48" width="26" height="42" rx="3" fill="url(#alpGlass)" stroke="#ddd6fe" stroke-opacity=".65"/>
+                <rect x="197" y="40" width="38" height="10" rx="3.5" fill="url(#alpGlass)" stroke="#ddd6fe" stroke-opacity=".65"/>
+                <path d="M200 84 L168 164 Q163 180 180 180 L246 180 Q263 180 258 164 L226 84 Z" fill="#0f0820" fill-opacity=".55"/>
+                <g clip-path="url(#alpClipP)">
+                <rect x="150" y="126" width="126" height="64" fill="url(#alpLiqP)"/>
+                <path d="M150 126 Q166 119 182 126 T214 126 T246 126 T278 126 V134 H150 Z" fill="#ede9fe" opacity=".5"/>
+                <circle cx="196" cy="152" r="4.5" fill="#f5f3ff" opacity=".65"/><circle cx="226" cy="162" r="3.2" fill="#f5f3ff" opacity=".6"/><circle cx="212" cy="140" r="2.4" fill="#f5f3ff" opacity=".6"/><circle cx="238" cy="148" r="2" fill="#f5f3ff" opacity=".6"/>
+                </g>
+                <path d="M200 84 L168 164 Q163 180 180 180 L246 180 Q263 180 258 164 L226 84 Z" fill="url(#alpGlass)" stroke="#ddd6fe" stroke-opacity=".75" stroke-width="1.6"/>
+                <path d="M196 98 L178 146" stroke="#fff" stroke-opacity=".55" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+                <rect x="206" y="29" width="20" height="15" rx="3" fill="url(#alpCork)"/><rect x="206" y="29" width="20" height="4" rx="2" fill="#e3b37d" opacity=".7"/>
+                <circle cx="216" cy="20" r="3.4" fill="#c4b5fd" opacity=".7"/><circle cx="224" cy="10" r="2.2" fill="#c4b5fd" opacity=".5"/><circle cx="210" cy="6" r="1.6" fill="#c4b5fd" opacity=".4"/>
+                <!-- Destellos -->
+                <g fill="#D4AF37"><path transform="translate(150 52)" d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z"/><path transform="translate(40 84) scale(.6)" d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z"/><path transform="translate(268 70) scale(.75)" d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z"/><circle cx="148" cy="108" r="2" opacity=".8"/><circle cx="280" cy="124" r="1.6" opacity=".7"/><circle cx="24" cy="130" r="1.6" opacity=".7"/></g>
+                </svg>
+                </div>
             </div>
             <div id="al-connect" class="hidden rounded-xl border border-dashed border-obsidian-border p-5 text-center space-y-3">
                 <p id="al-connect-text" class="text-xs text-slate-400"></p>
@@ -495,6 +555,8 @@
                     <span class="text-slate-300">Aeterna Ledger<span id="tm-symbol">&trade;</span> Ecosystem</span>
                     <span class="text-slate-700" aria-hidden="true">&middot;</span>
                     <a href="#legal" data-action="open-legal" id="footer-legal-link" class="text-obsidian-gold hover:underline underline-offset-4">Legal</a>
+                    <span class="text-slate-700" aria-hidden="true">&middot;</span>
+                    <a href="#about" data-action="open-about" id="footer-about-link" class="text-obsidian-gold hover:underline underline-offset-4">About</a>
                 </div>
                 <div class="flex items-center gap-2.5">
                     <a id="social-x" href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="Aeterna Ledger on X" class="w-9 h-9 rounded-full border border-obsidian-border flex items-center justify-center text-slate-400 hover:text-white hover:border-obsidian-gold/60 transition"><svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/></svg></a>
@@ -1031,7 +1093,7 @@
             document.getElementById('tab-store').innerText = t.navStore;
             document.getElementById('tab-market').innerText = t.navMarket;
             document.getElementById('tab-mynfts').innerText = t.navHoldings;
-            document.getElementById('tab-about').innerText = t.navAbout;
+            document.getElementById('footer-about-link').innerText = t.navAbout;
             document.getElementById('connect-btn').innerText = t.connectWallet;
             document.getElementById('t-tag-genesis').innerText = t.tagGenesis;
             document.getElementById('t-store-title').innerText = t.storeTitle;
@@ -1124,7 +1186,7 @@
             WALLETCONNECT_SDK: 'https://cdn.jsdelivr.net/npm/@walletconnect/sign-client@2.23.10/dist/index.umd.js',
             QR_LIB: 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js',
             // Orbitor (ChainSafe) es un gateway público y gratuito de IPFS. El gateway de Pinata queda solo como último recurso.
-            IPFS_GATEWAYS: ['https://ipfs.orbitor.dev/ipfs/', 'https://ipfs.io/ipfs/', 'https://dweb.link/ipfs/', 'https://gateway.pinata.cloud/ipfs/']
+            IPFS_GATEWAYS: ['https://ipfs.orbitor.dev/ipfs/', 'https://latam.orbitor.dev/ipfs/', 'https://w3s.link/ipfs/', 'https://4everland.io/ipfs/', 'https://ipfs.filebase.io/ipfs/', 'https://ipfs.io/ipfs/', 'https://dweb.link/ipfs/']
         };
         const NETWORKS = {
             mainnet: { rpc: ['https://xrplcluster.com', 'https://s1.ripple.com:51234', 'https://s2.ripple.com:51234'], explorer: 'https://livenet.xrpl.org' },
@@ -1494,9 +1556,18 @@
             } catch (e) { return false; }
         }
         function isVideoUrl(url) { return !!url && /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(url); }
+        // Cualquier enlace https a un gateway de IPFS (Pinata, ipfs.io, subdominios…) se convierte en ipfs://CID/ruta:
+        // así SIEMPRE se sirve por nuestra lista (Orbitor primero) y nunca gasta ancho de banda de Pinata.
+        function canonIpfs(u) {
+            if (typeof u !== 'string') return u;
+            const s = u.trim();
+            if (!/^https?:\/\//i.test(s)) return s;
+            const m = s.match(/^https?:\/\/[^/]+\/ipfs\/([^/?#]+)(\/[^?#]*)?/i) || s.match(/^https?:\/\/([a-z0-9]{40,})\.ipfs\.[^/]+(\/[^?#]*)?/i);
+            return m && CID_RE.test(m[1]) ? 'ipfs://' + m[1] + (m[2] || '') : s;
+        }
         function resolveMediaUrl(u, gw = 0) {
             if (!u || typeof u !== 'string') return '';
-            u = u.trim();
+            u = canonIpfs(u.trim());
             if (u.startsWith('ipfs://')) {
                 const p = u.slice(7).replace(/^ipfs\//, '');
                 return CONFIG.IPFS_GATEWAYS[gw % CONFIG.IPFS_GATEWAYS.length] + p;
@@ -1565,6 +1636,12 @@
         function normFromClio(n) {
             return { nftokenId: n.nft_id, issuer: n.issuer, owner: n.owner, uri: decodeUri(n.uri), flags: n.flags, transferFee: n.transfer_fee, taxon: n.nft_taxon, serial: n.nft_serial, burned: !!n.is_burned };
         }
+        const nftInfoStore = loadJson('aeterna_nftinfo_v1', {});
+        let nftInfoTimer = null;
+        function saveNftInfoSoon() {
+            clearTimeout(nftInfoTimer);
+            nftInfoTimer = setTimeout(() => { const ks = Object.keys(nftInfoStore); if (ks.length > 3000) ks.slice(0, ks.length - 3000).forEach(k => delete nftInfoStore[k]); saveJson('aeterna_nftinfo_v1', nftInfoStore); }, 1500);
+        }
         function makeItem(b) {
             const id = String(b.nftokenId).toUpperCase();
             const it = nftIndex.get(id) || { nftokenId: id, offers: [], listing: null, myOffers: [], metaLoaded: false };
@@ -1572,6 +1649,14 @@
             it.nftokenId = id;
             if (it.flags == null) it.flags = parseInt(id.slice(0, 4), 16);
             if (it.transferFee == null) it.transferFee = parseInt(id.slice(4, 8), 16);
+            const cached = nftInfoStore[id];
+            if (cached) {
+                if (!it.uri && cached.uri) it.uri = cached.uri;
+                if (it.issuer == null && cached.issuer) it.issuer = cached.issuer;
+                if (it.taxon == null && cached.taxon != null) it.taxon = cached.taxon;
+                if (it.serial == null && cached.serial != null) it.serial = cached.serial;
+            }
+            if (it.uri && (!cached || cached.uri !== it.uri)) { nftInfoStore[id] = { uri: it.uri, issuer: it.issuer, taxon: it.taxon, serial: it.serial }; saveNftInfoSoon(); }
             if (!it.title) it.title = it.serial != null ? `NFT #${it.serial}` : `NFT ${short(id, 8, 6)}`;
             nftIndex.set(id, it);
             return it;
@@ -1684,23 +1769,41 @@
             category(id) { const e = this.all()[id]; return e && e.category; }
         };
         async function fetchMetadataDoc(uri) {
-            const gwCount = uri.startsWith('ipfs://') ? CONFIG.IPFS_GATEWAYS.length : 1;
-            for (let g = 0; g < gwCount; g++) {
-                const url = resolveMediaUrl(uri, g);
+            const canon = canonIpfs(uri);
+            const gwCount = canon.startsWith('ipfs://') ? CONFIG.IPFS_GATEWAYS.length : 1;
+            const one = async g => {
+                const url = resolveMediaUrl(canon, g);
                 if (!url) return null;
                 try {
                     const res = await fetchT(url, {}, 9000);
-                    if (!res.ok) continue;
+                    if (!res.ok) return null;
                     const ct = (res.headers.get('content-type') || '').toLowerCase();
                     if (ct.startsWith('image/')) { try { res.body.cancel(); } catch (e) {} return { image: uri }; }
                     if (ct.startsWith('video/')) { try { res.body.cancel(); } catch (e) {} return { video: uri }; }
                     if ((+res.headers.get('content-length') || 0) > 2000000) { try { res.body.cancel(); } catch (e) {} return isVideoUrl(uri) ? { video: uri } : { image: uri }; }
                     const text = await res.text();
                     try { const j = JSON.parse(text); if (j && typeof j === 'object') return j; } catch (e) {}
-                    return { image: uri };
-                } catch (e) { /* probar siguiente gateway */ }
-            }
-            return null;
+                    return null;                       // respuesta que no es JSON (p. ej. una página de error del gateway)
+                } catch (e) { return null; }
+            };
+            // Peticiones escalonadas: si un gateway falla se pasa al siguiente de inmediato; si solo tarda (3 s) se lanza el siguiente en paralelo.
+            return new Promise(resolve => {
+                let done = false, started = 0, finished = 0, timer = null;
+                const finish = v => { if (done) return; done = true; clearTimeout(timer); resolve(v); };
+                const next = () => {
+                    clearTimeout(timer);
+                    if (done || started >= gwCount) return;
+                    const g = started++;
+                    one(g).catch(() => null).then(doc => {
+                        finished++;
+                        if (doc) return finish(doc);
+                        if (finished >= gwCount) return finish(null);
+                        next();
+                    });
+                    if (started < gwCount) timer = setTimeout(next, 3000);
+                };
+                next();
+            });
         }
         function applyMetadata(it, m) {
             m = m || {};
@@ -1727,20 +1830,25 @@
         }
         function finalizeCategory(it) { it.category = Registry.category(it.nftokenId) || normalizeCategory(it.rawCategory); }
         function loadMetadata(it) {
-            if (it.metaPromise) return it.metaPromise;
+            if (it.metaPromise && !it.metaRetry) return it.metaPromise;
+            it.metaRetry = false;
             it.metaPromise = (async () => {
                 const cached = metaStore[it.nftokenId];
-                if (cached && cached.uri === it.uri) { applyMetadata(it, cached.meta); }
-                else if (!it.uri) { applyMetadata(it, {}); }
+                if (cached && cached.uri === it.uri) { applyMetadata(it, cached.meta); it.metaFailed = false; }
+                else if (!it.uri) { applyMetadata(it, {}); if (!it.issuer) it.metaRetry = true; }          // aún no conocemos la URI: se reintentará cuando llegue
                 else {
-                    let doc = await fetchMetadataDoc(it.uri);
-                    if (doc) { metaStore[it.nftokenId] = { uri: it.uri, meta: doc }; saveMetaSoon(); }
-                    else doc = isVideoUrl(it.uri) ? { video: it.uri } : { image: it.uri };
-                    applyMetadata(it, doc);
+                    const doc = await fetchMetadataDoc(it.uri);
+                    if (doc) { metaStore[it.nftokenId] = { uri: it.uri, meta: doc }; saveMetaSoon(); applyMetadata(it, doc); it.metaFailed = false; }
+                    else if (isVideoUrl(it.uri)) { applyMetadata(it, { video: it.uri }); it.metaFailed = false; }
+                    else {                                                                                  // ningún gateway respondió: NO se da por definitivo
+                        applyMetadata(it, {}); it.metaFailed = true; it.metaRetry = true;
+                        it.metaTries = (it.metaTries || 0) + 1;
+                        if (it.metaTries <= 4) setTimeout(() => loadMetadata(it).then(() => scheduleRender()), 8000 * it.metaTries);
+                    }
                 }
                 finalizeCategory(it);
                 it.metaLoaded = true;
-            })().catch(e => { console.warn('[meta]', e); it.metaLoaded = true; finalizeCategory(it); });
+            })().catch(e => { console.warn('[meta]', e); it.metaLoaded = true; it.metaRetry = true; finalizeCategory(it); });
             return it.metaPromise;
         }
 
@@ -2111,6 +2219,7 @@
                 const out = await confirmOnLedger(signed, async () => (await currentOwner(id)) === connectedAccount);
                 outcomeToast(out, T('buyOk', { title: it.title }));
                 await refreshNft(id); refreshBalance();
+                if (out.ok) alchemyAfterTrade(id);
             } catch (e) {
                 reportError(e);
                 if (walletType === 'bifrost' && e && e.code === 'bifrost' && feeBpsFor(nftIndex.get(id)) > 0) showToast(T('feeBifrostHint'), 'warning');
@@ -2274,6 +2383,7 @@
                 const out = await confirmOnLedger(signed, async () => (await currentOwner(id)) === connectedAccount);
                 outcomeToast(out, T('acceptedOk', { title: entry.it.title }));
                 await refreshNft(id); loadIncoming(); refreshBalance();
+                if (out.ok) alchemyAfterTrade(id);
             } catch (e) { reportError(e); }
         }
 
@@ -2577,7 +2687,7 @@
             if (renderQueued) return; renderQueued = true;
             requestAnimationFrame(() => { renderQueued = false; renderAll(); });
         }
-        function renderAll() { renderStore(); renderMarketplace(); renderMyHoldings(); }
+        function renderAll() { renderStore(); renderMarketplace(); renderMyHoldings(); if (currentTab === 'alchemy' && typeof renderAlchemy === 'function') renderAlchemy(); }
 
         /* ----- Modelos 3D (GLB/GLTF) en el campo video / animation_url ----- */
         const MODEL_VIEWER_SRC = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer-umd.min.js';
@@ -2632,12 +2742,27 @@
         function renderCardMedia(nft, cls = 'w-full h-full object-contain') {
             const iu = resolveMediaUrl(nft.img);
             if (!iu && nft.video && nft.is3d) return `<div class="w-full h-full bg-slate-900 flex items-center justify-center text-slate-300 text-xs font-mono">🧊 3D</div>`;
-            if (iu) return `<img src="${esc(iu)}" data-raw="${esc(nft.img)}" data-gw="0" loading="lazy" alt="${esc(nft.title)}" class="${cls} bg-black">`;
+            if (iu) return `<img src="${esc(iu)}" data-raw="${esc(nft.img)}" data-gw="0" data-t="${Date.now()}" loading="lazy" alt="${esc(nft.title)}" class="${cls} bg-black">`;
             const vu = resolveMediaUrl(nft.video);
             if (vu) return `<video src="${esc(vu)}" data-raw="${esc(nft.video)}" data-gw="0" autoplay loop muted playsinline class="${cls} bg-black"></video>`;
-            if (!nft.metaLoaded) return `<div class="spinner"></div>`;
+            if (!nft.metaLoaded || (nft.metaFailed && (nft.metaTries || 0) <= 4)) return `<div class="spinner"></div>`;
             return `<div class="w-full h-full bg-slate-900 flex items-center justify-center text-slate-600 text-xs font-mono">${esc(T('noMedia'))}</div>`;
         }
+        // Pasa al siguiente gateway de la lista (si falla o tarda demasiado)
+        function advanceGateway(el) {
+            const raw = canonIpfs(el.dataset && el.dataset.raw || '');
+            const next = (+el.dataset.gw || 0) + 1;
+            if (raw.startsWith('ipfs://') && next < CONFIG.IPFS_GATEWAYS.length) { el.dataset.gw = next; el.dataset.t = Date.now(); el.src = resolveMediaUrl(raw, next); return true; }
+            return false;
+        }
+        // Vigilante: una imagen que lleva más de 7 s cargando sin éxito pasa al siguiente gateway (las imágenes no tienen tiempo límite propio)
+        setInterval(() => {
+            const now = Date.now();
+            document.querySelectorAll('img[data-raw][data-t]').forEach(el => {
+                if (el.complete && el.naturalWidth > 0) { el.removeAttribute('data-t'); return; }
+                if (now - (+el.dataset.t || now) > 7000) advanceGateway(el);
+            });
+        }, 2000);
         // Si un gateway IPFS falla, probar el siguiente
         document.addEventListener('error', e => {
             const el = e.target;
@@ -2645,7 +2770,7 @@
             const raw = el.dataset && el.dataset.raw;
             if (!raw) return;
             const next = (+el.dataset.gw || 0) + 1;
-            if (raw.startsWith('ipfs://') && next < CONFIG.IPFS_GATEWAYS.length) { el.dataset.gw = next; el.src = resolveMediaUrl(raw, next); return; }
+            if (advanceGateway(el)) return;
             const ph = document.createElement('div');
             ph.className = 'w-full h-full bg-slate-900 flex items-center justify-center text-slate-600 text-xs font-mono';
             ph.textContent = T('noMedia');
@@ -2831,7 +2956,7 @@
             });
             const mi = document.getElementById('t-market-invite'), mb = document.getElementById('t-market-invite-btn');
             if (mi) mi.textContent = T('mintInviteText'); if (mb) mb.textContent = T('mintInviteBtn');
-            const ta = document.getElementById('tab-alchemy'); if (ta) ta.textContent = T('alchemyTab');
+            const ta = document.getElementById('tab-alchemy'); if (ta) ta.textContent = '⚗ ' + T('alchemyTab');
             if (typeof renderAlchemy === 'function') { renderAlchemy(); applyAdminAlI18n(); renderAdminAlchemy(); }
             if (typeof updateMintModeUi === 'function') updateMintModeUi();
         }
@@ -3328,6 +3453,7 @@
                 case 'page': goToPage(target, id); break;
                 case 'toggle-meta': toggleMeta(); break;
                 case 'open-legal': e.preventDefault(); openLegal(); break;
+                case 'open-about': e.preventDefault(); closeLegal(); switchTab('about'); window.scrollTo({ top: 0, behavior: 'smooth' }); break;
                 case 'close-legal': closeLegal(); break;
                 case 'admin-refresh': loadAnalytics(); break;
                 case 'admin-csv': exportConnectionsCsv(); break;
@@ -4214,6 +4340,12 @@
             alViewPrize: "Смотреть NFT",
             alUnknown: "Мы проверяем доставку. Загляните снова через несколько минут."
         });
+        Object.assign(EXTRA_I18N.en, {"alOpensIn": "Opens in", "alClosesIn": "Closes in", "alDays": "Days", "alHours": "Hours", "alMins": "Min", "alSecs": "Sec"});
+        Object.assign(EXTRA_I18N.es, {"alOpensIn": "Abre en", "alClosesIn": "Cierra en", "alDays": "Días", "alHours": "Horas", "alMins": "Min", "alSecs": "Seg"});
+        Object.assign(EXTRA_I18N.ja, {"alOpensIn": "開始まで", "alClosesIn": "終了まで", "alDays": "日", "alHours": "時間", "alMins": "分", "alSecs": "秒"});
+        Object.assign(EXTRA_I18N.ko, {"alOpensIn": "시작까지", "alClosesIn": "종료까지", "alDays": "일", "alHours": "시간", "alMins": "분", "alSecs": "초"});
+        Object.assign(EXTRA_I18N.zh, {"alOpensIn": "距开放还有", "alClosesIn": "距结束还有", "alDays": "天", "alHours": "时", "alMins": "分", "alSecs": "秒"});
+        Object.assign(EXTRA_I18N.ru, {"alOpensIn": "Откроется через", "alClosesIn": "Закроется через", "alDays": "Дн.", "alHours": "Ч.", "alMins": "Мин.", "alSecs": "Сек."});
         const MINT_TAXON_KEY = 'aeterna_taxon_names_v1';
         const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{40,}|k[a-z0-9]{40,}|z[1-9A-HJ-NP-Za-km-z]{40,})$/i;
         const mintState = { doc: null, attrs: [{ k: '', v: '' }], issuerTaxons: new Map(), taxonFor: null, busy: false, last: null, probeToken: 0 };
@@ -4471,7 +4603,7 @@
 
         // ----- Página -----
         /* ===== ALCHEMY: reúne NFTs concretos y reclama una creación secreta (no se quema nada) ===== */
-        const alchemy = { enabled: false, recipes: [], progress: {}, items: new Map(), loading: false, loadedAt: 0, claiming: false, result: null };
+        const alchemy = { enabled: false, recipes: [], progress: {}, uris: {}, items: new Map(), loading: false, loadedAt: 0, claiming: false, result: null, skew: 0, retryMs: 800, lastCdReload: 0 };
         const AL_STATUS = { open: 'alStOpen', claimed: 'alStClaimed', upcoming: 'alStUpcoming', ended: 'alStEnded' };
         function updateAlchemyTab() {
             const tab = document.getElementById('tab-alchemy'); if (!tab) return;
@@ -4481,17 +4613,21 @@
         async function loadAlchemyConfig() {
             try {
                 const { res, data } = await backendFetch('/api/alchemy/config', { retry: false });
-                if (res.ok && data.success) { alchemy.enabled = !!data.enabled; alchemy.recipes = data.recipes || []; }
+                if (res.ok && data.success) {
+                    alchemy.enabled = !!data.enabled; alchemy.recipes = data.recipes || [];
+                    if (data.now) alchemy.skew = data.now - Date.now();                                  // reloj del servidor para la cuenta regresiva
+                    alchemy.recipes.forEach(r => { if (r.prizeNftId && r.prizeUri) alchemy.uris[r.prizeNftId] = r.prizeUri; });
+                }
             } catch (e) { /* sin cambios */ }
             updateAlchemyTab();
         }
-        async function refreshAlchemyProgress() {
+        async function refreshAlchemyProgress(fresh) {
             alchemy.progress = {};
             if (!connectedAccount) return;
             const acct = connectedAccount;
             try {
-                const { res, data } = await backendFetch(`/api/alchemy/progress/${encodeURIComponent(acct)}`, { retry: false });
-                if (acct === connectedAccount && res.ok && data.success) alchemy.progress = data.progress || {};
+                const { res, data } = await backendFetch(`/api/alchemy/progress/${encodeURIComponent(acct)}${fresh ? '?fresh=1' : ''}`, { retry: false });
+                if (acct === connectedAccount && res.ok && data.success) { alchemy.progress = data.progress || {}; Object.assign(alchemy.uris, data.uris || {}); }
             } catch (e) { /* sin progreso */ }
         }
         async function loadAlchemy() {
@@ -4500,18 +4636,56 @@
             try {
                 await loadAlchemyConfig();
                 if (alchemy.enabled) {
+                    await refreshAlchemyProgress();           // primero: trae las URI de los ingredientes que tiene el usuario (no dependen de nft_info)
                     const ids = [...new Set(alchemy.recipes.flatMap(r => r.ingredients.concat(r.prizeNftId ? [r.prizeNftId] : [])))];
                     await pool(ids, async id => {
-                        const info = await resolveNft(id, [connectedAccount]).catch(() => null);
-                        const it = makeItem(info || { nftokenId: id });
+                        let info = null;
+                        for (let i = 0; i < 3 && !info; i++) {   // los nodos públicos a veces fallan un instante: se reintenta
+                            info = await resolveNft(id, [connectedAccount]).catch(() => null);
+                            if (!info && i < 2) await sleep(alchemy.retryMs * (i + 1));
+                        }
+                        const it = makeItem({ ...(info || { nftokenId: id }), uri: (info && info.uri) || alchemy.uris[id] || undefined });
                         await enrichOffers(it).catch(() => {});
                         await loadMetadata(it);
                         alchemy.items.set(id, it);
-                    });
-                    await refreshAlchemyProgress();
+                    }, 3, () => renderAlchemy());
                 }
             } finally { alchemy.loading = false; alchemy.loadedAt = Date.now(); renderAlchemy(); }
         }
+        // Tras comprar o aceptar un NFT: se actualiza el progreso sin recargar la página (hasta ver el NFT en la billetera)
+        async function alchemyAfterTrade(id) {
+            if (!alchemy.enabled || !alchemy.recipes.some(r => r.ingredients.includes(id))) return;
+            for (let i = 0; i < 4; i++) {
+                await refreshAlchemyProgress(true);
+                if (Object.values(alchemy.progress).some(p => p.have.includes(id))) break;
+                await sleep(alchemy.retryMs * 3);
+            }
+            const it = nftIndex.get(id); if (it) alchemy.items.set(id, it);
+            renderAlchemy();
+        }
+        /* ----- Cuenta regresiva (apertura o cierre de la receta) ----- */
+        const alNow = () => Date.now() + alchemy.skew;
+        function alCountdownHtml(r) {
+            const upcoming = r.status === 'upcoming' && r.start, closing = r.status === 'open' && r.end;
+            if (!upcoming && !closing) return '';
+            const target = upcoming ? r.start : r.end;
+            const when = new Date(target).toLocaleString(getCurrentLang(), { dateStyle: 'medium', timeStyle: 'short' });
+            const box = (k, lbl) => `<div class="rounded-lg border border-obsidian-gold/30 bg-black/30 px-2 py-1.5 sm:px-3 text-center min-w-[3.2rem]"><div class="text-lg sm:text-xl font-semibold text-white font-ui tabular-nums" data-cd="${k}">00</div><div class="text-[9px] uppercase tracking-wider text-slate-400 font-ui">${esc(lbl)}</div></div>`;
+            return `<div class="rounded-xl border border-obsidian-gold/25 bg-gradient-to-r from-obsidian-gold/10 to-transparent p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3" data-al-cd="${esc(r.id)}" data-target="${target}">
+                <div class="min-w-0"><p class="text-xs font-ui text-obsidian-gold font-semibold uppercase tracking-wider">⏳ ${esc(T(upcoming ? 'alOpensIn' : 'alClosesIn'))}</p><p class="text-[11px] text-slate-400 font-ui">${esc(when)}</p></div>
+                <div class="flex gap-2 sm:ml-auto">${box('d', T('alDays'))}${box('h', T('alHours'))}${box('m', T('alMins'))}${box('s', T('alSecs'))}</div></div>`;
+        }
+        function alTick() {
+            if (document.hidden) return;
+            document.querySelectorAll('[data-al-cd]').forEach(el => {
+                const ms = Math.max(0, (+el.dataset.target || 0) - alNow()), s = Math.floor(ms / 1000);
+                const parts = { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
+                for (const k in parts) { const n = el.querySelector(`[data-cd="${k}"]`); if (n) n.textContent = k === 'd' ? String(parts.d) : String(parts[k]).padStart(2, '0'); }
+                if (ms === 0 && Date.now() - alchemy.lastCdReload > 8000) { alchemy.lastCdReload = Date.now(); setTimeout(() => loadAlchemy(), 1200); }   // llegó la hora: recargar el estado
+            });
+        }
+        setInterval(alTick, 1000);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && currentTab === 'alchemy' && alchemy.enabled && Date.now() - alchemy.loadedAt > 60000) loadAlchemy(); });
         function alIngredientHtml(id, prog) {
             const it = alchemy.items.get(id) || { nftokenId: id, title: short(id, 8, 6), metaLoaded: false };
             const used = !!(prog && prog.used.includes(id)), have = !!(prog && prog.have.includes(id));
@@ -4554,6 +4728,7 @@
                     <div class="min-w-0"><h3 class="text-lg text-white font-medium break-words">${esc(r.name)}</h3>${r.teaser ? `<p class="text-xs text-slate-400 mt-0.5 break-words">${esc(r.teaser)}</p>` : ''}</div>
                     <div class="flex items-center gap-2 flex-shrink-0"><span class="text-[10px] font-ui uppercase tracking-wider border rounded px-2 py-0.5 ${chipCls}">${esc(T(AL_STATUS[r.status] || 'alStOpen'))}</span>
                     ${connectedAccount && prog && r.status === 'open' ? `<span class="text-[10px] font-ui text-slate-400">${esc(T('alProgress', { n: have, t: total }))}</span>` : ''}</div></div>
+                ${alCountdownHtml(r)}
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
                     <div class="lg:col-span-2 space-y-2"><h4 class="text-[10px] font-ui uppercase tracking-[0.18em] text-slate-400">${esc(T('alIngredients'))}</h4>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">${r.ingredients.map(id => alIngredientHtml(id, prog)).join('')}</div></div>
@@ -4572,6 +4747,7 @@
                 <button type="button" data-action="al-dismiss" class="bg-obsidian-border hover:bg-slate-800 text-slate-200 px-4 py-2.5 rounded-lg text-xs font-ui transition">${esc(T('cancel'))}</button></div></div>` : '';
             if (alchemy.loading && !alchemy.recipes.length) { box.innerHTML = '<div class="flex justify-center py-12"><div class="spinner"></div></div>'; return; }
             box.innerHTML = alchemy.recipes.length ? alchemy.recipes.map(alRecipeHtml).join('') : emptyBox(T('alNone'));
+            alTick();
         }
         function pollAlchemyClaim(id) {
             return (async () => {

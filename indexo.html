@@ -32,13 +32,17 @@
         .al-mystery { width: 4.5rem; height: 4.5rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: #D4AF37; background: radial-gradient(circle at 35% 30%, rgba(212,175,55,.28), rgba(212,175,55,.04) 70%); border: 1px solid rgba(212,175,55,.45); box-shadow: 0 0 28px rgba(212,175,55,.18); animation: alPulse 3.2s ease-in-out infinite; }
         @keyframes alPulse { 0%, 100% { box-shadow: 0 0 18px rgba(212,175,55,.12); transform: scale(1); } 50% { box-shadow: 0 0 34px rgba(212,175,55,.32); transform: scale(1.04); } }
         @media (prefers-reduced-motion: reduce) { .al-mystery { animation: none; } }
-        /* Menú principal: cada sección con su color (el activo se rellena y brilla) */
-        .nav-btn { --c: 212,175,55; flex-shrink: 0; padding: .5rem .85rem; border-radius: .65rem; border: 1px solid rgba(var(--c), .4); background: rgba(var(--c), .10); color: rgb(var(--c)); font-weight: 600; letter-spacing: .01em; white-space: nowrap; transition: background .2s, border-color .2s, box-shadow .2s, color .2s, transform .2s; }
-        .nav-btn:hover { background: rgba(var(--c), .22); border-color: rgba(var(--c), .8); color: #fff; transform: translateY(-1px); }
-        .nav-btn.nav-active { background: rgba(var(--c), .30); border-width: 1px; border-color: rgb(var(--c)); color: #fff; font-weight: 700; box-shadow: 0 0 16px rgba(var(--c), .32), inset 0 -2px 0 rgb(var(--c)); }
-        .nav-store { --c: 212,175,55; } .nav-market { --c: 56,189,248; } .nav-mint { --c: 167,139,250; } .nav-holdings { --c: 45,212,191; } .nav-admin { --c: 251,113,133; }
-        .nav-alchemy { --c: 52,211,153; background: linear-gradient(135deg, rgba(16,185,129,.42), rgba(52,211,153,.14)); border-color: rgba(52,211,153,.85); color: #d1fae5; font-weight: 700; box-shadow: 0 0 14px rgba(52,211,153,.3); animation: alGlow 3s ease-in-out infinite; }
-        @keyframes alGlow { 0%, 100% { box-shadow: 0 0 10px rgba(52,211,153,.22); } 50% { box-shadow: 0 0 22px rgba(52,211,153,.55); } }
+        /* Menú principal: cada sección con su color. Inactivo = cristal tintado; activo = relleno degradado con halo */
+        .nav-btn { --c: 250,204,21; --a1: 250,204,21; --a2: 234,179,8; --t: #fef08a; --ta: #2b2000; flex-shrink: 0; padding: .5rem .95rem; border-radius: .7rem; border: 1px solid rgba(var(--c), .75); background: linear-gradient(180deg, rgba(var(--c), .30), rgba(var(--c), .12)); color: var(--t); font-weight: 600; letter-spacing: .02em; white-space: nowrap; box-shadow: inset 0 1px 0 rgba(255,255,255,.07); transition: background .2s, border-color .2s, box-shadow .2s, color .2s, transform .2s; }
+        .nav-btn:hover { background: linear-gradient(180deg, rgba(var(--c), .46), rgba(var(--c), .20)); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(var(--c), .26), inset 0 1px 0 rgba(255,255,255,.1); }
+        .nav-btn.nav-active { background: linear-gradient(180deg, rgb(var(--a1)), rgb(var(--a2))); border-color: rgb(var(--a1)); color: var(--ta); font-weight: 700; box-shadow: 0 6px 20px rgba(var(--c), .38), 0 0 0 3px rgba(var(--c), .18); }
+        .nav-store { --c: 250,204,21; --a1: 250,204,21; --a2: 234,179,8; --t: #fef08a; --ta: #2b2000; }
+        .nav-market { --c: 239,68,68; --a1: 220,38,38; --a2: 185,28,28; --t: #fecaca; --ta: #ffffff; }
+        .nav-mint { --c: 217,70,239; --a1: 192,38,211; --a2: 134,25,143; --t: #f5d0fe; --ta: #ffffff; }
+        .nav-holdings { --c: 59,130,246; --a1: 37,99,235; --a2: 29,78,216; --t: #bfdbfe; --ta: #ffffff; }
+        .nav-admin { --c: 45,212,191; --a1: 94,234,212; --a2: 20,184,166; --t: #ccfbf1; --ta: #042f2e; }
+        .nav-alchemy { --c: 163,230,53; --a1: 190,242,100; --a2: 132,204,22; --t: #ecfccb; --ta: #14290a; background: linear-gradient(180deg, rgba(var(--c), .42), rgba(var(--c), .16)); animation: alGlow 3s ease-in-out infinite; }
+        @keyframes alGlow { 0%, 100% { box-shadow: 0 0 10px rgba(163,230,53,.22), inset 0 1px 0 rgba(255,255,255,.08); } 50% { box-shadow: 0 0 22px rgba(163,230,53,.55), inset 0 1px 0 rgba(255,255,255,.08); } }
         .al-art { animation: alFloat 6s ease-in-out infinite; filter: drop-shadow(0 8px 18px rgba(0,0,0,.45)); }
         @keyframes alFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         @media (prefers-reduced-motion: reduce) { .nav-alchemy, .al-art { animation: none; } .nav-btn { transition: none; } }
@@ -619,6 +623,7 @@
                     <button id="btn-media-img" onclick="switchDetailMedia('image')" class="px-2.5 py-1 text-[10px] font-mono rounded text-slate-300 hover:text-white">🖼️ Image</button>
                 </div>
                 <div id="detail-container-media" class="w-full h-full min-h-[280px] flex items-center justify-center overflow-hidden"></div>
+                <div id="detail-media-diag" class="hidden absolute inset-x-3 bottom-3 z-10 rounded-lg border border-amber-500/30 bg-amber-950/90 px-3 py-2.5 text-[11px] leading-relaxed text-amber-100 space-y-1.5" aria-live="polite"></div>
             </div>
             <div class="md:w-1/2 p-6 flex flex-col justify-between space-y-4 overflow-y-auto font-mono text-xs">
                 <div class="space-y-4">
@@ -1186,7 +1191,7 @@
             WALLETCONNECT_SDK: 'https://cdn.jsdelivr.net/npm/@walletconnect/sign-client@2.23.10/dist/index.umd.js',
             QR_LIB: 'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js',
             // Orbitor (ChainSafe) es un gateway público y gratuito de IPFS. El gateway de Pinata queda solo como último recurso.
-            IPFS_GATEWAYS: ['https://ipfs.orbitor.dev/ipfs/', 'https://latam.orbitor.dev/ipfs/', 'https://w3s.link/ipfs/', 'https://4everland.io/ipfs/', 'https://ipfs.filebase.io/ipfs/', 'https://ipfs.io/ipfs/', 'https://dweb.link/ipfs/']
+            IPFS_GATEWAYS: ['https://ipfs.orbitor.dev/ipfs/', 'https://latam.orbitor.dev/ipfs/', 'https://w3s.link/ipfs/', 'https://4everland.io/ipfs/', 'https://ipfs.filebase.io/ipfs/']
         };
         const NETWORKS = {
             mainnet: { rpc: ['https://xrplcluster.com', 'https://s1.ripple.com:51234', 'https://s2.ripple.com:51234'], explorer: 'https://livenet.xrpl.org' },
@@ -1768,36 +1773,41 @@
             add(id, data) { const m = this.all(); m[id] = { ...(m[id] || {}), ...data, ts: Date.now() }; saveJson(this.key, m); },
             category(id) { const e = this.all()[id]; return e && e.category; }
         };
+        const metaFailKind = new Map();     // uri -> 'notfound' | 'invalid' | 'network' (último fallo)
         async function fetchMetadataDoc(uri) {
             const canon = canonIpfs(uri);
             const gwCount = canon.startsWith('ipfs://') ? CONFIG.IPFS_GATEWAYS.length : 1;
             const one = async g => {
                 const url = resolveMediaUrl(canon, g);
-                if (!url) return null;
+                if (!url) return { kind: 'error' };
                 try {
                     const res = await fetchT(url, {}, 9000);
-                    if (!res.ok) return null;
+                    if (res.status === 404) return { kind: 'notfound' };        // el gateway respondió: ese archivo no existe en ese directorio
+                    if (!res.ok) return { kind: 'http' };
                     const ct = (res.headers.get('content-type') || '').toLowerCase();
-                    if (ct.startsWith('image/')) { try { res.body.cancel(); } catch (e) {} return { image: uri }; }
-                    if (ct.startsWith('video/')) { try { res.body.cancel(); } catch (e) {} return { video: uri }; }
-                    if ((+res.headers.get('content-length') || 0) > 2000000) { try { res.body.cancel(); } catch (e) {} return isVideoUrl(uri) ? { video: uri } : { image: uri }; }
+                    if (ct.startsWith('image/')) { try { res.body.cancel(); } catch (e) {} return { doc: { image: uri } }; }
+                    if (ct.startsWith('video/')) { try { res.body.cancel(); } catch (e) {} return { doc: { video: uri } }; }
+                    if ((+res.headers.get('content-length') || 0) > 2000000) { try { res.body.cancel(); } catch (e) {} return { doc: isVideoUrl(uri) ? { video: uri } : { image: uri } }; }
                     const text = await res.text();
-                    try { const j = JSON.parse(text); if (j && typeof j === 'object') return j; } catch (e) {}
-                    return null;                       // respuesta que no es JSON (p. ej. una página de error del gateway)
-                } catch (e) { return null; }
+                    try { const j = JSON.parse(text); if (j && typeof j === 'object') return { doc: j }; } catch (e) {}
+                    return { kind: 'invalid' };                                  // 200 pero no es JSON (p. ej. una página de error)
+                } catch (e) { return { kind: 'error' }; }                       // red caída, tiempo agotado o CORS
             };
             // Peticiones escalonadas: si un gateway falla se pasa al siguiente de inmediato; si solo tarda (3 s) se lanza el siguiente en paralelo.
+            // Dos gateways que responden "404" son una respuesta definitiva: no se insiste con los demás.
             return new Promise(resolve => {
-                let done = false, started = 0, finished = 0, timer = null;
-                const finish = v => { if (done) return; done = true; clearTimeout(timer); resolve(v); };
+                let done = false, started = 0, finished = 0, notFound = 0, invalid = 0, timer = null;
+                const finish = (v, kind) => { if (done) return; done = true; clearTimeout(timer); if (v) metaFailKind.delete(uri); else metaFailKind.set(uri, kind || 'network'); resolve(v); };
                 const next = () => {
                     clearTimeout(timer);
                     if (done || started >= gwCount) return;
                     const g = started++;
-                    one(g).catch(() => null).then(doc => {
+                    one(g).catch(() => ({ kind: 'error' })).then(r => {
                         finished++;
-                        if (doc) return finish(doc);
-                        if (finished >= gwCount) return finish(null);
+                        if (r.doc) return finish(r.doc);
+                        if (r.kind === 'notfound') notFound++; else if (r.kind === 'invalid') invalid++;
+                        if (notFound >= 2) return finish(null, 'notfound');
+                        if (finished >= gwCount) return finish(null, notFound ? 'notfound' : invalid ? 'invalid' : 'network');
                         next();
                     });
                     if (started < gwCount) timer = setTimeout(next, 3000);
@@ -1834,22 +1844,44 @@
             it.metaRetry = false;
             it.metaPromise = (async () => {
                 const cached = metaStore[it.nftokenId];
-                if (cached && cached.uri === it.uri) { applyMetadata(it, cached.meta); it.metaFailed = false; }
+                if (cached && cached.uri === it.uri) { applyMetadata(it, cached.meta); it.metaFailed = false; it.metaMissing = false; }
                 else if (!it.uri) { applyMetadata(it, {}); if (!it.issuer) it.metaRetry = true; }          // aún no conocemos la URI: se reintentará cuando llegue
                 else {
+                    metaFailKind.delete(it.uri);
                     const doc = await fetchMetadataDoc(it.uri);
-                    if (doc) { metaStore[it.nftokenId] = { uri: it.uri, meta: doc }; saveMetaSoon(); applyMetadata(it, doc); it.metaFailed = false; }
-                    else if (isVideoUrl(it.uri)) { applyMetadata(it, { video: it.uri }); it.metaFailed = false; }
-                    else {                                                                                  // ningún gateway respondió: NO se da por definitivo
-                        applyMetadata(it, {}); it.metaFailed = true; it.metaRetry = true;
-                        it.metaTries = (it.metaTries || 0) + 1;
-                        if (it.metaTries <= 4) setTimeout(() => loadMetadata(it).then(() => scheduleRender()), 8000 * it.metaTries);
+                    if (doc) { metaStore[it.nftokenId] = { uri: it.uri, meta: doc }; saveMetaSoon(); applyMetadata(it, doc); it.metaFailed = false; it.metaMissing = false; }
+                    else if (isVideoUrl(it.uri)) { applyMetadata(it, { video: it.uri }); it.metaFailed = false; it.metaMissing = false; }
+                    else {
+                        applyMetadata(it, {});
+                        const kind = metaFailKind.get(it.uri) || 'network';
+                        it.metaKind = kind;
+                        if (kind === 'notfound' || kind === 'invalid') { it.metaMissing = true; it.metaFailed = false; }      // el archivo no existe: definitivo en esta sesión, sin reintentos automáticos
+                        else {                                                                                          // red/gateways caídos: NO se da por definitivo
+                            it.metaMissing = false; it.metaFailed = true; it.metaRetry = true;
+                            it.metaTries = (it.metaTries || 0) + 1;
+                            if (it.metaTries <= 4) setTimeout(() => loadMetadata(it).then(() => scheduleRender()), 8000 * it.metaTries);
+                        }
                     }
                 }
                 finalizeCategory(it);
                 it.metaLoaded = true;
             })().catch(e => { console.warn('[meta]', e); it.metaLoaded = true; it.metaRetry = true; finalizeCategory(it); });
             return it.metaPromise;
+        }
+        // Reintento manual (botón "Retry" del detalle)
+        async function retryMedia(id) {
+            const it = nftIndex.get(String(id).toUpperCase()); if (!it) return;
+            it.metaRetry = true; it.metaMissing = false; it.metaFailed = false; it.metaTries = 0; it.metaLoaded = false; delete metaStore[it.nftokenId];
+            renderAll(); await loadMetadata(it); renderAll();
+            if (currentActiveDetailNft && currentActiveDetailNft.nftokenId === it.nftokenId) { detailMediaKey = ''; renderDetails(it); }
+        }
+        function renderMediaDiag(nft) {
+            const box = document.getElementById('detail-media-diag'); if (!box) return;
+            const bad = nft.uri && (nft.metaMissing || (nft.metaFailed && (nft.metaTries || 0) > 4));
+            if (!bad) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+            box.classList.remove('hidden');
+            const key = nft.metaKind === 'invalid' ? 'mediaInvalid' : nft.metaKind === 'notfound' ? 'mediaMissing' : 'mediaNetwork';
+            box.innerHTML = `<p class="font-ui font-semibold">⚠ ${esc(T(key))}</p><p class="font-mono text-[10px] break-all text-amber-200/80">${esc(nft.uri)}</p><button type="button" data-action="retry-media" data-id="${esc(nft.nftokenId)}" class="underline font-ui text-amber-100 hover:text-white">${esc(T('retryLbl'))}</button>`;
         }
 
         /* =====================================================================
@@ -3103,6 +3135,7 @@
             if (nft.desc && nft.desc.trim()) { document.getElementById('detail-desc').textContent = nft.desc; descBox.classList.remove('hidden'); } else descBox.classList.add('hidden');
             renderMetaSection(nft);
             renderDetailCollection(nft);
+            renderMediaDiag(nft);
             const key = `${nft.img}|${nft.video}|${nft.metaLoaded}`;
             if (key !== detailMediaKey) {
                 detailMediaKey = key;
@@ -3222,7 +3255,7 @@
         function renderAdminPanel(nft) {
             const wrap = document.getElementById('detail-admin-wrap');
             if (!wrap) return;
-            if (!(connectedAccount && currentUserIsAdmin)) { wrap.classList.add('hidden'); return; }
+            if (!(connectedAccount && currentUserIsAdmin && (nft.metaMissing || nft.metaFailed || nft.mediaOverride))) { wrap.classList.add('hidden'); return; }   // solo si el NFT no tiene medios que mostrar (o ya tiene una dirección alternativa)
             wrap.classList.remove('hidden');
             const canEdit = walletType === 'xaman';
             document.getElementById('detail-admin-form').classList.toggle('hidden', !canEdit);
@@ -3474,6 +3507,7 @@
                 case 'coll-open': openCollectionOf(id); break;
                 case 'browse-clear': clearBrowse(target); break;
                 case 'goto-mint': switchTab('mint'); break;
+                case 'retry-media': retryMedia(id); break;
                 case 'al-claim': claimAlchemy(id); break;
                 case 'al-accept': acceptAlchemyPrize(id, el.dataset.offer, el.dataset.from); break;
                 case 'al-dismiss': alchemy.result = null; renderAlchemy(); break;
@@ -4346,6 +4380,12 @@
         Object.assign(EXTRA_I18N.ko, {"alOpensIn": "시작까지", "alClosesIn": "종료까지", "alDays": "일", "alHours": "시간", "alMins": "분", "alSecs": "초"});
         Object.assign(EXTRA_I18N.zh, {"alOpensIn": "距开放还有", "alClosesIn": "距结束还有", "alDays": "天", "alHours": "时", "alMins": "分", "alSecs": "秒"});
         Object.assign(EXTRA_I18N.ru, {"alOpensIn": "Откроется через", "alClosesIn": "Закроется через", "alDays": "Дн.", "alHours": "Ч.", "alMins": "Мин.", "alSecs": "Сек."});
+        Object.assign(EXTRA_I18N.en, {"mediaMissing": "The metadata file of this NFT was not found on IPFS. Its URI points to a file that does not exist, so no name or image can be shown.", "mediaInvalid": "The URI of this NFT does not point to a valid metadata file (it is neither JSON nor an image).", "mediaNetwork": "The IPFS gateways did not answer. Check your connection and try again.", "retryLbl": "Retry", "alMetaMissing": "Metadata not found", "mintUriUnreadable": "We could not read a metadata file at {uri}. If you mint now, the NFT will have no name or image, and the URI cannot be fixed later unless you enable \"Updatable metadata\". Mint anyway?", "mintBatchUnreadable": "{n} of {t} metadata URIs could not be read (for example {uri}). Those NFTs would have no name or image. Mint anyway?"});
+        Object.assign(EXTRA_I18N.es, {"mediaMissing": "No se encontró el archivo de metadatos de este NFT en IPFS. Su URI apunta a un archivo que no existe, por eso no se puede mostrar nombre ni imagen.", "mediaInvalid": "La URI de este NFT no apunta a un archivo de metadatos válido (no es JSON ni una imagen).", "mediaNetwork": "Los gateways de IPFS no respondieron. Revisa tu conexión e inténtalo de nuevo.", "retryLbl": "Reintentar", "alMetaMissing": "Metadatos no encontrados", "mintUriUnreadable": "No pudimos leer ningún archivo de metadatos en {uri}. Si creas el NFT ahora no tendrá nombre ni imagen, y la URI no se podrá corregir después salvo que actives \"Metadatos actualizables\". ¿Crear de todos modos?", "mintBatchUnreadable": "No se pudieron leer {n} de {t} URIs de metadatos (por ejemplo {uri}). Esos NFTs no tendrían nombre ni imagen. ¿Crear de todos modos?"});
+        Object.assign(EXTRA_I18N.ja, {"mediaMissing": "このNFTのメタデータファイルがIPFS上に見つかりません。URIが存在しないファイルを指しているため、名前も画像も表示できません。", "mediaInvalid": "このNFTのURIは有効なメタデータファイル（JSONまたは画像）を指していません。", "mediaNetwork": "IPFSゲートウェイが応答しませんでした。接続を確認して、もう一度お試しください。", "retryLbl": "再試行", "alMetaMissing": "メタデータが見つかりません", "mintUriUnreadable": "{uri} のメタデータファイルを読み取れませんでした。今ミントすると、NFTには名前も画像もなく、「更新可能なメタデータ」を有効にしない限りURIは後から修正できません。それでもミントしますか？", "mintBatchUnreadable": "{t}件中{n}件のメタデータURIを読み取れませんでした（例：{uri}）。これらのNFTには名前も画像もありません。それでもミントしますか？"});
+        Object.assign(EXTRA_I18N.ko, {"mediaMissing": "이 NFT의 메타데이터 파일을 IPFS에서 찾을 수 없습니다. URI가 존재하지 않는 파일을 가리키고 있어 이름과 이미지를 표시할 수 없습니다.", "mediaInvalid": "이 NFT의 URI가 올바른 메타데이터 파일(JSON 또는 이미지)을 가리키지 않습니다.", "mediaNetwork": "IPFS 게이트웨이가 응답하지 않았습니다. 연결을 확인하고 다시 시도하세요.", "retryLbl": "다시 시도", "alMetaMissing": "메타데이터를 찾을 수 없음", "mintUriUnreadable": "{uri}에서 메타데이터 파일을 읽을 수 없습니다. 지금 민팅하면 NFT에 이름과 이미지가 없으며, \"업데이트 가능한 메타데이터\"를 켜지 않으면 나중에 URI를 수정할 수 없습니다. 그래도 민팅하시겠습니까?", "mintBatchUnreadable": "메타데이터 URI {t}개 중 {n}개를 읽을 수 없습니다(예: {uri}). 해당 NFT에는 이름과 이미지가 없게 됩니다. 그래도 민팅하시겠습니까?"});
+        Object.assign(EXTRA_I18N.zh, {"mediaMissing": "在 IPFS 上找不到此 NFT 的元数据文件。其 URI 指向一个不存在的文件，因此无法显示名称或图片。", "mediaInvalid": "此 NFT 的 URI 没有指向有效的元数据文件（既不是 JSON 也不是图片）。", "mediaNetwork": "IPFS 网关没有响应。请检查网络后重试。", "retryLbl": "重试", "alMetaMissing": "未找到元数据", "mintUriUnreadable": "无法读取 {uri} 处的元数据文件。若现在铸造，该 NFT 将没有名称和图片，且除非启用“可更新元数据”，否则之后无法修正 URI。仍要铸造吗？", "mintBatchUnreadable": "{t} 个元数据 URI 中有 {n} 个无法读取（例如 {uri}）。这些 NFT 将没有名称和图片。仍要铸造吗？"});
+        Object.assign(EXTRA_I18N.ru, {"mediaMissing": "Файл метаданных этого NFT не найден в IPFS. Его URI указывает на несуществующий файл, поэтому имя и изображение показать нельзя.", "mediaInvalid": "URI этого NFT не указывает на корректный файл метаданных (это не JSON и не изображение).", "mediaNetwork": "Шлюзы IPFS не отвечают. Проверьте соединение и повторите попытку.", "retryLbl": "Повторить", "alMetaMissing": "Метаданные не найдены", "mintUriUnreadable": "Не удалось прочитать файл метаданных по адресу {uri}. Если создать NFT сейчас, у него не будет имени и изображения, а URI позже нельзя будет исправить, если не включить «Обновляемые метаданные». Всё равно создать?", "mintBatchUnreadable": "Не удалось прочитать {n} из {t} URI метаданных (например, {uri}). У этих NFT не будет имени и изображения. Всё равно создать?"});
         const MINT_TAXON_KEY = 'aeterna_taxon_names_v1';
         const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|b[a-z2-7]{40,}|k[a-z0-9]{40,}|z[1-9A-HJ-NP-Za-km-z]{40,})$/i;
         const mintState = { doc: null, attrs: [{ k: '', v: '' }], issuerTaxons: new Map(), taxonFor: null, busy: false, last: null, probeToken: 0 };
@@ -4701,7 +4741,7 @@
                 : `<p class="text-[10px] text-slate-500">${esc(T('alNotForSale'))}</p>`;
             return `<div class="rounded-xl border ${cls} bg-obsidian-card/70 overflow-hidden flex flex-col" data-al-ing="${esc(id)}">
                 <div class="h-28 bg-black flex items-center justify-center cursor-pointer" data-action="details" data-id="${esc(id)}">${renderCardMedia(it, 'w-full h-full object-contain')}</div>
-                <div class="p-3 space-y-1.5"><p class="text-xs text-white line-clamp-1" title="${esc(it.title)}">${esc(it.title)}</p>${badge ? `<p class="text-[10px] font-ui ${tone}">${esc(badge)}</p>` : ''}${buy}</div></div>`;
+                <div class="p-3 space-y-1.5"><p class="text-xs text-white line-clamp-1" title="${esc(it.title)}">${esc(it.title)}</p>${it.metaMissing ? `<p class="text-[10px] text-amber-300/90 font-ui">⚠ ${esc(T('alMetaMissing'))}</p>` : ''}${badge ? `<p class="text-[10px] font-ui ${tone}">${esc(badge)}</p>` : ''}${buy}</div></div>`;
         }
         function alPrizeHtml(r) {
             if (r.status === 'claimed' && r.prizeNftId) {
@@ -5006,6 +5046,12 @@
             const v = collectBatchInputs();
             if (v.error) return showToast(T(v.error, v.params), 'warning');
             if (mintState.batchOk === false && v.uris.length > 1) return showToast(T('mintBatchUnsupported'), 'warning');
+            {   // comprobar que los archivos de metadatos existen (si alguno no se puede leer, pedir confirmación)
+                showToast(T('mintChecking'), 'info');
+                const uniq = [...new Set(v.uris)], bad = [];
+                await pool(uniq, async u => { if (!(await fetchMetadataDoc(u))) bad.push(u); }, 4);
+                if (bad.length && !window.confirm(T('mintBatchUnreadable', { n: bad.length, t: uniq.length, uri: short(bad[0], 18, 10) }))) return;
+            }
             mintState.busy = true; mel('mint-submit').disabled = true;
             const acct = connectedAccount, plan = planBatches(v.uris.length), txs = [];
             const known = new Set();
@@ -5101,6 +5147,11 @@
             if (!requireWallet()) return;
             const v = collectMintInputs();
             if (v.error) return showToast(T(v.error, v.params), 'warning');
+            if (!(mintState.doc && mintState.uriChecked === v.uri)) {        // URI sin verificar: comprobar que el archivo existe antes de gastar reserva y comisión
+                showToast(T('mintChecking'), 'info');
+                const probe = await fetchMetadataDoc(v.uri);
+                if (!probe && !window.confirm(T('mintUriUnreadable', { uri: short(v.uri, 18, 10) }))) return;
+            }
             mintState.busy = true; mel('mint-submit').disabled = true; mel('mint-submit-label').textContent = T('mintMinting');
             const acct = connectedAccount;
             try {
